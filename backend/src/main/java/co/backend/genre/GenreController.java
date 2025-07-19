@@ -2,6 +2,7 @@ package co.backend.genre;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ public class GenreController {
     private final GenreService genreService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public GenreDto createGenre(@RequestBody @Valid GenreDto genreDto) {
         return genreService.createGenre(genreDto);
     }
@@ -28,6 +30,7 @@ public class GenreController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteGenre(@PathVariable Long id) {
         genreService.deleteGenre(id);
     }
