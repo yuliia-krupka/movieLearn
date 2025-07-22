@@ -3,6 +3,10 @@ import {GoogleOutlined} from "@ant-design/icons";
 import "./SignIn.css";
 
 function SignIn() {
+
+    const handleGoogleLogin = () => {
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    }
     return (
         <div className="login-container">
             <div className="logo" aria-label="логотип">
@@ -18,7 +22,7 @@ function SignIn() {
                 className="google-button"
                 icon={<GoogleOutlined/>}
                 size="large"
-                // onClick={handleGoogleLogin}
+                onClick={handleGoogleLogin}
                 aria-label="Sign in with Google"
             >
                 Sign In with Google

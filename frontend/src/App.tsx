@@ -1,11 +1,15 @@
 import SignIn from "./components/SignIn.tsx";
-
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import Account from "./components/Account.tsx";
 
 function App() {
     return (
-        <div>
-            <SignIn />
-        </div>
+        <Router>
+            <Routes>
+                <Route path="/" element={<SignIn/>}/>
+                <Route path="/account" element={<Account/>}/>
+            </Routes>
+        </Router>
     );
 }
 
