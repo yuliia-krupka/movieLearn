@@ -14,7 +14,6 @@
 .logo {
     font-family: "Krona One", sans-serif;
     font-style: normal;
-    font-size: 48px;
     font-weight: bold;
     margin-bottom: 16px;
 }
@@ -30,16 +29,29 @@
 .subtitle {
     color: #888;
     font-size: 16px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
-.google-button {
+.subtitle-2 {
+    color: #888;
+    font-size: 16px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.level-button {
     background-color: #F49E4C;
     border-color: #F49E4C;
     color: white;
-    font-size: 16px;
+    font-size: 14px;
     padding: 8px 24px;
     border-radius: 20px;
-    width: 100%;
-    max-width: 280px;
+    margin-bottom: 10px;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
 }

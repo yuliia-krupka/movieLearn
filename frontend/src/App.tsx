@@ -1,6 +1,7 @@
-import SignIn from "./components/SignIn.tsx";
+import SignIn from "./components/signIn/SignIn.tsx";
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
-import Account from "./components/Account.tsx";
+import Account from "./components/account/Account.tsx";
+import EnglishLevel from "./components/englishLevel/EnglishLevel.tsx";
 
 function App() {
     return (
@@ -8,6 +9,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<SignIn/>}/>
                 <Route path="/account" element={<Account/>}/>
+                <Route path="/level" element={<EnglishLevel/>}/>
             </Routes>
         </Router>
     );

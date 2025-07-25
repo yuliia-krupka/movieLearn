@@ -1,18 +1,20 @@
-import {Button} from "antd";
 import {GoogleOutlined} from "@ant-design/icons";
 import "./SignIn.css";
+import {Button, Typography} from 'antd';
+
+const {Title} = Typography;
 
 function SignIn() {
 
     const handleGoogleLogin = () => {
-        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+        window.location.href = "/oauth2/authorization/google";
     }
     return (
         <div className="login-container">
-            <div className="logo" aria-label="логотип">
-                <span className="logo-blue logo-part">MOVIE</span>
-                <span className="logo-orange logo-part">LEARN</span>
-            </div>
+            <Title level={1} className="logo">
+                <span className="logo-blue">MOVIE</span>
+                <span className="logo-orange">LEARN</span>
+            </Title>
 
             <div className="subtitle">
                 Study English with scripts of your favorite movies!
