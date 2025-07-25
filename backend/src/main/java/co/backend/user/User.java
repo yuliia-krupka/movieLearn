@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +21,18 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String lastName;
+    private String lastname;
     private String email;
     private String password;
 
     @Lob
-    @Column(name = "profile_pic", columnDefinition = "LONGBLOB")
-    private byte[] profilePic;
+    private byte[] photo;
 
     @Enumerated(EnumType.STRING)
     private EnglishLevel englishLevel;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "json")
     private List<String> interests = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

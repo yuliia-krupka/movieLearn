@@ -14,9 +14,9 @@ public class UserDto {
     private Long id;
     private String email;
     private String name;
-    private String lastName;
+    private String lastname;
     private EnglishLevel englishLevel;
-    private byte[] profilePic;
+    private byte[] photo;
     private Role role;
     private List<String> interests = new ArrayList<>();
 }
