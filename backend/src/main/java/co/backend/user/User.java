@@ -31,9 +31,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private EnglishLevel englishLevel;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json")
-    private List<String> interests = new ArrayList<>();
+    @Column(columnDefinition = "TEXT")
+    private String interests;
 
     @Enumerated(EnumType.STRING)
     private Role role;

@@ -4,8 +4,9 @@ import {useNavigate} from 'react-router-dom';
 import useMessage from 'antd/es/message/useMessage';
 import {type FC} from 'react';
 import "./EnglishLevel.css";
+import Logo from "../Logo.tsx";
 
-const {Title, Text} = Typography;
+const {Text} = Typography;
 
 const EnglishLevel: FC = () => {
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ const EnglishLevel: FC = () => {
                 {},
                 {withCredentials: true}
             );
-            navigate('/account');
+            navigate('/interests');
         } catch (error) {
             console.error('Failed to set level:', error);
             customMessage.error('Failed to set level. Please try again later.');
@@ -29,12 +30,9 @@ const EnglishLevel: FC = () => {
     };
 
     return (
-        <div className="login-container">
+        <div className="container">
             {contextHolder}
-            <Title level={1} className="logo">
-                <span className="logo-blue">MOVIE</span>
-                <span className="logo-orange">LEARN</span>
-            </Title>
+            <Logo/>
 
             <Text className="subtitle">Tell us your level of English</Text>
 

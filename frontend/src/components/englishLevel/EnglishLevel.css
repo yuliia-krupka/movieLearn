@@ -1,6 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Krona+One&display=swap');
-
-.login-container {
+.container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -9,21 +7,6 @@
     height: 100vh;
     max-width: 100%;
     text-align: center;
-}
-
-.logo {
-    font-family: "Krona One", sans-serif;
-    font-style: normal;
-    font-weight: bold;
-    margin-bottom: 16px;
-}
-
-.logo-blue {
-    color: #5A73DB;
-}
-
-.logo-orange {
-    color: #F49E4C;
 }
 
 .subtitle {

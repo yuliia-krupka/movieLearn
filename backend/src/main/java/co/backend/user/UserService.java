@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ public class UserService {
 
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(userMapper::toDTO)
+                .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -51,7 +50,7 @@ public class UserService {
             return userRepository.save(newUser);
         });
 
-        return userMapper.toDTO(user);
+        return userMapper.toDto(user);
     }
 
     public UserDto updateUser(OAuth2User oauth2User, UserDto userDto) {
@@ -69,11 +68,16 @@ public class UserService {
             user.setEnglishLevel(userDto.getEnglishLevel());
         }
 
-        if (userDto.getInterests() != null && !userDto.getInterests().isEmpty()) {
-            user.setInterests(userDto.getInterests());
+        if (userDto.getInterests() != null) {
+            String interestsStr = userDto.getInterests().stream()
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.joining(","));
+            user.setInterests(interestsStr);
         }
 
-        return userMapper.toDTO(userRepository.save(user));
+
+        return userMapper.toDto(userRepository.save(user));
     }
 
 
@@ -86,7 +90,7 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
 
-        return userMapper.toDTO(user);
+        return userMapper.toDto(user);
     }
 
     public void setEnglishLevel(OAuth2User oauth2User, EnglishLevel level) {
@@ -98,14 +102,12 @@ public class UserService {
     public void saveOrUpdateInterests(OAuth2User oauth2User, List<String> interestNames) {
         User user = getCurrentUserByEmail(oauth2User.getAttribute("email"));
 
-        List<String> interests = new ArrayList<>();
-        for (String interestName : interestNames) {
-            interestName = interestName.trim();
-            if (!interestName.isEmpty()) {
-                interests.add(interestName);
-            }
-        }
-        user.setInterests(interests);
+        String joined = interestNames.stream()
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.joining(","));
+
+        user.setInterests(joined);
         userRepository.save(user);
     }
 
@@ -153,7 +155,7 @@ public class UserService {
         }
     }
 
-    private User getCurrentUserByEmail(String email) {
+    public User getCurrentUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
     }

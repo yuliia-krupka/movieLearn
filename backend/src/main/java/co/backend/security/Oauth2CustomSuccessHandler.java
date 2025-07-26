@@ -1,6 +1,7 @@
 package co.backend.security;
 
 import co.backend.user.UserDto;
+import co.backend.user.UserMapper;
 import co.backend.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import java.io.IOException;
 public class Oauth2CustomSuccessHandler implements AuthenticationSuccessHandler {
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -25,8 +27,12 @@ public class Oauth2CustomSuccessHandler implements AuthenticationSuccessHandler 
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
         UserDto userDto = userService.createUserFromOAuth2(oauth2User);
 
-        if (userDto.getEnglishLevel() != null) {
+        UserDto currentUserDto = userMapper.toDto(userService.getCurrentUserByEmail(userDto.getEmail()));
+
+        if (currentUserDto.getEnglishLevel() != null && currentUserDto.getInterests() != null && !currentUserDto.getInterests().isEmpty()) {
             response.sendRedirect("http://localhost:5173/account");
+        } else if (currentUserDto.getEnglishLevel() != null) {
+            response.sendRedirect("http://localhost:5173/interests");
         } else {
             response.sendRedirect("http://localhost:5173/level");
         }
