@@ -1,9 +1,13 @@
 package co.backend.movie;
 
+import co.backend.user.User;
+import co.backend.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api/movies")
 public class MovieController {
     private final MovieService movieService;
+    private final UserService userService;
 
     @GetMapping()
     public List<MovieDto> getMovies(@RequestParam(required = false) String genre,
@@ -73,4 +78,17 @@ public class MovieController {
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(scriptData);
     }
+
+    @GetMapping("/count")
+    public int getMoviesCountByUserId(@AuthenticationPrincipal OAuth2User principal) {
+        User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
+        return movieService.getMoviesCountByUserId(user.getId());
+    }
+
+    @GetMapping("/home")
+    public List<MovieDto> getHomeMovies(@AuthenticationPrincipal OAuth2User principal) {
+        User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
+        return movieService.getMoviesByUser(user.getId());
+    }
+
 }

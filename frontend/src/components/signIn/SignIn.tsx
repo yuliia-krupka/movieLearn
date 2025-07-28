@@ -1,8 +1,7 @@
 import {GoogleOutlined} from "@ant-design/icons";
 import "./SignIn.css";
-import {Button, Typography} from 'antd';
-
-const {Title} = Typography;
+import {Button} from 'antd';
+import Logo from "../logo/Logo.tsx";
 
 function SignIn() {
 
@@ -11,11 +10,7 @@ function SignIn() {
     }
     return (
         <div className="login-container">
-            <Title level={1} className="logo">
-                <span className="logo-blue">MOVIE</span>
-                <span className="logo-orange">LEARN</span>
-            </Title>
-
+            <Logo level={1}/>
             <div className="subtitle">
                 Study English with scripts of your favorite movies!
             </div>

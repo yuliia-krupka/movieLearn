@@ -3,15 +3,19 @@ import "./Logo.css";
 
 const {Title} = Typography;
 
-const Logo = () => {
+type Props = {
+    level: 1 | 2 | 3 | 4 | 5;
+};
+
+const Logo = (props: Props) => {
     return (
         <div>
-            <Title className="logo">
+            <Title level={props.level} className="logo">
                 <span className="logo-blue logo-part">MOVIE</span>
                 <span className="logo-orange logo-part">LEARN</span>
             </Title>
         </div>
-    )
-}
+    );
+};
 
 export default Logo;

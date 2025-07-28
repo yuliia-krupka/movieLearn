@@ -11,32 +11,15 @@
     text-align: center;
 }
 
-.logo {
-    font-family: "Krona One", sans-serif;
-    font-style: normal;
-    font-weight: bold;
-    margin-bottom: 16px;
-}
-
-.logo-blue {
-    color: #5A73DB;
-}
-
-.logo-orange {
-    color: #F49E4C;
-}
-
 .subtitle {
     color: #888;
     font-size: 16px;
-    margin-bottom: 24px;
 }
 
 .google-button {
     background-color: #F49E4C;
     border-color: #F49E4C;
     color: white;
-    font-size: 16px;
     padding: 8px 24px;
     border-radius: 20px;
 }

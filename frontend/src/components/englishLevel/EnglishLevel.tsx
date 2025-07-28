@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import useMessage from 'antd/es/message/useMessage';
 import {type FC} from 'react';
 import "./EnglishLevel.css";
-import Logo from "../Logo.tsx";
+import Logo from "../logo/Logo.tsx";
 
 const {Text} = Typography;
 
@@ -32,7 +32,7 @@ const EnglishLevel: FC = () => {
     return (
         <div className="container">
             {contextHolder}
-            <Logo/>
+            <Logo level={1}/>
 
             <Text className="subtitle">Tell us your level of English</Text>
 

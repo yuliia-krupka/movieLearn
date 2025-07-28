@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import useMessage from 'antd/es/message/useMessage';
 import axios from 'axios';
 import './Interests.css';
-import Logo from "../Logo.tsx";
+import Logo from "../logo/Logo.tsx";
 
 const {Text} = Typography;
 
@@ -48,7 +48,7 @@ const Interests: React.FC = () => {
     return (
         <div className="container">
             {contextHolder}
-            <Logo/>
+            <Logo level={1}/>
             <Text className="subtitle">Tell us your interests</Text>
             <div className="buttons">
                 {interestsList.map((interest) => (
