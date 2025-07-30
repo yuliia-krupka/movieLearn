@@ -50,7 +50,7 @@ const Account = () => {
                                 src="http://localhost:8080/api/users/photo"
                                 size={80}
                             />
-                            <Title level={4} style={{marginTop: 5}}>
+                            <Title level={4} className='naming'>
                                 {user ? `${user.name} ${user.lastname}` : 'Loading...'}
                             </Title>
                         </div>
@@ -66,7 +66,7 @@ const Account = () => {
                                     <div className="interests-badges">
                                         {user?.interests?.length ? (
                                             user.interests.map((interest, idx) => (
-                                                <span key={idx} className="interest-badge">
+                                                <span key={idx} className="interest-badge-yellow">
                                                     {interest}
                                                 </span>
                                             ))

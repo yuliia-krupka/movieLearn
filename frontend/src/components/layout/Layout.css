@@ -11,3 +11,12 @@
     background-color: #fff;
     border-radius: 8px;
 }
+
+.content-movies {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    margin: 16px;
+    background-color: #fff;
+    border-radius: 8px;
+}

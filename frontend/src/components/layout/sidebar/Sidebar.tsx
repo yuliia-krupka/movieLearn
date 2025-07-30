@@ -44,6 +44,12 @@ const Sidebar: React.FC = () => {
             label: 'Account',
             onClick: () => navigate('/account'),
         },
+        {
+            key: '/new-movie',
+            icon: <VideoCameraOutlined/>,
+            label: 'New Movie',
+            onClick: () => navigate('/new-movie'),
+        }
     ];
 
     if (!screens.md) {

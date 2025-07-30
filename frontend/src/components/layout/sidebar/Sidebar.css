@@ -37,10 +37,7 @@
 
 .sidebar-menu-button {
     position: fixed;
-    top: 16px;
-    left: 16px;
     z-index: 1100;
-    font-size: 22px;
     background: none;
     border: none;
 }
