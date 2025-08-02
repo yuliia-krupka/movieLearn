@@ -118,13 +118,13 @@ public class MovieService {
         return movieMapper.toDto(movie);
     }
 
-    public List<MovieDto> getMoviesByGenre(String genreName) {
-        Genre genre = genreRepository.findByName(genreName);
-        if (genre == null) {
-            throw new NotFoundException("Genre '" + genreName + "' not found");
+    public List<MovieDto> getMoviesByGenres(List<String> genreNames) {
+        List<Genre> genres = genreRepository.findAllByNameIn(genreNames);
+        if (genres.isEmpty()) {
+            throw new NotFoundException("Genres not found");
         }
 
-        List<Movie> movies = movieRepository.findByGenresContaining(genre);
+        List<Movie> movies = movieRepository.findByGenresIn(genres);
 
         return movies.stream()
                 .map(movieMapper::toDto)

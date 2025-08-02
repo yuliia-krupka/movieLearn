@@ -2,6 +2,9 @@ package co.backend.genre;
 
 import co.backend.exceptions.DuplicateEntityException;
 import co.backend.exceptions.NotFoundException;
+import co.backend.exceptions.BadRequestException;
+import co.backend.movie.Movie;
+import co.backend.movie.MovieRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,7 @@ import java.util.stream.Collectors;
 public class GenreService {
     private final GenreRepository genreRepository;
     private final GenreMapper genreMapper;
+    private final MovieRepository movieRepository;
 
     public GenreDto createGenre(GenreDto genreDTO) {
         if (genreRepository.existsByName(genreDTO.getName())) {
@@ -46,6 +50,13 @@ public class GenreService {
         if (!genreRepository.existsById(id)) {
             throw new NotFoundException("Genre with id " + id + " not found");
         }
+
+        List<Movie> moviesGenreUsedIn = movieRepository.findAllByGenres_Id(id);
+
+        if (moviesGenreUsedIn != null && !moviesGenreUsedIn.isEmpty()) {
+            throw new BadRequestException("Cannot delete genre. It is currently used by one or more movies.");
+        }
+
         genreRepository.deleteById(id);
     }
 

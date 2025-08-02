@@ -21,12 +21,12 @@ public class MovieController {
     private final UserService userService;
 
     @GetMapping()
-    public List<MovieDto> getMovies(@RequestParam(required = false) String genre,
+    public List<MovieDto> getMovies(@RequestParam(required = false) List<String> genre,
                                     @RequestParam(required = false) String title) {
         if (title != null && !title.isBlank()) {
             return movieService.getMoviesByTitle(title);
-        } else if (genre != null && !genre.equalsIgnoreCase("all") && !genre.isBlank()) {
-            return movieService.getMoviesByGenre(genre);
+        } else if (genre != null && !genre.isEmpty()) {
+            return movieService.getMoviesByGenres(genre);
         } else {
             return movieService.getAllMovies();
         }

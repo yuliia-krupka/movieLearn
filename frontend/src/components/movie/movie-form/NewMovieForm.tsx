@@ -146,7 +146,9 @@ const CreateMovieForm: React.FC = () => {
                             <GenreSelector
                                 genres={genres}
                                 onAddGenre={() => setIsGenreModalVisible(true)}
+                                messageApi={customMessage}
                             />
+
 
                             <FileUploader
                                 label="Poster"

@@ -12,7 +12,9 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     List<Movie> findByTitleContainingIgnoreCase(String title);
 
-    List<Movie> findByGenresContaining(Genre genre);
-
     int countMoviesByUsers_Id(Long userId);
+
+    List<Movie> findByGenresIn(List<Genre> genres);
+
+    List<Movie> findAllByGenres_Id(Long id);
 }

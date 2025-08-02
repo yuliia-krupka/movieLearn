@@ -5,6 +5,7 @@ import {
 } from 'antd';
 import MovieCard from "./MovieCard";
 import {useGenres} from '../hooks/useGenres';
+import {useLocation} from 'react-router-dom';
 import axios from 'axios';
 
 const {Title} = Typography;
@@ -37,31 +38,26 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [messageApi, contextHolder] = antMessage.useMessage();
+    const location = useLocation();
 
-    const [pageSize, setPageSize] = useState<number>(8);
-
-    useEffect(() => {
-        function updatePageSize() {
-            const width = window.innerWidth;
-            if (width < 350) {
-                setPageSize(2);
-            } else if (width >= 350 && width < 768) {
-                setPageSize(6);
-            } else {
-                setPageSize(8);
-            }
-        }
-
-        updatePageSize();
-        window.addEventListener('resize', updatePageSize);
-        return () => window.removeEventListener('resize', updatePageSize);
-    }, []);
+    const searchParams = new URLSearchParams(location.search);
+    const searchQuery = searchParams.get('search');
 
     useEffect(() => {
         async function fetchMovies() {
             setLoading(true);
             try {
-                const response = await axios.get(apiEndpoint, {withCredentials: true});
+                const params = new URLSearchParams();
+
+                if (searchQuery && searchQuery.trim()) {
+                    params.append('title', searchQuery.trim());
+                } else if (selectedGenres.length > 0) {
+                    params.append('genre', selectedGenres.join(','));
+                }
+
+                const url = params.toString() ? `${apiEndpoint}?${params.toString()}` : apiEndpoint;
+
+                const response = await axios.get(url, {withCredentials: true});
                 setMovies(response.data);
             } catch (err) {
                 console.error(err);
@@ -71,16 +67,18 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
             }
         }
 
-        fetchMovies().catch(err => {
-            console.error('Unhandled error in fetchMovies:', err);
-        });
-    }, [apiEndpoint, messageApi]);
+        fetchMovies().catch(console.error);
+    }, [apiEndpoint, messageApi, searchQuery, selectedGenres]);
 
-    const filteredMovies = selectedGenres.length === 0
-        ? movies
-        : movies.filter(movie =>
-            selectedGenres.some(genre => movie.genres.includes(genre))
-        );
+    const filteredMovies = searchQuery ? movies : (
+        selectedGenres.length === 0
+            ? movies
+            : movies.filter(movie =>
+                selectedGenres.some(genre => movie.genres.includes(genre))
+            )
+    );
+
+    const pageSize = 8;
 
     const currentMovies = filteredMovies.slice(
         (currentPage - 1) * pageSize,
@@ -89,7 +87,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [selectedGenres, pageSize]);
+    }, [selectedGenres, searchQuery]);
 
     const isLoading = loading || (showGenreFilter && genresLoading);
 
@@ -98,9 +96,11 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
             {contextHolder}
             <Row justify="space-between" align="middle" className="title-row">
                 <Col>
-                    <Title level={5} className="subtitle">{title}</Title>
+                    <Title level={5} className="subtitle">
+                        {searchQuery ? `Search results for: "${searchQuery}"` : title}
+                    </Title>
                 </Col>
-                {showGenreFilter && (
+                {showGenreFilter && !searchQuery && (
                     <Col>
                         <Space>
                             <Select
@@ -127,9 +127,11 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
             ) : filteredMovies.length === 0 ? (
                 <div style={{display: 'flex', justifyContent: 'center', padding: '50px 0'}}>
                     <Empty description={
-                        selectedGenres.length > 0
-                            ? "No movies match the selected genres"
-                            : emptyMessage
+                        searchQuery
+                            ? `No movies found for "${searchQuery}"`
+                            : selectedGenres.length > 0
+                                ? "No movies match the selected genres"
+                                : emptyMessage
                     }/>
                 </div>
             ) : (
@@ -138,15 +140,15 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                         {currentMovies.map(movie => (
                             <Col
                                 key={movie.id}
-                                xs={24}  // 1 картка на ряд (24/24)
-                                sm={12}  // 1 картка на ряд (24/24)
-                                md={12}  // 2 картки на ряд (12/24)
-                                lg={6}  // 2 картки на ряд (12/24)
-                                xl={6}   // 4 картки на ряд (6/24)
-                                xxl={6}  // 4 картки на ряд (6/24)
+                                xs={24}
+                                sm={12}
+                                md={12}
+                                lg={6}
+                                xl={6}
+                                xxl={6}
                                 style={{display: 'flex', justifyContent: 'center'}}
                             >
-                                <MovieCard movie={movie}/>
+                                <MovieCard movie={movie} />
                             </Col>
                         ))}
                     </Row>
@@ -159,9 +161,6 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                         showSizeChanger={false}
                         showQuickJumper={false}
                         responsive={true}
-                        showTotal={(total, range) =>
-                            `${range[0]}-${range[1]} of ${total} movies`
-                        }
                         style={{textAlign: 'center', margin: '16px 0'}}
                     />
                 </>
