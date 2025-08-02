@@ -48,6 +48,12 @@ const SidebarDrawer: React.FC<Props> = ({open, onClose}) => {
                 onClose();
             },
         },
+        {
+            key: '/new-movie',
+            icon: <VideoCameraOutlined/>,
+            label: 'New Movie',
+            onClick: () => navigate('/new-movie'),
+        }
     ];
 
     const handleLogout = () => {

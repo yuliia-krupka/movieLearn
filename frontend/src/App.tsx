@@ -5,8 +5,9 @@ import EnglishLevel from "./components/englishLevel/EnglishLevel.tsx";
 import Interests from "./components/interests/Interests.tsx";
 import UpdateAccount from "./components/account/UpdateAccount.tsx";
 import MoviesList from "./components/movie/MoviesList.tsx";
-import NewMovieForm from "./components/movie/NewMovieForm.tsx";
+import NewMovieForm from "./components/movie/movie-form/NewMovieForm.tsx";
 import Movie from "./components/movie/Movie.tsx";
+import Home from "./components/movie/Home.tsx";
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                 <Route path="/level" element={<EnglishLevel/>}/>
                 <Route path="/interests" element={<Interests/>}/>
                 <Route path="/movies" element={<MoviesList/>}/>
+                <Route path="/home" element={<Home/>}/>
                 <Route path="/new-movie" element={<NewMovieForm/>}/>
                 <Route path="/movies/:id" element={<Movie/>}/>
             </Routes>
