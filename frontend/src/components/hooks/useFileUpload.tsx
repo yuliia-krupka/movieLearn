@@ -27,7 +27,7 @@ export const useFileUpload = (errorMessage: string) => {
             reader.readAsDataURL(file);
         }
 
-        return false; // Prevent default upload
+        return false;
     };
 
     const handleFileRemove = (): void => {

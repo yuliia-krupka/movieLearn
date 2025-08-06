@@ -461,3 +461,24 @@
     justify-content: center !important;
     margin: 5px 0 !important;
 }
+
+.update-movie-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 120px);
+    padding: 24px;
+}
+
+.update-movie-card {
+    width: 100%;
+    max-width: 700px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.update-movie-title {
+    text-align: center;
+    margin-bottom: 20px;
+}

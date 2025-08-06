@@ -24,6 +24,16 @@ const MovieDetails: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [message, contextHolder] = antMessage.useMessage();
 
+    const handleDelete = () => {
+        axios.delete(`/api/movies/${id}`)
+            .then(() => navigate('/movies'))
+            .catch(error => {
+                console.error('Error deleting movie:', error);
+                message.error('Error deleting movie');
+            });
+    };
+
+
     useEffect(() => {
         if (!id) {
             message.error('Invalid movie ID');
@@ -104,6 +114,17 @@ const MovieDetails: React.FC = () => {
                                         Vocabulary Test
                                     </Button>
                                 </div>
+
+                                <div className="movie-actions">
+                                    <Button className="yellow-btn" onClick={() => navigate(`/movies/${id}/update`)}>
+                                        Edit
+                                    </Button>
+                                    <Button className="yellow-btn" onClick={handleDelete}>
+                                        Delete
+                                    </Button>
+                                </div>
+
+
                             </div>
                         </Col>
                     </Row>

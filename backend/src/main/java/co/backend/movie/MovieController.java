@@ -54,7 +54,7 @@ public class MovieController {
 
     @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
     public MovieDto updateMovie(@PathVariable Long id,
-                                @RequestPart(value = "movieData", required = false) MovieDto movieDto,
+                                @RequestPart("movieData") MovieDto movieDto,
                                 @RequestPart(value = "image", required = false) MultipartFile image,
                                 @RequestPart(value = "script", required = false) MultipartFile script) {
         return movieService.updateMovie(id, movieDto, image, script);

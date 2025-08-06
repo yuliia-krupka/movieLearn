@@ -107,7 +107,7 @@ public class MovieService {
                         .map(String::trim)
                         .map(genreRepository::findByName)
                         .filter(Objects::nonNull)
-                        .toList();
+                        .collect(Collectors.toList());
                 movie.setGenres(genreList);
             }
         }

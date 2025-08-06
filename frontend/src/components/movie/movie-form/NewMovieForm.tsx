@@ -12,7 +12,7 @@ import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import {useGenres} from '../../hooks/useGenres.tsx';
-import {useFileUpload} from '../../hooks/useFileUpliad.tsx';
+import {useFileUpload} from '../../hooks/useFileUpload.tsx';
 import {type MovieFormData, type NewGenreData} from './types.tsx';
 import GenreSelector from './GenreSelector';
 import FileUploader from './FileUploader';

@@ -8,6 +8,7 @@ import MoviesList from "./components/movie/MoviesList.tsx";
 import NewMovieForm from "./components/movie/movie-form/NewMovieForm.tsx";
 import Movie from "./components/movie/Movie.tsx";
 import Home from "./components/movie/Home.tsx";
+import UpdateMovieForm from "./components/movie/movie-form/UpdateMovieForm.tsx";
 
 function App() {
     return (
@@ -22,6 +23,7 @@ function App() {
                 <Route path="/home" element={<Home/>}/>
                 <Route path="/new-movie" element={<NewMovieForm/>}/>
                 <Route path="/movies/:id" element={<Movie/>}/>
+                <Route path="/movies/:id/update" element={<UpdateMovieForm/>}/>
             </Routes>
         </Router>
     );
