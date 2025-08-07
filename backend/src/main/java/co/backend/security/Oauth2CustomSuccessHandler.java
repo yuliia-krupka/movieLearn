@@ -30,7 +30,7 @@ public class Oauth2CustomSuccessHandler implements AuthenticationSuccessHandler 
         UserDto currentUserDto = userMapper.toDto(userService.getCurrentUserByEmail(userDto.getEmail()));
 
         if (currentUserDto.getEnglishLevel() != null && currentUserDto.getInterests() != null && !currentUserDto.getInterests().isEmpty()) {
-            response.sendRedirect("http://localhost:5173/account");
+            response.sendRedirect("http://localhost:5173/home");
         } else if (currentUserDto.getEnglishLevel() != null) {
             response.sendRedirect("http://localhost:5173/interests");
         } else {

@@ -38,24 +38,24 @@ export const useGenres = () => {
             return true;
         } catch (err: unknown) {
             console.error('Failed to add genre:', err);
-
-            let errorMessage = 'Error adding genre';
-            if (axios.isAxiosError(err)) {
-                if (err.response?.status === 409) {
-                    errorMessage = 'Genre with this name already exists';
-                } else if (err.response?.data?.message) {
-                    errorMessage = err.response.data.message;
-                }
-            }
-
-            customMessage.error(errorMessage);
-            return false;
+            // Don't show message here, let the calling component handle it
+            throw err; // Re-throw the error so the calling component can handle it
         }
+    };
+
+    const updateGenre = async (id: number, data: { name: string }) => {
+        await axios.put(`/api/genres/${id}`, data, { withCredentials: true });
+        await fetchGenres();
+    };
+
+    const deleteGenre = async (id: number) => {
+        await axios.delete(`/api/genres/${id}`, { withCredentials: true });
+        await fetchGenres();
     };
 
     useEffect(() => {
         fetchGenres();
     }, []);
 
-    return { genres, loading, addGenre };
+    return { genres, loading, addGenre, updateGenre, deleteGenre, fetchGenres };
 };

@@ -51,17 +51,20 @@ const UpdateMovieForm: React.FC = () => {
     const [movie, setMovie] = useState<Movie | null>(null);
     const [submitting, setSubmitting] = useState<boolean>(false);
     const [addGenreModalVisible, setAddGenreModalVisible] = useState<boolean>(false);
+    const [addingGenre, setAddingGenre] = useState<boolean>(false);
     const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
-    const [currentScriptInfo, setCurrentScriptInfo] = useState<{ name: string, size: string } | null>(null);
+    const [currentScriptInfo, setCurrentScriptInfo] = useState<{name: string, size: string} | null>(null);
     const navigate = useNavigate();
     const [message, contextHolder] = antMessage.useMessage();
     const {id} = useParams<{ id: string }>();
 
+    // Use custom hooks
     const {genres, loading: genresLoading, addGenre} = useGenres();
 
     const imageUpload = useFileUpload('Please select an image file');
     const scriptUpload = useFileUpload('Please select a script file');
 
+    // Move useForm here to ensure it's only called when Form is rendered
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -256,10 +259,30 @@ const UpdateMovieForm: React.FC = () => {
         setAddGenreModalVisible(true);
     };
 
-    const handleAddGenreSubmit = async (genreData: { name: string }) => {
-        const success = await addGenre(genreData);
-        if (success) {
-            setAddGenreModalVisible(false);
+    const handleAddGenreSubmit = async (genreData: { name: string }): Promise<void> => {
+        setAddingGenre(true);
+        try {
+            const success = await addGenre(genreData);
+            if (success) {
+                setAddGenreModalVisible(false);
+            }
+        } catch (error: unknown) {
+            console.error('Error adding genre:', error);
+
+            // Handle duplicate genre error specifically
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 409) {
+                    message.error(`Genre '${genreData.name}' already exists`);
+                } else if (error.response?.data?.message) {
+                    message.error(error.response.data.message);
+                } else {
+                    message.error('Failed to add genre');
+                }
+            } else {
+                message.error('Failed to add genre');
+            }
+        } finally {
+            setAddingGenre(false);
         }
     };
 
@@ -275,7 +298,7 @@ const UpdateMovieForm: React.FC = () => {
                     </Title>
                     <div className="update-movie-container">
                         <Card className="update-movie-card">
-                        <Form
+                            <Form
                                 form={form}
                                 layout="vertical"
                                 onFinish={handleSubmit}
@@ -502,14 +525,14 @@ const UpdateMovieForm: React.FC = () => {
 
                     <AddGenreModal
                         visible={addGenreModalVisible}
-                        loading={genresLoading}
+                        loading={addingGenre}
                         onCancel={() => setAddGenreModalVisible(false)}
                         onSubmit={handleAddGenreSubmit}
                     />
+
                 </Content>
             </Layout>
         </Layout>
-
     );
 };
 

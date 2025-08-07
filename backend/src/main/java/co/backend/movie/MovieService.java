@@ -45,6 +45,14 @@ public class MovieService {
     }
 
     public MovieDto createMovie(MovieDto movieDto, MultipartFile image, MultipartFile script) {
+
+        if (movieDto.getTitle() == null || movieDto.getTitle().isBlank()) {
+            throw new DuplicateEntityException("Movie title cannot be empty");
+        }
+        if (movieRepository.existsByTitle(movieDto.getTitle())) {
+            throw new DuplicateEntityException("Movie with title '" + movieDto.getTitle() + "' already exists");
+        }
+
         Movie movie = new Movie();
         movie.setTitle(movieDto.getTitle());
         movie.setDescription(movieDto.getDescription());
