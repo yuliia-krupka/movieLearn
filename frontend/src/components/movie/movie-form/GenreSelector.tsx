@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Form, Select, Button, Popconfirm, Input, Modal} from 'antd';
 import {PlusOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
-import {type Genre} from './types.tsx';
+import {type Genre} from '../../types/movies.ts';
 import axios from 'axios';
 import type useMessage from "antd/es/message/useMessage";
 

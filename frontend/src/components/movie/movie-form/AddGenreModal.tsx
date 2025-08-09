@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Form, Input, Button, Space } from 'antd';
-import {type NewGenreData } from './types.tsx';
+import {type NewGenreData } from '../../types/movies.ts';
 
 interface AddGenreModalProps {
     visible: boolean;

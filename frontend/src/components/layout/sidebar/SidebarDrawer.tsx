@@ -1,60 +1,26 @@
 import React from "react";
-import {Button, Drawer, Menu, Typography} from "antd";
+import {Button, Drawer, Menu, Typography, message as antMessage} from "antd";
 import {
     CloseOutlined,
     LogoutOutlined,
-    HomeOutlined,
-    VideoCameraOutlined,
-    UserOutlined,
 } from "@ant-design/icons";
 import {useNavigate, useLocation} from "react-router-dom";
+import {getMenuItems} from "./Menu.tsx";
 
 const {Title} = Typography;
 
 type Props = {
     open: boolean;
     onClose: () => void;
+    isAdmin: boolean;
+    messageApi: ReturnType<typeof antMessage.useMessage>[0];
 };
 
-const SidebarDrawer: React.FC<Props> = ({open, onClose}) => {
+const SidebarDrawer: React.FC<Props> = ({open, onClose, isAdmin, messageApi}) => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const items = [
-        {
-            key: '/home',
-            icon: <HomeOutlined/>,
-            label: 'Home',
-            onClick: () => {
-                navigate('/home');
-                onClose();
-            },
-        },
-        {
-            key: '/movies',
-            icon: <VideoCameraOutlined/>,
-            label: 'Movies List',
-            onClick: () => {
-                navigate('/movies');
-                onClose();
-            },
-        },
-        {
-            key: '/account',
-            icon: <UserOutlined/>,
-            label: 'Account',
-            onClick: () => {
-                navigate('/account');
-                onClose();
-            },
-        },
-        {
-            key: '/new-movie',
-            icon: <VideoCameraOutlined/>,
-            label: 'New Movie',
-            onClick: () => navigate('/new-movie'),
-        }
-    ];
+    const items = getMenuItems(navigate, isAdmin, (msg: string) => messageApi.error(msg), onClose);
 
     const handleLogout = () => {
         window.location.href = "http://localhost:8080/logout";
@@ -66,11 +32,6 @@ const SidebarDrawer: React.FC<Props> = ({open, onClose}) => {
             open={open}
             onClose={onClose}
             closable={false}
-            width={200}
-            styles={{
-                body: {padding: 0},
-                mask: {backgroundColor: "rgba(0, 0, 0, 0.5)"}
-            }}
         >
             <div className="drawer-content">
                 <div>
@@ -88,11 +49,7 @@ const SidebarDrawer: React.FC<Props> = ({open, onClose}) => {
                     </div>
 
                     <div className="drawer-menu-container">
-                        <Menu
-                            mode="vertical"
-                            selectedKeys={[location.pathname]}
-                            items={items}
-                        />
+                        <Menu mode="vertical" selectedKeys={[location.pathname]} items={items}/>
                     </div>
                 </div>
 

@@ -9,25 +9,79 @@ import NewMovieForm from "./components/movie/movie-form/NewMovieForm.tsx";
 import Movie from "./components/movie/Movie.tsx";
 import Home from "./components/movie/Home.tsx";
 import UpdateMovieForm from "./components/movie/movie-form/UpdateMovieForm.tsx";
+import {AuthProvider} from "./components/auth/AuthProvider.tsx";
+import {ProtectedRoute} from "./components/auth/ProtectedRoute.tsx";
 
 function App() {
     return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<SignIn/>}/>
-                <Route path="/account" element={<Account/>}/>
-                <Route path="/account/update" element={<UpdateAccount/>}/>
-                <Route path="/level" element={<EnglishLevel/>}/>
-                <Route path="/interests" element={<Interests/>}/>
-                <Route path="/movies" element={<MoviesList/>}/>
-                <Route path="/home" element={<Home/>}/>
-                <Route path="/new-movie" element={<NewMovieForm/>}/>
-                <Route path="/movies/:id" element={<Movie/>}/>
-                <Route path="/movies/:id/update" element={<UpdateMovieForm/>}/>
-            </Routes>
-        </Router>
+        <AuthProvider>
+            <Router>
+                <Routes>
+                    <Route path="/" element={<SignIn/>}/>
+                    <Route path="/level" element={<EnglishLevel/>}/>
+                    <Route path="/interests" element={<Interests/>}/>
+
+                    <Route
+                        path="/account"
+                        element={
+                            <ProtectedRoute requireAuth={true}>
+                                <Account/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/account/update"
+                        element={
+                            <ProtectedRoute requireAuth={true}>
+                                <UpdateAccount/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/movies"
+                        element={
+                            <ProtectedRoute requireAuth={true}>
+                                <MoviesList/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/home"
+                        element={
+                            <ProtectedRoute requireAuth={true}>
+                                <Home/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/movies/:id"
+                        element={
+                            <ProtectedRoute requireAuth={true}>
+                                <Movie/>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/new-movie"
+                        element={
+                            <ProtectedRoute requireAdmin requireAuth={true}>
+                                <NewMovieForm/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/movies/:id/update"
+                        element={
+                            <ProtectedRoute requireAdmin requireAuth={true}>
+                                <UpdateMovieForm/>
+                            </ProtectedRoute>
+                        }
+                    />
+                </Routes>
+            </Router>
+        </AuthProvider>
     );
 }
 
-
-export default App
+export default App;

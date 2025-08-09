@@ -4,6 +4,7 @@ import {Spin, Button, Layout, Row, Col, message as antMessage} from 'antd';
 import axios from "axios";
 import Sidebar from "../layout/sidebar/Sidebar.tsx";
 import TopBar from "../layout/topbar/TopBar.tsx";
+import {useAuth} from '../auth/useAuth';
 import './movies.css';
 import '../layout/Layout.css';
 
@@ -21,35 +22,43 @@ const MovieDetails: React.FC = () => {
     const {id} = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [movie, setMovie] = useState<Movie | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [isAdded, setIsAdded] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [message, contextHolder] = antMessage.useMessage();
+    const {isAdmin} = useAuth();
 
-    const handleDelete = () => {
-        axios.delete(`/api/movies/${id}`)
-            .then(() => navigate('/movies'))
-            .catch(error => {
-                console.error('Error deleting movie:', error);
-                message.error('Error deleting movie');
-            });
-    };
+    useEffect(() => {
+        if (errorMsg) {
+            message.error(errorMsg);
+            setErrorMsg(null);
+        }
+    }, [errorMsg, message]);
 
+    useEffect(() => {
+        if (successMsg) {
+            message.success(successMsg);
+            setSuccessMsg(null);
+        }
+    }, [successMsg, message]);
 
     useEffect(() => {
         if (!id) {
-            message.error('Invalid movie ID');
+            setErrorMsg('Invalid movie ID');
             navigate('/movies');
             return;
         }
 
         const fetchMovie = async () => {
+            setLoading(true);
             try {
                 const response = await axios.get(`/api/movies/${id}`, {
                     withCredentials: true,
                 });
                 setMovie(response.data);
-            } catch (error) {
-                message.error('Error fetching movie');
-                console.error('Fetch error:', error);
+            } catch {
+                setErrorMsg('Error fetching movie');
                 navigate('/movies');
             } finally {
                 setLoading(false);
@@ -57,7 +66,32 @@ const MovieDetails: React.FC = () => {
         };
 
         fetchMovie();
-    }, [id, navigate, message]);
+    }, [id, navigate]);
+
+    const handleDelete = () => {
+        axios.delete(`/api/movies/${id}`)
+            .then(() => navigate('/movies'))
+            .catch(error => {
+                console.error('Error deleting movie:', error);
+                setErrorMsg('Error deleting movie');
+            });
+    };
+
+    const addMovieToUser = async () => {
+        if (isAdded) return;
+
+        setLoading(true);
+        try {
+            await axios.put(`/api/users/movies/${id}`, null, {
+                withCredentials: true,
+            });
+            setIsAdded(true);
+        } catch (error) {
+            console.error('Error adding movie:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (loading) return <Spin size="large" className="loading-spinner"/>;
     if (!movie) return null;
@@ -106,25 +140,26 @@ const MovieDetails: React.FC = () => {
                                     {movie.description}
                                 </div>
 
-                                <div className="movie-actions">
-                                    <Button className="yellow-btn">
-                                        Study Vocabulary
-                                    </Button>
-                                    <Button className="yellow-btn">
-                                        Vocabulary Test
-                                    </Button>
-                                </div>
-
-                                <div className="movie-actions">
-                                    <Button className="yellow-btn" onClick={() => navigate(`/movies/${id}/update`)}>
-                                        Edit
-                                    </Button>
-                                    <Button className="yellow-btn" onClick={handleDelete}>
-                                        Delete
-                                    </Button>
-                                </div>
-
-
+                                {!isAdmin && (
+                                    <div className="movie-actions">
+                                        <Button className="yellow-btn" onClick={addMovieToUser} disabled={isAdded}>
+                                            Study Vocabulary
+                                        </Button>
+                                        <Button className="yellow-btn" onClick={addMovieToUser} disabled={isAdded}>
+                                            Vocabulary Test
+                                        </Button>
+                                    </div>
+                                )}
+                                {isAdmin && (
+                                    <div className="movie-actions">
+                                        <Button className="yellow-btn" onClick={() => navigate(`/movies/${id}/update`)}>
+                                            Edit
+                                        </Button>
+                                        <Button className="yellow-btn" onClick={handleDelete}>
+                                            Delete
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         </Col>
                     </Row>

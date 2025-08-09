@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import {type Genre, type NewGenreData} from '../movie/movie-form/types.tsx';
+import {type Genre, type NewGenreData} from '../types/movies.ts';
 import useMessage from 'antd/es/message/useMessage';
 
 export const useGenres = () => {

@@ -1,15 +1,15 @@
 import React, {useState} from "react";
-import {Layout, Menu, Button, Typography, Grid} from "antd";
+import {Layout, Menu, Button, Typography, Grid, message as antMessage} from "antd";
 import {
-    UserOutlined,
     LogoutOutlined,
-    HomeOutlined,
-    VideoCameraOutlined,
-    MenuOutlined
+    MenuOutlined,
 } from "@ant-design/icons";
 import {useNavigate, useLocation} from "react-router-dom";
-import SidebarDrawer from "./SidebarDrawer.tsx";
+import SidebarDrawer from "./SidebarDrawer";
+
 import "./Sidebar.css";
+import {getMenuItems} from "./Menu.tsx";
+import {useAuth} from "../../auth/useAuth.tsx";
 
 const {Sider} = Layout;
 const {Title} = Typography;
@@ -20,37 +20,14 @@ const Sidebar: React.FC = () => {
     const location = useLocation();
     const [drawerVisible, setDrawerVisible] = useState(false);
     const screens = useBreakpoint();
+    const [messageApi, contextHolder] = antMessage.useMessage();
+    const {isAdmin} = useAuth();
 
     const handleLogout = () => {
         window.location.href = "http://localhost:8080/logout";
     };
 
-    const items = [
-        {
-            key: '/home',
-            icon: <HomeOutlined/>,
-            label: 'Home',
-            onClick: () => navigate('/home'),
-        },
-        {
-            key: '/movies',
-            icon: <VideoCameraOutlined/>,
-            label: 'Movies List',
-            onClick: () => navigate('/movies'),
-        },
-        {
-            key: '/account',
-            icon: <UserOutlined/>,
-            label: 'Account',
-            onClick: () => navigate('/account'),
-        },
-        {
-            key: '/new-movie',
-            icon: <VideoCameraOutlined/>,
-            label: 'New Movie',
-            onClick: () => navigate('/new-movie'),
-        }
-    ];
+    const items = getMenuItems(navigate, isAdmin, (msg: string) => messageApi.error(msg));
 
     if (!screens.md) {
         return (
@@ -60,17 +37,22 @@ const Sidebar: React.FC = () => {
                     icon={<MenuOutlined/>}
                     onClick={() => setDrawerVisible(true)}
                     className="sidebar-menu-button"
-                    style={{
-                        display: drawerVisible ? 'none' : 'block'
-                    }}
+                    style={{display: drawerVisible ? "none" : "block"}}
                 />
-                <SidebarDrawer open={drawerVisible} onClose={() => setDrawerVisible(false)}/>
+                <SidebarDrawer
+                    open={drawerVisible}
+                    onClose={() => setDrawerVisible(false)}
+                    isAdmin={isAdmin}
+                    messageApi={messageApi}
+                />
+                {contextHolder}
             </>
         );
     }
 
     return (
         <Sider className="sidebar" width={200}>
+            {contextHolder}
             <div className="sidebar-content">
                 <div className="sidebar-container">
                     <Title level={4} className="sidebar-title">
