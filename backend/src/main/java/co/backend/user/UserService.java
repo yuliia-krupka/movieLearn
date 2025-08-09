@@ -4,6 +4,9 @@ import co.backend.exceptions.FileSizeExceededException;
 import co.backend.exceptions.FileUploadException;
 import co.backend.exceptions.NotFoundException;
 import co.backend.exceptions.UnsupportedFileTypeException;
+import co.backend.movie.Movie;
+import co.backend.movie.MovieRepository;
+import co.backend.movie.MovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +24,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final MovieRepository movieRepository;
     private final UserMapper userMapper;
 
     public List<UserDto> getAllUsers() {
@@ -131,6 +136,18 @@ public class UserService {
         }
 
         user.setRole(role);
+        userRepository.save(user);
+    }
+
+    public void addMovieToUser(Long movieId, Long userId) {
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new NotFoundException("Movie with id " + movieId + " not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
+        if (user.getMovies().contains(movie)) {
+            return;
+        }
+        user.getMovies().add(movie);
         userRepository.save(user);
     }
 

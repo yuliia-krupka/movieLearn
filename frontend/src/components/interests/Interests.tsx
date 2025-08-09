@@ -38,7 +38,7 @@ const Interests: React.FC = () => {
                 {withCredentials: true}
             );
 
-            navigate('/account');
+            navigate('/home');
         } catch (error) {
             console.error('Failed to set interests:', error);
             customMessage.error('Failed to set interests. Please try again later.');

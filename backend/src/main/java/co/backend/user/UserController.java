@@ -41,6 +41,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/movies/{movieId}")
+    public void addMovieToUser(
+            @PathVariable Long movieId,
+            @AuthenticationPrincipal OAuth2User oauth2User) {
+        UserDto user = userService.getCurrentUser(oauth2User);
+        userService.addMovieToUser(movieId, user.getId());
+    }
 
 
     @PutMapping("/account/update")
