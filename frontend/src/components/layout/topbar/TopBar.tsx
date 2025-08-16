@@ -9,6 +9,7 @@ const {Text} = Typography;
 const {Search} = Input;
 
 interface User {
+    id: number;
     name?: string;
     lastname?: string;
     photo?: string;
@@ -20,7 +21,7 @@ const TopBar: React.FC = () => {
     const [message, contextHolder] = antMessage.useMessage();
 
     useEffect(() => {
-        axios.get('/api/users/account', {withCredentials: true})
+        axios.get<User>('/api/users/account', {withCredentials: true})
             .then(res => setUser(res.data))
             .catch(error => console.log("ERROR OCCURRED: " + error))
     }, []);
@@ -53,7 +54,7 @@ const TopBar: React.FC = () => {
                 <div className="topbar-user">
                     <Avatar
                         size="small"
-                        src={user?.photo ? "http://localhost:8080/api/users/photo" : undefined}
+                        src={user ? `http://localhost:8080/api/users/photo/${user.id}` : undefined}
                         className="topbar-avatar"
                     >
                         {!user?.photo && (user?.name?.[0] || '?')}
@@ -70,5 +71,4 @@ const TopBar: React.FC = () => {
         </Header>
     );
 };
-
 export default TopBar;

@@ -40,6 +40,31 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
     const [messageApi, contextHolder] = antMessage.useMessage();
     const location = useLocation();
 
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    let cardsPerPage = 8;
+    let colSpan = 6;
+
+    if (windowWidth < 375) {
+        cardsPerPage = 2;
+        colSpan = 24;
+    } else if (windowWidth >= 375 && windowWidth < 576) {
+        cardsPerPage = 4;
+        colSpan = 12;
+    } else if (windowWidth >= 576 && windowWidth < 768) {
+        cardsPerPage = 6;
+        colSpan = 8;
+    } else {
+        cardsPerPage = 8;
+        colSpan = 6;
+    }
+
     const searchParams = new URLSearchParams(location.search);
     const searchQuery = searchParams.get('search');
 
@@ -78,11 +103,9 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
             )
     );
 
-    const pageSize = 8;
-
     const currentMovies = filteredMovies.slice(
-        (currentPage - 1) * pageSize,
-        currentPage * pageSize
+        (currentPage - 1) * cardsPerPage,
+        currentPage * cardsPerPage
     );
 
     useEffect(() => {
@@ -136,19 +159,18 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                 </div>
             ) : (
                 <>
-                    <Row gutter={[16, 16]} style={{marginBottom: '16px'}}>
+                    <Row gutter={[12, 12]} style={{marginBottom: '16px'}}>
                         {currentMovies.map(movie => (
                             <Col
                                 key={movie.id}
                                 xs={24}
-                                sm={12}
-                                md={12}
-                                lg={6}
-                                xl={6}
-                                xxl={6}
-                                style={{display: 'flex', justifyContent: 'center'}}
+                                sm={colSpan}
+                                md={colSpan}
+                                lg={colSpan}
+                                xl={colSpan}
+                                style={{display: 'flex', justifyContent: 'flex-start'}} // Вирівнюємо картки ліворуч
                             >
-                                <MovieCard movie={movie} />
+                                <MovieCard movie={movie}/>
                             </Col>
                         ))}
                     </Row>
@@ -157,7 +179,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                         current={currentPage}
                         onChange={setCurrentPage}
                         total={filteredMovies.length}
-                        pageSize={pageSize}
+                        pageSize={cardsPerPage}
                         showSizeChanger={false}
                         showQuickJumper={false}
                         responsive={true}

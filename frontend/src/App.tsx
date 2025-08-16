@@ -11,6 +11,7 @@ import Home from "./components/movie/Home.tsx";
 import UpdateMovieForm from "./components/movie/movie-form/UpdateMovieForm.tsx";
 import {AuthProvider} from "./components/auth/AuthProvider.tsx";
 import {ProtectedRoute} from "./components/auth/ProtectedRoute.tsx";
+import UsersAdminPanel from "./components/users/UsersAdminPanel.tsx";
 
 function App() {
     return (
@@ -75,6 +76,14 @@ function App() {
                         element={
                             <ProtectedRoute requireAdmin requireAuth={true}>
                                 <UpdateMovieForm/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/users"
+                        element={
+                            <ProtectedRoute requireAdmin requireAuth={true}>
+                                <UsersAdminPanel/>
                             </ProtectedRoute>
                         }
                     />

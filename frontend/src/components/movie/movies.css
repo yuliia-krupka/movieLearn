@@ -482,3 +482,23 @@
     text-align: center;
     margin-bottom: 20px;
 }
+
+.movie-card {
+    width: 100%;
+    max-width: 270px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .movie-card {
+        max-width: 220px !important;
+    }
+}
+
+@media (max-width: 374px) {
+    .movie-card {
+        max-width: 100% !important;
+    }
+}

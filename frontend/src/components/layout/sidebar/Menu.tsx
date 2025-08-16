@@ -48,12 +48,20 @@ export const getMenuItems = (
     ];
 
     if (isAdmin) {
-        items.push({
-            key: "/new-movie",
-            icon: <VideoCameraOutlined/>,
-            label: "New Movie",
-            onClick: () => handleClick("/new-movie"),
-        });
+        items.push(
+            {
+                key: "/new-movie",
+                icon: <VideoCameraOutlined/>,
+                label: "New Movie",
+                onClick: () => handleClick("/new-movie"),
+            },
+            {
+                key: "/users",
+                icon: <UserOutlined/>,
+                label: "Users List",
+                onClick: () => handleClick("/users"),
+            }
+        );
     }
 
     return items;

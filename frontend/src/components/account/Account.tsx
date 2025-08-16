@@ -13,6 +13,7 @@ const {Content} = Layout;
 const {Title, Text} = Typography;
 
 type User = {
+    id: number;
     name: string;
     lastname: string;
     interests: string[];
@@ -21,13 +22,14 @@ type User = {
     photo?: string;
 };
 
+
 const Account = () => {
     const [user, setUser] = useState<User | null>(null);
     const [moviesStarted, setMoviesStarted] = useState<number>(0);
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('/api/users/account', {withCredentials: true})
+        axios.get<User>('/api/users/account', {withCredentials: true})
             .then(res => setUser(res.data))
             .catch(err => console.error("Failed to fetch user account:", err));
     }, []);
@@ -47,8 +49,9 @@ const Account = () => {
                     <div className="profile-container">
                         <div className="profile-header">
                             <Avatar
-                                src="http://localhost:8080/api/users/photo"
+                                src={user ? `http://localhost:8080/api/users/photo/${user.id}` : undefined}
                                 size={80}
+                                alt={user ? `${user.name} ${user.lastname}` : 'User avatar'}
                             />
                             <Title level={4} className='naming'>
                                 {user ? `${user.name} ${user.lastname}` : 'Loading...'}
@@ -91,6 +94,7 @@ const Account = () => {
         </Layout>
     );
 };
+
 
 const ProfileDetail = ({
                            label, value

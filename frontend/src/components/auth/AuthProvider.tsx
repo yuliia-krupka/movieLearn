@@ -1,13 +1,13 @@
-import React, {useState, useEffect, type ReactNode} from 'react';
-import type {User} from '../types/auth';
-import {AuthContext} from './AuthContext';
+import React, { useState, useEffect, type ReactNode } from 'react';
+import type { User } from '../types/auth';
+import { AuthContext } from './AuthContext';
 
 interface AuthProviderProps {
     children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
-    const [user, setUser] = useState<User | null>(null);
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+    const [user, setUser] = useState<User & { id?: number } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         },
         logout: async () => {
             try {
-                await fetch('/logout', {method: 'POST', credentials: 'include'});
+                await fetch('/logout', { method: 'POST', credentials: 'include' });
                 setUser(null);
                 window.location.href = '/';
             } catch (error) {
@@ -53,6 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         isAdmin,
         isLoading,
         isAuthenticated: !!user,
+        currentUserId: user?.id,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

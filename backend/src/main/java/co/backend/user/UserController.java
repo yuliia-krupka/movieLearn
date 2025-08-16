@@ -1,6 +1,7 @@
 package co.backend.user;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/users")
@@ -26,19 +28,65 @@ public class UserController {
         return userService.getCurrentUser(oauth2User);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<UserDto> getAllUsers() {
         return userService.getAllUsers();
     }
 
+    @PutMapping("/{userId}/role/{roleName}")
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{userId}/role")
-    public ResponseEntity<Void> setUserRole(
+    public ResponseEntity<String> setUserRole(
             @PathVariable Long userId,
-            @RequestBody String roleName) {
-        userService.setUserRole(userId, roleName);
-        return ResponseEntity.noContent().build();
+            @PathVariable String roleName,
+            @AuthenticationPrincipal OAuth2User oauth2User) {
+
+        UserDto currentUser = userService.getCurrentUser(oauth2User);
+        if (currentUser.getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("You cannot modify your own role");
+        }
+
+        UserDto targetUser = userService.getUserById(userId);
+        if (targetUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if ("ADMIN".equalsIgnoreCase(String.valueOf(targetUser.getRole()))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Cannot modify other admin users");
+        }
+
+        try {
+            userService.setUserRole(userId, roleName.toUpperCase());
+            return ResponseEntity.ok("Role updated successfully");
+        } catch (Exception e) {
+            log.error("Error setting user role for user {}: {}", userId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update user role");
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oauth2User) {
+        try {
+            UserDto currentUser = userService.getCurrentUser(oauth2User);
+
+            if (currentUser.getId().equals(id)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You cannot delete yourself");
+            }
+            UserDto userToDelete = userService.getUserById(id);
+            if (userToDelete == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+            if ("ADMIN".equalsIgnoreCase(String.valueOf(userToDelete.getRole()))) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot delete other admins");
+            }
+
+            userService.deleteUser(id);
+            return ResponseEntity.ok().body("User deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete user");
+        }
     }
 
     @PutMapping("/movies/{movieId}")
@@ -74,11 +122,11 @@ public class UserController {
         userService.saveAvatar(file, oauth2User);
     }
 
-    @GetMapping("/photo")
-    public ResponseEntity<byte[]> getProfilePicture(@AuthenticationPrincipal OAuth2User oauth2User) {
-        UserDto userDto = userService.getCurrentUser(oauth2User);
+    @GetMapping("/photo/{userId}")
+    public ResponseEntity<byte[]> getProfilePictureByUserId(@PathVariable Long userId) {
+        UserDto userDto = userService.getUserById(userId);
 
-        if (userDto.getPhoto() == null) {
+        if (userDto == null || userDto.getPhoto() == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 

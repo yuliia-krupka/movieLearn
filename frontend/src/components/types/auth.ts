@@ -14,4 +14,5 @@ export interface AuthContextType {
     isAdmin: boolean;
     isLoading: boolean;
     isAuthenticated: boolean;
+    currentUserId?: number;
 }
