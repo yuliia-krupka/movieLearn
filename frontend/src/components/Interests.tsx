@@ -3,8 +3,8 @@ import {Typography} from 'antd';
 import {useNavigate} from 'react-router-dom';
 import useMessage from 'antd/es/message/useMessage';
 import axios from 'axios';
-import './Interests.css';
-import Logo from "../logo/Logo.tsx";
+import './css/interests.css';
+import Logo from "./Logo.tsx";
 
 const {Text} = Typography;
 

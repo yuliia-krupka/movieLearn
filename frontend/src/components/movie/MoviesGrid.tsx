@@ -7,6 +7,7 @@ import MovieCard from "./MovieCard";
 import {useGenres} from '../hooks/useGenres';
 import {useLocation} from 'react-router-dom';
 import axios from 'axios';
+import '../css/MoviesGrid.css';
 
 const {Title} = Typography;
 const {Option} = Select;

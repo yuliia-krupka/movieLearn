@@ -12,16 +12,18 @@ import {
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 
-import '../../layout/Layout.css';
-import '../movies.css';
+import '../css/Layout.css';
+import '../css/movies.css';
+import '../css/UpdateMovie.css';
+
 import axios, {AxiosError} from 'axios';
 import {useNavigate, useParams} from "react-router-dom";
-import {useFileUpload} from '../../hooks/useFileUpload';
-import {useGenres} from '../../hooks/useGenres';
-import AddGenreModal from './AddGenreModal';
-import FileUploader from './FileUploader';
-import Sidebar from "../../layout/sidebar/Sidebar.tsx";
-import TopBar from "../../layout/topbar/TopBar.tsx";
+import {useFileUpload} from '../hooks/useFileUpload.tsx';
+import {useGenres} from '../hooks/useGenres.tsx';
+import AddGenreModal from '../genre/AddGenreModal.tsx';
+import FileUploader from './FileUploader.tsx';
+import Sidebar from "../layout/Sidebar.tsx";
+import TopBar from "../layout/TopBar.tsx";
 import {Content} from "antd/es/layout/layout";
 
 const {Title} = Typography;
@@ -53,18 +55,16 @@ const UpdateMovieForm: React.FC = () => {
     const [addGenreModalVisible, setAddGenreModalVisible] = useState<boolean>(false);
     const [addingGenre, setAddingGenre] = useState<boolean>(false);
     const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
-    const [currentScriptInfo, setCurrentScriptInfo] = useState<{name: string, size: string} | null>(null);
+    const [currentScriptInfo, setCurrentScriptInfo] = useState<{ name: string, size: string } | null>(null);
     const navigate = useNavigate();
     const [message, contextHolder] = antMessage.useMessage();
     const {id} = useParams<{ id: string }>();
 
-    // Use custom hooks
     const {genres, loading: genresLoading, addGenre} = useGenres();
 
     const imageUpload = useFileUpload('Please select an image file');
     const scriptUpload = useFileUpload('Please select a script file');
 
-    // Move useForm here to ensure it's only called when Form is rendered
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -269,7 +269,6 @@ const UpdateMovieForm: React.FC = () => {
         } catch (error: unknown) {
             console.error('Error adding genre:', error);
 
-            // Handle duplicate genre error specifically
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 409) {
                     message.error(`Genre '${genreData.name}' already exists`);
@@ -292,7 +291,7 @@ const UpdateMovieForm: React.FC = () => {
             <Layout className="account-root-layout">
                 <TopBar/>
                 {contextHolder}
-                <Content className='content-movies'>
+                <Content className='content'>
                     <Title level={2} className='update-movie-title'>
                         Update Movie
                     </Title>
@@ -341,11 +340,7 @@ const UpdateMovieForm: React.FC = () => {
 
                                         <Form.Item
                                             label={
-                                                <div style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center'
-                                                }}>
+                                                <div className="genre-selector-label">
                                                     <span>Genres</span>
                                                     <Button
                                                         className='yellow-btn add-genre-btn'
@@ -394,21 +389,11 @@ const UpdateMovieForm: React.FC = () => {
                                         />
 
                                         {currentImageUrl && !imageUpload.file && (
-                                            <div style={{marginBottom: 16}}>
-                                                <div style={{
-                                                    padding: 12,
-                                                    backgroundColor: '#f5f5f5',
-                                                    borderRadius: 4,
-                                                    border: '1px solid #d9d9d9'
-                                                }}>
-                                                    <div style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: 8,
-                                                        marginBottom: 8
-                                                    }}>
-                                                        <span style={{color: '#52c41a'}}>✓</span>
-                                                        <span style={{fontWeight: 500}}>Current Poster</span>
+                                            <div className="current-file-container">
+                                                <div className="current-file-info">
+                                                    <div className="current-file-header">
+                                                        <span className="current-file-status">✓</span>
+                                                        <span className="current-file-label">Current Poster</span>
                                                         <Button
                                                             size="small"
                                                             onClick={() => {
@@ -422,12 +407,7 @@ const UpdateMovieForm: React.FC = () => {
                                                     <img
                                                         src={currentImageUrl}
                                                         alt="Current movie poster"
-                                                        style={{
-                                                            maxWidth: '100%',
-                                                            maxHeight: '200px',
-                                                            objectFit: 'contain',
-                                                            borderRadius: 4
-                                                        }}
+                                                        className="current-image-preview"
                                                     />
                                                 </div>
                                             </div>
@@ -445,21 +425,11 @@ const UpdateMovieForm: React.FC = () => {
                                         />
 
                                         {currentScriptInfo && (
-                                            <div style={{marginBottom: 16}}>
-                                                <div style={{
-                                                    padding: 12,
-                                                    backgroundColor: '#f5f5f5',
-                                                    borderRadius: 4,
-                                                    border: '1px solid #d9d9d9'
-                                                }}>
-                                                    <div style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: 8,
-                                                        marginBottom: 8
-                                                    }}>
-                                                        <span style={{color: '#52c41a'}}>✓</span>
-                                                        <span style={{fontWeight: 500}}>Current Script</span>
+                                            <div className="current-file-container">
+                                                <div className="current-file-info">
+                                                    <div className="current-file-header">
+                                                        <span className="current-file-status">✓</span>
+                                                        <span className="current-file-label">Current Script</span>
                                                         <Button
                                                             size="small"
                                                             onClick={() => {
@@ -470,13 +440,7 @@ const UpdateMovieForm: React.FC = () => {
                                                             Remove
                                                         </Button>
                                                     </div>
-                                                    <div style={{
-                                                        fontSize: '14px',
-                                                        color: '#333',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: 12
-                                                    }}>
+                                                    <div className="current-script-info">
                                                         <span>Script file available</span>
                                                         <Button
                                                             size="small"

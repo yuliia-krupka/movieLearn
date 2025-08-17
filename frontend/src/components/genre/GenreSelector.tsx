@@ -1,9 +1,10 @@
 import React, {useState} from 'react';
 import {Form, Select, Button, Popconfirm, Input, Modal} from 'antd';
 import {PlusOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
-import {type Genre} from '../../types/movies.ts';
+import {type Genre} from '../types/movies.ts';
 import axios from 'axios';
 import type useMessage from "antd/es/message/useMessage";
+import '../css/GenreSelector.css';
 
 const {Option} = Select;
 
@@ -96,7 +97,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
         <>
             <Form.Item
                 label={
-                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <div className="genre-selector-label">
                         <span>Genres</span>
                         <Button
                             className='yellow-btn add-genre-btn'
@@ -114,14 +115,9 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                 <Select mode="multiple" placeholder="Select genres">
                     {genres.map((genre) => (
                         <Option key={genre.id} value={genre.name}>
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                width: '100%'
-                            }}>
+                            <div className="genre-option-container">
                                 <span>{genre.name}</span>
-                                <div style={{display: 'flex', gap: '4px'}}>
+                                <div className="genre-actions">
                                     <Button
                                         type="text"
                                         size="small"
@@ -130,12 +126,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                                             e.stopPropagation();
                                             handleEditGenre(genre);
                                         }}
-                                        style={{
-                                            color: '#1890ff',
-                                            padding: '2px 4px',
-                                            height: 'auto',
-                                            minWidth: 'auto'
-                                        }}
+                                        className="genre-edit-btn"
                                     />
                                     <Popconfirm
                                         title="Delete Genre"
@@ -156,12 +147,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                             }}
-                                            style={{
-                                                color: '#ff4d4f',
-                                                padding: '2px 4px',
-                                                height: 'auto',
-                                                minWidth: 'auto'
-                                            }}
+                                            className="genre-delete-btn"
                                         />
                                     </Popconfirm>
                                 </div>

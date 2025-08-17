@@ -1,10 +1,10 @@
 import React from 'react';
 import {Layout} from 'antd';
 import {Content} from "antd/es/layout/layout";
-import Sidebar from "../layout/sidebar/Sidebar.tsx";
-import TopBar from "../layout/topbar/TopBar.tsx";
+import Sidebar from "../layout/Sidebar.tsx";
+import TopBar from "../layout/TopBar.tsx";
 import MoviesGrid from "./MoviesGrid";
-import '../layout/Layout.css';
+import '../css/Layout.css';
 
 const HomePage: React.FC = () => {
     return (

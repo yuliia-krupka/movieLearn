@@ -4,10 +4,10 @@ import {Avatar, Button, Card, Layout, Space, Typography} from "antd";
 import {EditOutlined} from "@ant-design/icons";
 import {useNavigate} from "react-router-dom";
 
-import Sidebar from "../layout/sidebar/Sidebar.tsx";
-import TopBar from "../layout/topbar/TopBar.tsx";
-import './Account.css';
-import '../layout/Layout.css'
+import Sidebar from "../layout/Sidebar.tsx";
+import TopBar from "../layout/TopBar.tsx";
+import '../css/Account.css';
+import '../css/Layout.css'
 
 const {Content} = Layout;
 const {Title, Text} = Typography;

@@ -2,15 +2,16 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Spin, Button, Layout, Row, Col, message as antMessage} from 'antd';
 import axios from "axios";
-import Sidebar from "../layout/sidebar/Sidebar.tsx";
-import TopBar from "../layout/topbar/TopBar.tsx";
+import Sidebar from "../layout/Sidebar.tsx";
+import TopBar from "../layout/TopBar.tsx";
 import {useAuth} from '../auth/useAuth';
-import './movies.css';
-import '../layout/Layout.css';
+import '../css/MovieDetails.css';
+import '../css/movies.css';
+import '../css/Layout.css';
 
 const {Content} = Layout;
 
-interface Movie {
+interface MovieDetails {
     id: number;
     title: string;
     description: string;
@@ -21,7 +22,7 @@ interface Movie {
 const MovieDetails: React.FC = () => {
     const {id} = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const [movie, setMovie] = useState<Movie | null>(null);
+    const [movie, setMovie] = useState<MovieDetails | null>(null);
     const [isAdded, setIsAdded] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);

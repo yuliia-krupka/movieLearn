@@ -1,5 +1,5 @@
 import {Typography} from "antd";
-import "./Logo.css";
+import "./css/Logo.css";
 
 const {Title} = Typography;
 

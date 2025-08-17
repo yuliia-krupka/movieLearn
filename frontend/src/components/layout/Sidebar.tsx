@@ -5,11 +5,11 @@ import {
     MenuOutlined,
 } from "@ant-design/icons";
 import {useNavigate, useLocation} from "react-router-dom";
-import SidebarDrawer from "./SidebarDrawer";
+import SidebarDrawer from "./SidebarDrawer.tsx";
 
-import "./Sidebar.css";
+import "../css/Sidebar.css";
 import {getMenuItems} from "./Menu.tsx";
-import {useAuth} from "../../auth/useAuth.tsx";
+import {useAuth} from "../auth/useAuth.tsx";
 
 const {Sider} = Layout;
 const {Title} = Typography;

@@ -2,10 +2,10 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {Button, Form, Input, Typography, Layout, Card} from "antd";
 import {useNavigate} from "react-router-dom";
-import Sidebar from "../layout/sidebar/Sidebar";
-import TopBar from "../layout/topbar/TopBar";
-import './Account.css';
-import '../layout/Layout.css'
+import Sidebar from "../layout/Sidebar.tsx";
+import TopBar from "../layout/TopBar.tsx";
+import '../css/Account.css';
+import '../css/Layout.css'
 import useMessage from "antd/es/message/useMessage";
 
 const {Content} = Layout;

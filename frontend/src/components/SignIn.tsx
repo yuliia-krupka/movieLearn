@@ -1,10 +1,10 @@
 import {useEffect} from 'react';
 import {GoogleOutlined} from "@ant-design/icons";
 import {Button} from 'antd';
-import {useAuth} from '../auth/useAuth';
+import {useAuth} from './auth/useAuth.tsx';
 import {useNavigate} from 'react-router-dom';
-import Logo from "../logo/Logo.tsx";
-import "./SignIn.css";
+import Logo from "./Logo.tsx";
+import "./css/SignIn.css";
 
 function SignIn() {
     const {isAuthenticated, login} = useAuth();

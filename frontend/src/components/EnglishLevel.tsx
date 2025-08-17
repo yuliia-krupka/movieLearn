@@ -3,8 +3,8 @@ import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import useMessage from 'antd/es/message/useMessage';
 import {type FC} from 'react';
-import "./EnglishLevel.css";
-import Logo from "../logo/Logo.tsx";
+import "./css/EnglishLevel.css";
+import Logo from "./Logo.tsx";
 
 const {Text} = Typography;
 

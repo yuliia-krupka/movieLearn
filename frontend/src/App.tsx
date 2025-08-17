@@ -1,17 +1,17 @@
-import SignIn from "./components/signIn/SignIn.tsx";
+import SignIn from "./components/SignIn.tsx";
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Account from "./components/account/Account.tsx";
-import EnglishLevel from "./components/englishLevel/EnglishLevel.tsx";
-import Interests from "./components/interests/Interests.tsx";
+import EnglishLevel from "./components/EnglishLevel.tsx";
+import Interests from "./components/Interests.tsx";
 import UpdateAccount from "./components/account/UpdateAccount.tsx";
 import MoviesList from "./components/movie/MoviesList.tsx";
-import NewMovieForm from "./components/movie/movie-form/NewMovieForm.tsx";
-import Movie from "./components/movie/Movie.tsx";
+import NewMovieForm from "./components/movie/CreateMovie.tsx";
+import Movie from "./components/movie/MovieDetails.tsx";
 import Home from "./components/movie/Home.tsx";
-import UpdateMovieForm from "./components/movie/movie-form/UpdateMovieForm.tsx";
+import UpdateMovie from "./components/movie/UpdateMovie.tsx";
 import {AuthProvider} from "./components/auth/AuthProvider.tsx";
 import {ProtectedRoute} from "./components/auth/ProtectedRoute.tsx";
-import UsersAdminPanel from "./components/users/UsersAdminPanel.tsx";
+import UsersAdminPanel from "./components/UsersAdminPanel.tsx";
 
 function App() {
     return (
@@ -75,7 +75,7 @@ function App() {
                         path="/movies/:id/update"
                         element={
                             <ProtectedRoute requireAdmin requireAuth={true}>
-                                <UpdateMovieForm/>
+                                <UpdateMovie/>
                             </ProtectedRoute>
                         }
                     />
