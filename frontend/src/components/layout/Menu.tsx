@@ -1,4 +1,4 @@
-import type {MenuProps} from "antd";
+import type { MenuProps } from "antd";
 import {
     HomeOutlined,
     VideoCameraOutlined,
@@ -29,40 +29,25 @@ export const getMenuItems = (
     const items: MenuItem[] = [
         {
             key: "/home",
-            icon: <HomeOutlined/>,
+            icon: <HomeOutlined />,
             label: "Home",
             onClick: () => handleClick("/home"),
         },
         {
             key: "/movies",
-            icon: <VideoCameraOutlined/>,
+            icon: <VideoCameraOutlined />,
             label: "Movies List",
             onClick: () => handleClick("/movies"),
         },
         {
             key: "/account",
-            icon: <UserOutlined/>,
+            icon: <UserOutlined />,
             label: "Account",
             onClick: () => handleClick("/account"),
         },
     ];
 
-    if (isAdmin) {
-        items.push(
-            {
-                key: "/new-movie",
-                icon: <VideoCameraOutlined/>,
-                label: "New Movie",
-                onClick: () => handleClick("/new-movie"),
-            },
-            {
-                key: "/users",
-                icon: <UserOutlined/>,
-                label: "Users List",
-                onClick: () => handleClick("/users"),
-            }
-        );
-    }
+
 
     return items;
 };

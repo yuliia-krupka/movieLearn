@@ -1,19 +1,19 @@
-import React, {useState} from "react";
-import {Layout, Menu, Button, Typography, Grid, message as antMessage} from "antd";
+import React, { useState } from "react";
+import { Layout, Menu, Button, Typography, Grid, message as antMessage } from "antd";
 import {
     LogoutOutlined,
     MenuOutlined,
 } from "@ant-design/icons";
-import {useNavigate, useLocation} from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import SidebarDrawer from "./SidebarDrawer.tsx";
 
 import "../css/Sidebar.css";
-import {getMenuItems} from "./Menu.tsx";
-import {useAuth} from "../auth/useAuth.tsx";
+import { getMenuItems } from "./Menu.tsx";
+import { useAuth } from "../auth/useAuth.tsx";
 
-const {Sider} = Layout;
-const {Title} = Typography;
-const {useBreakpoint} = Grid;
+const { Sider } = Layout;
+const { Title } = Typography;
+const { useBreakpoint } = Grid;
 
 const Sidebar: React.FC = () => {
     const navigate = useNavigate();
@@ -21,10 +21,10 @@ const Sidebar: React.FC = () => {
     const [drawerVisible, setDrawerVisible] = useState(false);
     const screens = useBreakpoint();
     const [messageApi, contextHolder] = antMessage.useMessage();
-    const {isAdmin} = useAuth();
+    const { isAdmin, logout } = useAuth();
 
     const handleLogout = () => {
-        window.location.href = "http://localhost:8080/logout";
+        logout();
     };
 
     const items = getMenuItems(navigate, isAdmin, (msg: string) => messageApi.error(msg));
@@ -34,10 +34,10 @@ const Sidebar: React.FC = () => {
             <>
                 <Button
                     type="text"
-                    icon={<MenuOutlined/>}
+                    icon={<MenuOutlined />}
                     onClick={() => setDrawerVisible(true)}
                     className="sidebar-menu-button"
-                    style={{display: drawerVisible ? "none" : "block"}}
+                    style={{ display: drawerVisible ? "none" : "block" }}
                 />
                 <SidebarDrawer
                     open={drawerVisible}
@@ -69,7 +69,7 @@ const Sidebar: React.FC = () => {
 
                 <Button
                     type="primary"
-                    icon={<LogoutOutlined/>}
+                    icon={<LogoutOutlined />}
                     className="sidebar-logout"
                     onClick={handleLogout}
                 >

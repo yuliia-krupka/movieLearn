@@ -11,7 +11,7 @@
 .topbar-right {
     display: flex;
     align-items: center;
-    gap: 35px;
+    gap: 20px;
 }
 
 .topbar-user {
@@ -26,13 +26,24 @@
 
 .topbar-username {
     color: #333;
+    color: #333;
     cursor: pointer;
+}
+
+.admin-dashboard-btn:hover {
+    background-color: rgba(0, 0, 0, 0.025) !important;
+    color: #1890ff !important;
+}
+
+.admin-dashboard-btn:hover .anticon {
+    color: #1890ff !important;
 }
 
 .ant-input-search-button {
     border-color: #F5A623 !important;
     background-color: #F5A623 !important;
 }
+
 .ant-input-affix-wrapper:focus,
 .ant-input-affix-wrapper-focused {
     border-color: #F5A623 !important;
@@ -42,4 +53,3 @@
 .ant-input-affix-wrapper:hover {
     border-color: #F5A623 !important;
 }
-

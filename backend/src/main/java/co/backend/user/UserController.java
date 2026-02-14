@@ -29,8 +29,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
+    public List<UserDto> getAllUsers(@RequestParam(required = false) String email) {
+        return userService.getAllUsers(email);
     }
 
     @PutMapping("/{userId}/role/{roleName}")
@@ -59,10 +59,11 @@ public class UserController {
         try {
             userService.setUserRole(userId, roleName.toUpperCase());
             return ResponseEntity.ok("Role updated successfully");
+
         } catch (Exception e) {
             log.error("Error setting user role for user {}: {}", userId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to update user role");
+                    .body("Failed to update user role: " + e.getMessage());
         }
     }
 
@@ -96,7 +97,6 @@ public class UserController {
         UserDto user = userService.getCurrentUser(oauth2User);
         userService.addMovieToUser(movieId, user.getId());
     }
-
 
     @PutMapping("/account/update")
     public UserDto updateUser(@AuthenticationPrincipal OAuth2User oauth2User, @RequestBody UserDto userDto) {
@@ -135,6 +135,5 @@ public class UserController {
                 .header(HttpHeaders.CACHE_CONTROL, "no-store")
                 .body(userDto.getPhoto());
     }
-
 
 }

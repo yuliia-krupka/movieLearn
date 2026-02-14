@@ -27,8 +27,14 @@ public class UserService {
     private final MovieRepository movieRepository;
     private final UserMapper userMapper;
 
-    public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream()
+    public List<UserDto> getAllUsers(String email) {
+        List<User> users;
+        if (email != null && !email.isBlank()) {
+            users = userRepository.findByEmailContainingIgnoreCase(email);
+        } else {
+            users = userRepository.findAll();
+        }
+        return users.stream()
                 .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }

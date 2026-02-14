@@ -1,8 +1,8 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     Avatar,
+    Input,
     List,
-    Spin,
     Layout,
     message as antMessage,
     Button,
@@ -12,16 +12,17 @@ import {
     Tag,
     Typography
 } from 'antd';
-import {DeleteOutlined, UserOutlined} from '@ant-design/icons';
-import axios, {AxiosError} from 'axios';
+import { DeleteOutlined, UserOutlined } from '@ant-design/icons';
+import axios, { AxiosError } from 'axios';
 import Sidebar from "./layout/Sidebar.tsx";
 import TopBar from "./layout/TopBar.tsx";
-import {Content} from "antd/es/layout/layout";
-import {useAuth} from "./auth/useAuth.tsx";
+import { Content } from "antd/es/layout/layout";
+import { useAuth } from "./auth/useAuth.tsx";
 import './css/UsersPanel.css';
 
-const {Text} = Typography;
-const {Option} = Select;
+const { Text } = Typography;
+const { Option } = Select;
+const { Search } = Input;
 
 type User = {
     id: number;
@@ -47,12 +48,17 @@ const UserList: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState<{ [key: number]: boolean }>({});
     const [message, contextHolder] = antMessage.useMessage();
-    const {user: currentUser} = useAuth();
+    const { user: currentUser } = useAuth();
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const fetchUsers = useCallback(async () => {
+    const fetchUsers = useCallback(async (email: string = '') => {
         setLoading(true);
         try {
-            const {data} = await axios.get<User[]>('http://localhost:8080/api/users', {withCredentials: true});
+            const params = email ? { email } : {};
+            const { data } = await axios.get<User[]>('/api/users', {
+                params,
+                withCredentials: true
+            });
             const sorted = data.slice().sort((a, b) => (rolePriority[a.role?.toUpperCase()] || 99) - (rolePriority[b.role?.toUpperCase()] || 99));
             setUsers(sorted);
         } catch (error) {
@@ -70,20 +76,28 @@ const UserList: React.FC = () => {
     }, [message]);
 
     useEffect(() => {
-        void fetchUsers(); // Promise явно ігноруємо для useEffect
-    }, [fetchUsers]);
+        const delayDebounceFn = setTimeout(() => {
+            void fetchUsers(searchTerm);
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm, fetchUsers]);
 
     const handleRoleChange = async (userId: number, newRole: string) => {
-        setActionLoading(prev => ({...prev, [userId]: true}));
+        setActionLoading(prev => ({ ...prev, [userId]: true }));
         try {
-            await axios.put(`http://localhost:8080/api/users/${userId}/role/${newRole}`, null, {withCredentials: true});
+            await axios.put(`/api/users/${userId}/role/${newRole}`, null, { withCredentials: true });
             message.success('User role updated successfully');
             await fetchUsers();
         } catch (error) {
-            const axiosError = error as AxiosError<{ message?: string }>;
-            message.error(axiosError.response?.data?.message || 'Failed to update user role');
+            const axiosError = error as AxiosError<any>;
+            console.error('Role update error:', axiosError);
+            const errorMsg = typeof axiosError.response?.data === 'string'
+                ? axiosError.response.data
+                : axiosError.response?.data?.message || 'Failed to update user role';
+            message.error(errorMsg);
         } finally {
-            setActionLoading(prev => ({...prev, [userId]: false}));
+            setActionLoading(prev => ({ ...prev, [userId]: false }));
         }
     };
 
@@ -101,50 +115,44 @@ const UserList: React.FC = () => {
             okType: 'danger',
             cancelText: 'Cancel',
             onOk: async () => {
-                setActionLoading(prev => ({...prev, [user.id]: true}));
+                setActionLoading(prev => ({ ...prev, [user.id]: true }));
                 try {
-                    await axios.delete(`http://localhost:8080/api/users/${user.id}`, {withCredentials: true});
+                    await axios.delete(`/api/users/${user.id}`, { withCredentials: true });
                     message.success('User deleted successfully');
                     await fetchUsers();
                 } catch (error) {
                     const axiosError = error as AxiosError<{ message?: string }>;
                     message.error(axiosError.response?.data?.message || 'Failed to delete user');
                 } finally {
-                    setActionLoading(prev => ({...prev, [user.id]: false}));
+                    setActionLoading(prev => ({ ...prev, [user.id]: false }));
                 }
             }
         });
     };
 
-    if (loading) {
-        return (
-            <Layout>
-                <Sidebar/>
-                <Layout className="account-root-layout">
-                    <TopBar/>
-                    <Content className="content">
-                        <div className="spinner-container">
-                            <Spin size="large"/>
-                        </div>
-                    </Content>
-                </Layout>
-            </Layout>
-        );
-    }
-
     return (
         <Layout>
-            <Sidebar/>
+            <Sidebar />
             <Layout className="account-root-layout">
-                <TopBar/>
+                <TopBar />
                 {contextHolder}
-                <Content className="content-movies" style={{padding: '24px'}}>
+                <Content className="content-movies" style={{ padding: '24px' }}>
                     <div className="userList-container">
-                        <h2 className="userList-title">User Management</h2>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                            <h2 className="userList-title" style={{ marginBottom: 0 }}>User Management</h2>
+                            <Search
+                                placeholder="Search by email"
+                                allowClear
+                                onSearch={(value) => setSearchTerm(value)}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{ width: 300 }}
+                            />
+                        </div>
                         <List
+                            loading={loading}
                             itemLayout="horizontal"
                             dataSource={users}
-                            locale={{emptyText: 'No users found'}}
+                            locale={{ emptyText: 'No users found' }}
                             renderItem={(user) => {
                                 const isCurrentUser = user.id === currentUser?.id;
                                 const isUserAdmin = user.role.toUpperCase() === 'ADMIN';
@@ -169,10 +177,10 @@ const UserList: React.FC = () => {
                                                     type="text"
                                                     danger
                                                     size="small"
-                                                    icon={<DeleteOutlined/>}
+                                                    icon={<DeleteOutlined />}
                                                     loading={actionLoading[user.id]}
                                                     onClick={() => void handleDeleteUser(user)}
-                                                    style={{color: '#ff4d4f'}}
+                                                    style={{ color: '#ff4d4f' }}
                                                 >
                                                     Delete
                                                 </Button>
@@ -183,8 +191,8 @@ const UserList: React.FC = () => {
                                             avatar={
                                                 <Avatar
                                                     size={48}
-                                                    src={user.photo ? `http://localhost:8080/api/users/photo/${user.id}` : undefined}
-                                                    icon={!user.photo ? <UserOutlined/> : undefined}
+                                                    src={user.photo ? `/api/users/photo/${user.id}` : undefined}
+                                                    icon={!user.photo ? <UserOutlined /> : undefined}
                                                     alt={`${user.name} ${user.lastname}`}
                                                     className={!user.photo ? 'avatar-default' : ''}
                                                 />
@@ -193,7 +201,7 @@ const UserList: React.FC = () => {
                                                 <div className="user-name-tag">
                                                     <span className="user-name">{user.name} {user.lastname}</span>
                                                     <Tag color={roleColors[user.role] || 'default'}
-                                                         className="role-tag">
+                                                        className="role-tag">
                                                         {user.role}
                                                     </Tag>
                                                     {isCurrentUser && <Tag className="you-tag">YOU</Tag>}

@@ -1,16 +1,16 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import {Avatar, Button, Card, Layout, Space, Typography} from "antd";
-import {EditOutlined} from "@ant-design/icons";
-import {useNavigate} from "react-router-dom";
+import { Avatar, Button, Card, Layout, Space, Typography } from "antd";
+import { EditOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 import Sidebar from "../layout/Sidebar.tsx";
 import TopBar from "../layout/TopBar.tsx";
 import '../css/Account.css';
 import '../css/Layout.css'
 
-const {Content} = Layout;
-const {Title, Text} = Typography;
+const { Content } = Layout;
+const { Title, Text } = Typography;
 
 type User = {
     id: number;
@@ -29,27 +29,27 @@ const Account = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get<User>('/api/users/account', {withCredentials: true})
+        axios.get<User>('/api/users/account', { withCredentials: true })
             .then(res => setUser(res.data))
             .catch(err => console.error("Failed to fetch user account:", err));
     }, []);
 
     useEffect(() => {
-        axios.get('/api/movies/count', {withCredentials: true})
+        axios.get('/api/movies/count', { withCredentials: true })
             .then(res => setMoviesStarted(res.data))
             .catch(err => console.error("Failed to fetch movie count:", err));
     }, []);
 
     return (
         <Layout className="account-root-layout">
-            <Sidebar/>
+            <Sidebar />
             <Layout>
-                <TopBar/>
+                <TopBar />
                 <Content className="content">
                     <div className="profile-container">
                         <div className="profile-header">
                             <Avatar
-                                src={user ? `http://localhost:8080/api/users/photo/${user.id}` : undefined}
+                                src={user ? `/api/users/photo/${user.id}` : undefined}
                                 size={80}
                                 alt={user ? `${user.name} ${user.lastname}` : 'User avatar'}
                             />
@@ -59,15 +59,15 @@ const Account = () => {
                         </div>
 
                         <Card className="profile-card">
-                            <Space direction="vertical" size="large" style={{width: "100%"}}>
-                                <ProfileDetail label="Email:" value={user?.email || "Not available"}/>
-                                <ProfileDetail label="English level:" value={user?.englishLevel || "Not set"}/>
-                                <ProfileDetail label="Movies started:" value={moviesStarted}/>
+                            <Space direction="vertical" size="large" style={{ width: "100%" }}>
+                                <ProfileDetail label="Email:" value={user?.email || "Not available"} />
+                                <ProfileDetail label="English level:" value={user?.englishLevel || "Not set"} />
+                                <ProfileDetail label="Movies started:" value={moviesStarted} />
 
                                 <div className="profile-detail">
                                     <Text className="profile-label">Interests:</Text>
                                     <div className="interests-badges">
-                                        {user?.interests?.length ? (
+                                        {Array.isArray(user?.interests) && user.interests.length > 0 ? (
                                             user.interests.map((interest, idx) => (
                                                 <span key={idx} className="interest-badge-yellow">
                                                     {interest}
@@ -81,7 +81,7 @@ const Account = () => {
 
                                 <Button
                                     className="update-profile-btn"
-                                    icon={<EditOutlined/>}
+                                    icon={<EditOutlined />}
                                     onClick={() => navigate("/account/update")}
                                 >
                                     Update Profile
@@ -97,8 +97,8 @@ const Account = () => {
 
 
 const ProfileDetail = ({
-                           label, value
-                       }: { label: string; value: string | number }) => (
+    label, value
+}: { label: string; value: string | number }) => (
     <div className="profile-detail">
         <Text className="profile-label">{label}</Text>
         <Text>{value}</Text>

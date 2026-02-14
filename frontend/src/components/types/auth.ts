@@ -4,6 +4,7 @@ export interface User {
     name: string;
     englishLevel?: string;
     interests?: string[];
+    photo?: string;
     role?: "USER" | "ADMIN";
 }
 

@@ -1,13 +1,14 @@
 import React from "react";
-import {Button, Drawer, Menu, Typography, message as antMessage} from "antd";
+import { Button, Drawer, Menu, Typography, message as antMessage, Avatar } from "antd";
 import {
-    CloseOutlined,
     LogoutOutlined,
+    UserOutlined
 } from "@ant-design/icons";
-import {useNavigate, useLocation} from "react-router-dom";
-import {getMenuItems} from "./Menu.tsx";
+import { useNavigate, useLocation } from "react-router-dom";
+import { getMenuItems } from "./Menu.tsx";
+import { useAuth } from "../auth/useAuth.tsx";
 
-const {Title} = Typography;
+const { Title } = Typography;
 
 type Props = {
     open: boolean;
@@ -16,14 +17,15 @@ type Props = {
     messageApi: ReturnType<typeof antMessage.useMessage>[0];
 };
 
-const SidebarDrawer: React.FC<Props> = ({open, onClose, isAdmin, messageApi}) => {
+const SidebarDrawer: React.FC<Props> = ({ open, onClose, isAdmin, messageApi }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { user, logout } = useAuth();
 
     const items = getMenuItems(navigate, isAdmin, (msg: string) => messageApi.error(msg), onClose);
 
     const handleLogout = () => {
-        window.location.href = "http://localhost:8080/logout";
+        logout();
     };
 
     return (
@@ -40,22 +42,22 @@ const SidebarDrawer: React.FC<Props> = ({open, onClose, isAdmin, messageApi}) =>
                             <span className="sidebar-title-movie">MOVIE</span>
                             <span className="sidebar-title-learn">LEARN</span>
                         </Title>
-                        <Button
-                            type="text"
-                            icon={<CloseOutlined/>}
-                            onClick={onClose}
-                            className="drawer-close-button"
+                        <Avatar
+                            size={48}
+                            src={user?.photo ? `/api/users/photo/${user.id}` : undefined}
+                            icon={!user?.photo && <UserOutlined />}
+                            className="sidebar-avatar"
                         />
                     </div>
 
                     <div className="drawer-menu-container">
-                        <Menu mode="vertical" selectedKeys={[location.pathname]} items={items}/>
+                        <Menu mode="vertical" selectedKeys={[location.pathname]} items={items} />
                     </div>
                 </div>
 
                 <Button
                     type="primary"
-                    icon={<LogoutOutlined/>}
+                    icon={<LogoutOutlined />}
                     className="sidebar-logout"
                     onClick={handleLogout}
                 >

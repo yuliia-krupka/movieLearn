@@ -111,7 +111,7 @@ public class MovieService {
                 movie.setDescription(movieDto.getDescription());
             }
 
-            if (movieDto.getGenres() != null && !movieDto.getGenres().isEmpty()) {
+            if (movieDto.getGenres() != null) {
                 List<Genre> genreList = movieDto.getGenres().stream()
                         .map(String::trim)
                         .map(genreRepository::findByName)

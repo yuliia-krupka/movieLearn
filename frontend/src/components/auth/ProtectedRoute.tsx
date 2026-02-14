@@ -17,8 +17,7 @@ export const ProtectedRoute = ({children, requireAuth = true, requireAdmin = fal
                 message.error('Please log in first');
                 navigate('/', {replace: true});
             } else if (requireAdmin && !isAdmin) {
-                message.error('Access denied');
-                navigate(-1);
+                navigate('/access-denied', {replace: true});
             }
         }
     }, [isAuthenticated, isAdmin, isLoading, requireAuth, requireAdmin, navigate]);

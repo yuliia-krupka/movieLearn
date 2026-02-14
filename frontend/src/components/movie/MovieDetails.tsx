@@ -1,15 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
-import {Spin, Button, Layout, Row, Col, message as antMessage} from 'antd';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Spin, Button, Layout, Row, Col, message as antMessage } from 'antd';
 import axios from "axios";
 import Sidebar from "../layout/Sidebar.tsx";
 import TopBar from "../layout/TopBar.tsx";
-import {useAuth} from '../auth/useAuth';
+import { useAuth } from '../auth/useAuth';
 import '../css/MovieDetails.css';
 import '../css/movies.css';
 import '../css/Layout.css';
 
-const {Content} = Layout;
+const { Content } = Layout;
 
 interface MovieDetails {
     id: number;
@@ -20,7 +20,7 @@ interface MovieDetails {
 }
 
 const MovieDetails: React.FC = () => {
-    const {id} = useParams<{ id: string }>();
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [movie, setMovie] = useState<MovieDetails | null>(null);
     const [isAdded, setIsAdded] = useState(false);
@@ -28,7 +28,7 @@ const MovieDetails: React.FC = () => {
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [message, contextHolder] = antMessage.useMessage();
-    const {isAdmin} = useAuth();
+    const { isAdmin } = useAuth();
 
     useEffect(() => {
         if (errorMsg) {
@@ -95,7 +95,7 @@ const MovieDetails: React.FC = () => {
         }
     };
 
-    if (loading) return <Spin size="large" className="loading-spinner"/>;
+    if (loading) return <Spin size="large" className="loading-spinner" />;
     if (!movie) return null;
 
     const imageSource = movie.image
@@ -106,9 +106,9 @@ const MovieDetails: React.FC = () => {
 
     return (
         <Layout>
-            <Sidebar/>
+            <Sidebar />
             <Layout className="account-root-layout">
-                <TopBar/>
+                <TopBar />
                 {contextHolder}
                 <Content className="content">
                     <div className="movie-poster-container">
@@ -122,7 +122,7 @@ const MovieDetails: React.FC = () => {
                             <div className="movie-poster-placeholder">...</div>
                         )}
 
-                        <div className="image-fade-bottom"/>
+                        <div className="image-fade-bottom" />
 
                         <div className="movie-title-overlay">
                             <div className="movie-title-main">
@@ -154,7 +154,7 @@ const MovieDetails: React.FC = () => {
                                 )}
                                 {isAdmin && (
                                     <div className="movie-actions">
-                                        <Button className="yellow-btn" onClick={() => navigate(`/movies/${id}/update`)}>
+                                        <Button className="yellow-btn" onClick={() => navigate(`/admin/movies/${id}/update`)}>
                                             Edit
                                         </Button>
                                         <Button className="yellow-btn" onClick={handleDelete}>
