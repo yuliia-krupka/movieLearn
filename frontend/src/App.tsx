@@ -12,6 +12,7 @@ import UpdateMovie from "./components/movie/UpdateMovie.tsx";
 import {AuthProvider} from "./components/auth/AuthProvider.tsx";
 import {ProtectedRoute} from "./components/auth/ProtectedRoute.tsx";
 import UsersAdminPanel from "./components/UsersAdminPanel.tsx";
+import FlashCardsModule from "./components/flash-card/FlashCardsModule.tsx";
 
 function App() {
     return (
@@ -84,6 +85,14 @@ function App() {
                         element={
                             <ProtectedRoute requireAdmin requireAuth={true}>
                                 <UsersAdminPanel/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/flash-cards"
+                        element={
+                            <ProtectedRoute requireAuth={true}>
+                                <FlashCardsModule/>
                             </ProtectedRoute>
                         }
                     />
