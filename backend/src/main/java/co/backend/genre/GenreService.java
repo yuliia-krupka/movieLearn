@@ -7,12 +7,14 @@ import co.backend.movie.Movie;
 import co.backend.movie.MovieRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class GenreService {
     private final GenreRepository genreRepository;
     private final GenreMapper genreMapper;
@@ -27,18 +29,19 @@ public class GenreService {
         return genreMapper.toDTO(genreRepository.save(genre));
     }
 
+    @Transactional
     public GenreDto updateGenre(Long id, GenreDto genreDTO) {
         Genre existingGenre = genreRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found"));
 
-        if (genreRepository.existsByName(genreDTO.getName())) {
+        if (!existingGenre.getName().equalsIgnoreCase(genreDTO.getName()) &&
+                genreRepository.existsByName(genreDTO.getName())) {
             throw new DuplicateEntityException("Genre with name '" + genreDTO.getName() + "' already exists");
         }
 
         existingGenre.setName(genreDTO.getName());
         return genreMapper.toDTO(genreRepository.save(existingGenre));
     }
-
 
     public List<GenreDto> getAllGenres() {
         return genreRepository.findAll().stream()
@@ -59,7 +62,6 @@ public class GenreService {
 
         genreRepository.deleteById(id);
     }
-
 
     public GenreDto getGenreById(Long id) {
         Genre genre = genreRepository.findById(id)

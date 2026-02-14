@@ -6,10 +6,10 @@ import co.backend.exceptions.NotFoundException;
 import co.backend.exceptions.UnsupportedFileTypeException;
 import co.backend.movie.Movie;
 import co.backend.movie.MovieRepository;
-import co.backend.movie.MovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
@@ -93,10 +94,8 @@ public class UserService {
             user.setInterests(interestsStr);
         }
 
-
         return userMapper.toDto(userRepository.save(user));
     }
-
 
     public UserDto getCurrentUser(OAuth2User oauth2User) {
         String email = oauth2User.getAttribute("email");
@@ -162,7 +161,6 @@ public class UserService {
         user.getMovies().add(movie);
         userRepository.save(user);
     }
-
 
     private void validateFile(MultipartFile file) {
         String fileType = file.getContentType();

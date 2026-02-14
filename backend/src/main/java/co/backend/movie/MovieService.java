@@ -9,6 +9,7 @@ import co.backend.user.User;
 import co.backend.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
+@Transactional
 public class MovieService {
     private final MovieRepository movieRepository;
     private final GenreRepository genreRepository;
@@ -89,7 +91,6 @@ public class MovieService {
         }
     }
 
-
     public MovieDto updateMovie(Long movieId, MovieDto movieDto, MultipartFile image, MultipartFile script) {
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new NotFoundException("Movie not found with id: " + movieId));
@@ -139,14 +140,12 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-
     public List<MovieDto> getMoviesByTitle(String title) {
         List<Movie> movies = movieRepository.findByTitleContainingIgnoreCase(title);
         return movies.stream()
                 .map(movieMapper::toDto)
                 .collect(Collectors.toList());
     }
-
 
     public List<MovieDto> getMoviesByUser(Long userId) {
         User user = userRepository.findById(userId)
@@ -162,6 +161,5 @@ public class MovieService {
     public int getMoviesCountByUserId(Long userId) {
         return movieRepository.countMoviesByUsers_Id(userId);
     }
-
 
 }

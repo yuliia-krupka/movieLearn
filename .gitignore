@@ -1,0 +1,31 @@
+# IDEs
+.idea
+*.iml
+.vscode
+.settings
+.classpath
+.project
+
+# System
+.DS_Store
+
+# Java / Spring Boot
+**/target/
+**/build/
+**/.gradle/
+**/out/
+**/bin/
+*.class
+*.jar
+*.war
+
+# Node / Frontend
+**/node_modules/
+**/dist/
+**/coverage/
+
+# Logs
+*.log
+
+# Misc
+*.xml

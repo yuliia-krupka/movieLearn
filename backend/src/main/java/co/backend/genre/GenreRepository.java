@@ -1,6 +1,5 @@
 package co.backend.genre;
 
-import co.backend.movie.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,5 +12,4 @@ public interface GenreRepository extends JpaRepository<Genre, Long> {
     Genre findByName(String name);
 
     List<Genre> findAllByNameIn(List<String> genreNames);
-
 }
