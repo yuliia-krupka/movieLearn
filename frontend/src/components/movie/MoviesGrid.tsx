@@ -1,24 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Row, Col, Typography, Pagination,
-    Spin, Empty, message as antMessage, Select, Space
+    Spin, Empty, Select, Space
 } from 'antd';
 import MovieCard from "./MovieCard";
-import {useGenres} from '../hooks/useGenres';
-import {useLocation} from 'react-router-dom';
-import axios from 'axios';
+import { useGenres } from '../hooks/useGenres';
+import { useLocation } from 'react-router-dom';
 import '../css/MoviesGrid.css';
 
-const {Title} = Typography;
-const {Option} = Select;
+const { Title } = Typography;
+const { Option } = Select;
 
-interface Movie {
-    id: number;
-    title: string;
-    description: string;
-    genres: string[];
-    image: string;
-}
+import { useMovies } from '../hooks/useMovies';
+import '../css/MoviesGrid.css';
 
 interface MoviesGridProps {
     apiEndpoint: string;
@@ -28,18 +22,25 @@ interface MoviesGridProps {
 }
 
 const MoviesGrid: React.FC<MoviesGridProps> = ({
-                                                   apiEndpoint,
-                                                   title,
-                                                   emptyMessage = "No movies available. Please check back later!",
-                                                   showGenreFilter = true,
-                                               }) => {
-    const [movies, setMovies] = useState<Movie[]>([]);
-    const {genres, loading: genresLoading} = useGenres();
+    apiEndpoint,
+    title,
+    emptyMessage = "No movies available. Please check back later!",
+    showGenreFilter = true,
+}) => {
+    const { genres, loading: genresLoading } = useGenres();
     const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [loading, setLoading] = useState(true);
-    const [messageApi, contextHolder] = antMessage.useMessage();
     const location = useLocation();
+
+
+    const searchParams = new URLSearchParams(location.search);
+    const searchQuery = searchParams.get('search');
+
+    const { movies, loading } = useMovies({
+        apiEndpoint,
+        searchQuery,
+        selectedGenres
+    });
 
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -66,35 +67,6 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
         colSpan = 6;
     }
 
-    const searchParams = new URLSearchParams(location.search);
-    const searchQuery = searchParams.get('search');
-
-    useEffect(() => {
-        async function fetchMovies() {
-            setLoading(true);
-            try {
-                const params = new URLSearchParams();
-
-                if (searchQuery && searchQuery.trim()) {
-                    params.append('title', searchQuery.trim());
-                } else if (selectedGenres.length > 0) {
-                    params.append('genre', selectedGenres.join(','));
-                }
-
-                const url = params.toString() ? `${apiEndpoint}?${params.toString()}` : apiEndpoint;
-
-                const response = await axios.get(url, {withCredentials: true});
-                setMovies(response.data);
-            } catch (err) {
-                console.error(err);
-                messageApi.error('Error during loading movies, try again later.');
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchMovies().catch(console.error);
-    }, [apiEndpoint, messageApi, searchQuery, selectedGenres]);
 
     const filteredMovies = searchQuery ? movies : (
         selectedGenres.length === 0
@@ -117,7 +89,6 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
 
     return (
         <>
-            {contextHolder}
             <Row justify="space-between" align="middle" className="title-row">
                 <Col>
                     <Title level={5} className="subtitle">
@@ -130,12 +101,12 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                             <Select
                                 mode="multiple"
                                 placeholder="Filter by genre"
-                                style={{width: 200}}
+                                style={{ width: 200 }}
                                 onChange={setSelectedGenres}
                                 value={selectedGenres}
                                 allowClear
                             >
-                                {genres.map(({id, name}) => (
+                                {genres.map(({ id, name }) => (
                                     <Option key={id} value={name}>{name}</Option>
                                 ))}
                             </Select>
@@ -145,22 +116,22 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
             </Row>
 
             {isLoading ? (
-                <div style={{display: 'flex', justifyContent: 'center', padding: '50px 0'}}>
-                    <Spin size="large"/>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '50px 0' }}>
+                    <Spin size="large" />
                 </div>
             ) : filteredMovies.length === 0 ? (
-                <div style={{display: 'flex', justifyContent: 'center', padding: '50px 0'}}>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '50px 0' }}>
                     <Empty description={
                         searchQuery
                             ? `No movies found for "${searchQuery}"`
                             : selectedGenres.length > 0
                                 ? "No movies match the selected genres"
                                 : emptyMessage
-                    }/>
+                    } />
                 </div>
             ) : (
                 <>
-                    <Row gutter={[12, 12]} style={{marginBottom: '16px'}}>
+                    <Row gutter={[12, 12]} style={{ marginBottom: '16px' }}>
                         {currentMovies.map(movie => (
                             <Col
                                 key={movie.id}
@@ -169,9 +140,9 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                                 md={colSpan}
                                 lg={colSpan}
                                 xl={colSpan}
-                                style={{display: 'flex', justifyContent: 'flex-start'}} // Вирівнюємо картки ліворуч
+                                style={{ display: 'flex', justifyContent: 'flex-start' }} // Вирівнюємо картки ліворуч
                             >
-                                <MovieCard movie={movie}/>
+                                <MovieCard movie={movie} />
                             </Col>
                         ))}
                     </Row>
@@ -184,7 +155,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                         showSizeChanger={false}
                         showQuickJumper={false}
                         responsive={true}
-                        style={{textAlign: 'center', margin: '16px 0'}}
+                        style={{ textAlign: 'center', margin: '16px 0' }}
                     />
                 </>
             )}

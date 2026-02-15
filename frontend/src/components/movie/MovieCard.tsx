@@ -1,10 +1,10 @@
 import React from 'react';
-import {Card} from 'antd';
-import {useNavigate} from 'react-router-dom';
+import { Card } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import '../css/MovieCard.css';
 import '../css/movies.css';
 
-const {Meta} = Card;
+const { Meta } = Card;
 
 interface MovieCardProps {
     movie: {
@@ -16,7 +16,7 @@ interface MovieCardProps {
     };
 }
 
-const MovieCard: React.FC<MovieCardProps> = ({movie}) => {
+const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
@@ -34,7 +34,7 @@ const MovieCard: React.FC<MovieCardProps> = ({movie}) => {
             hoverable
             className="movie-card"
             onClick={handleClick}
-            style={{cursor: 'pointer'}}
+            style={{ cursor: 'pointer' }}
             cover={
                 imageSource ? (
                     <img
@@ -43,7 +43,7 @@ const MovieCard: React.FC<MovieCardProps> = ({movie}) => {
                         className="movie-card-cover"
                     />
                 ) : (
-                    <div className="movie-card-placeholder"/>
+                    <div className="movie-card-placeholder" />
                 )
             }
         >

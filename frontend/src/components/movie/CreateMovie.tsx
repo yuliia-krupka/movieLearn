@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
     Form,
     Input,
@@ -6,28 +6,25 @@ import {
     Typography,
     Card,
     Space,
-    Layout,
 } from 'antd';
-import { SaveFilled, CloseOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import {SaveFilled, CloseOutlined} from '@ant-design/icons';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
-import { useGenres } from '../hooks/useGenres.tsx';
-import { useFileUpload } from '../hooks/useFileUpload.tsx';
-import { type MovieFormData, type NewGenreData } from '../types/movies.ts';
+import {useGenres} from '../hooks/useGenres.tsx';
+import {useFileUpload} from '../hooks/useFileUpload.tsx';
+import {type MovieFormData, type NewGenreData} from '../types/movies.ts';
 import GenreSelector from '../genre/GenreSelector.tsx';
 import FileUploader from './FileUploader.tsx';
 import AddGenreModal from '../genre/AddGenreModal.tsx';
-import Sidebar from '../layout/Sidebar.tsx';
-import TopBar from '../layout/TopBar.tsx';
+import MainLayout from '../layout/MainLayout.tsx';
 import useMessage from 'antd/es/message/useMessage';
-import { ErrorHandler } from '../err/ErrorHandler.tsx';
+import {ErrorHandler} from '../err/ErrorHandler.tsx';
 import '../css/Layout.css';
 import '../css/movies.css';
 import '../css/CreateMovie.css';
 
-const { Title } = Typography;
-const { TextArea } = Input;
-const { Content } = Layout;
+const {Title} = Typography;
+const {TextArea} = Input;
 
 const CreateMovieForm: React.FC = () => {
     const [submitting, setSubmitting] = useState(false);
@@ -36,7 +33,7 @@ const CreateMovieForm: React.FC = () => {
 
     const [customMessage, contextHolder] = useMessage();
     const navigate = useNavigate();
-    const { genres, loading, addGenre, fetchGenres } = useGenres();
+    const {genres, loading, addGenre, fetchGenres} = useGenres();
     const imageUpload = useFileUpload('Please upload a poster');
     const scriptUpload = useFileUpload('Please upload a script file');
 
@@ -72,7 +69,7 @@ const CreateMovieForm: React.FC = () => {
             description: values.description,
             genres: values.genres,
         };
-        formData.append('movieData', new Blob([JSON.stringify(movieData)], { type: 'application/json' }));
+        formData.append('movieData', new Blob([JSON.stringify(movieData)], {type: 'application/json'}));
         if (imageUpload.file) {
             formData.append('image', imageUpload.file);
         }
@@ -84,7 +81,7 @@ const CreateMovieForm: React.FC = () => {
 
     const submitMovieData = async (formData: FormData): Promise<void> => {
         const response = await axios.post('/api/movies', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+            headers: {'Content-Type': 'multipart/form-data'},
             withCredentials: true,
         });
         customMessage.success('Movie created successfully!');
@@ -110,18 +107,11 @@ const CreateMovieForm: React.FC = () => {
     };
 
     const renderLoadingState = () => (
-        <Layout className="account-root-layout">
-            <Sidebar />
-            <Layout>
-                {contextHolder}
-                <TopBar />
-                <Content className="content">
-                    <div className="loading-container">
-                        <span>Loading genres...</span>
-                    </div>
-                </Content>
-            </Layout>
-        </Layout>
+        <MainLayout messageContext={contextHolder}>
+            <div className="loading-container">
+                <span>Loading genres...</span>
+            </div>
+        </MainLayout>
     );
 
     const renderFormContent = () => (
@@ -135,30 +125,30 @@ const CreateMovieForm: React.FC = () => {
                     label="Title"
                     name="title"
                     rules={[
-                        { required: true, message: 'Please enter movie title' },
-                        { min: 2, message: 'Title must be at least 2 characters' },
+                        {required: true, message: 'Please enter movie title'},
+                        {min: 2, message: 'Title must be at least 2 characters'},
                         {
                             pattern: /^[A-Za-z0-9\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]*$/,
                             message: 'Only English letters, numbers, and symbols are allowed'
                         }
                     ]}
                 >
-                    <Input placeholder="Enter movie title" />
+                    <Input placeholder="Enter movie title"/>
                 </Form.Item>
 
                 <Form.Item
                     label="Description"
                     name="description"
                     rules={[
-                        { required: true, message: 'Please enter movie description' },
-                        { min: 2, message: 'Description must be at least 2 characters' },
+                        {required: true, message: 'Please enter movie description'},
+                        {min: 2, message: 'Description must be at least 2 characters'},
                         {
                             pattern: /^[A-Za-z0-9\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]*$/,
                             message: 'Only English letters, numbers, and symbols are allowed'
                         }
                     ]}
                 >
-                    <TextArea rows={4} placeholder="Enter movie description" />
+                    <TextArea rows={4} placeholder="Enter movie description"/>
                 </Form.Item>
 
                 <GenreSelector
@@ -191,13 +181,13 @@ const CreateMovieForm: React.FC = () => {
                     uploadButtonText="Upload Script File"
                 />
 
-                <Form.Item style={{ textAlign: 'center', marginTop: 24 }}>
+                <Form.Item style={{textAlign: 'center', marginTop: 24}}>
                     <Space size="middle">
                         <Button
                             className="yellow-btn"
                             htmlType="submit"
                             loading={submitting}
-                            icon={<SaveFilled />}
+                            icon={<SaveFilled/>}
                             size="large"
                         >
                             {submitting ? 'Creating...' : 'Create Movie'}
@@ -205,7 +195,7 @@ const CreateMovieForm: React.FC = () => {
                         <Button
                             className="blue-btn"
                             onClick={handleCancel}
-                            icon={<CloseOutlined />}
+                            icon={<CloseOutlined/>}
                             size="large"
                         >
                             Cancel
@@ -221,23 +211,16 @@ const CreateMovieForm: React.FC = () => {
     }
 
     return (
-        <Layout className="account-root-layout">
-            <Sidebar />
-            <Layout>
-                {contextHolder}
-                <TopBar />
-                <Content className="content">
-                    <Title level={2}>Add New Movie</Title>
-                    {renderFormContent()}
-                    <AddGenreModal
-                        visible={isGenreModalVisible}
-                        loading={addingGenre}
-                        onCancel={() => setIsGenreModalVisible(false)}
-                        onSubmit={handleAddNewGenre}
-                    />
-                </Content>
-            </Layout>
-        </Layout>
+        <MainLayout messageContext={contextHolder}>
+            <Title level={2}>Add New Movie</Title>
+            {renderFormContent()}
+            <AddGenreModal
+                visible={isGenreModalVisible}
+                loading={addingGenre}
+                onCancel={() => setIsGenreModalVisible(false)}
+                onSubmit={handleAddNewGenre}
+            />
+        </MainLayout>
     );
 };
 

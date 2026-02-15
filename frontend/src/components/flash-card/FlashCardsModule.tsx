@@ -1,8 +1,6 @@
-import React, {useState} from 'react';
-import {Layout} from 'antd';
+import React, { useState } from 'react';
 import FlashCard from './FlashCard';
-import Sidebar from "../layout/Sidebar.tsx";
-import TopBar from "../layout/TopBar.tsx";
+import MainLayout from "../layout/MainLayout.tsx";
 import '../css/Layout.css';
 
 interface FlashCardData {
@@ -11,20 +9,20 @@ interface FlashCardData {
 }
 
 const flashcards: FlashCardData[] = [
-    {word: "CAPACITY", translation: "МІСТКІСТЬ"},
-    {word: "BRILLIANT", translation: "БЛИСКУЧИЙ"},
-    {word: "ADVENTURE", translation: "ПРИГОДА"},
-    {word: "MYSTERIOUS", translation: "ТАЄМНИЧИЙ"},
-    {word: "COURAGE", translation: "СМІЛИВІСТЬ"},
-    {word: "INSIGHT", translation: "РОЗУМІННЯ"},
-    {word: "CREATIVE", translation: "ТВОРЧИЙ"},
-    {word: "INNOVATION", translation: "ІННОВАЦІЯ"},
-    {word: "EXPLORATION", translation: "ДОСЛІДЖЕННЯ"},
-    {word: "RESILIENCE", translation: "СТІЙКІСТЬ"}
+    { word: "CAPACITY", translation: "МІСТКІСТЬ" },
+    { word: "BRILLIANT", translation: "БЛИСКУЧИЙ" },
+    { word: "ADVENTURE", translation: "ПРИГОДА" },
+    { word: "MYSTERIOUS", translation: "ТАЄМНИЧИЙ" },
+    { word: "COURAGE", translation: "СМІЛИВІСТЬ" },
+    { word: "INSIGHT", translation: "РОЗУМІННЯ" },
+    { word: "CREATIVE", translation: "ТВОРЧИЙ" },
+    { word: "INNOVATION", translation: "ІННОВАЦІЯ" },
+    { word: "EXPLORATION", translation: "ДОСЛІДЖЕННЯ" },
+    { word: "RESILIENCE", translation: "СТІЙКІСТЬ" }
 ];
 
 
-const {Content} = Layout;
+
 
 const FlashCardsModule: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,28 +40,22 @@ const FlashCardsModule: React.FC = () => {
     };
 
     return (
-        <Layout style={{minHeight: '100vh'}}>
-            <Sidebar/>
-            <Layout>
-                <TopBar/>
-                <Content className="flashcard-content">
-                    <FlashCard
-                        word={currentCard.word}
-                        translation={currentCard.translation}
-                        onPrevious={handlePrevious}
-                        onNext={handleNext}
-                        onKnow={handleKnow}
-                        onDontKnow={handleDontKnow}
-                        hasPrevious={currentIndex > 0}
-                        hasNext={currentIndex < flashcards.length - 1}
-                    />
+        <MainLayout className="flashcard-content">
+            <FlashCard
+                word={currentCard.word}
+                translation={currentCard.translation}
+                onPrevious={handlePrevious}
+                onNext={handleNext}
+                onKnow={handleKnow}
+                onDontKnow={handleDontKnow}
+                hasPrevious={currentIndex > 0}
+                hasNext={currentIndex < flashcards.length - 1}
+            />
 
-                    <div className="flashcard-counter">
-                        {currentIndex + 1} / {flashcards.length}
-                    </div>
-                </Content>
-            </Layout>
-        </Layout>
+            <div className="flashcard-counter">
+                {currentIndex + 1} / {flashcards.length}
+            </div>
+        </MainLayout >
     );
 };
 
