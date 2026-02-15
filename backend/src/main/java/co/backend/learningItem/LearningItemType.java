@@ -1,5 +1,6 @@
 package co.backend.learningItem;
 
 public enum LearningItemType {
-    WORD, PHRASE, TEST
+    FLASH_CARD,
+    TEST
 }

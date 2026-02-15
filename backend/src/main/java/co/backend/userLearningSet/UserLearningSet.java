@@ -24,7 +24,11 @@ public class UserLearningSet {
     @JoinColumn(name = "learning_set_id")
     private LearningSet learningSet;
 
-    private Integer completedItems;
+    private boolean flashcardsCompleted;
 
-    private Integer score;
+    private boolean testsCompleted;
+
+    private Integer flashcardsScore;
+
+    private Integer testsScore;
 }

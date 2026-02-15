@@ -34,7 +34,9 @@ public class UserLearningItemStatus {
     @Enumerated(EnumType.STRING)
     private LearningStatus status;
 
-    private Integer attempts;
+    private Integer correctAnswers;
+
+    private Integer totalAttempts;
 
     private LocalDateTime lastAttemptAt;
 }
