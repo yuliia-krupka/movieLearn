@@ -71,7 +71,8 @@ public class TestDataProvider {
 
         // --- TEST items (множинний вибір) ---
         items.add(createTestItem(set, "What does 'endeavor' mean?",
-                List.of("A lazy attempt", "A serious effort or attempt", "A loud noise", "A type of food"),
+                List.of("A lazy attempt", "A serious effort or attempt", "A loud noise",
+                        "A type of food"),
                 "починання, зусилля"));
 
         items.add(createTestItem(set, "Choose the correct synonym for 'reluctant':",
@@ -83,8 +84,7 @@ public class TestDataProvider {
                         "The boring movie was compelling.",
                         "She made a compelling argument for change.",
                         "He compelled his lunch quickly.",
-                        "The compelling weather was nice."
-                ),
+                        "The compelling weather was nice."),
                 "переконливий"));
 
         items.add(createTestItem(set, "'Resilience' is closest in meaning to:",

@@ -4,23 +4,29 @@ import '../css/FlashCard.css';
 interface FlashCardProps {
     word: string;
     translation: string;
+    exampleSentence?: string;
     onPrevious?: () => void;
     onNext?: () => void;
     onKnow?: () => void;
     onDontKnow?: () => void;
     hasPrevious?: boolean;
     hasNext?: boolean;
+    allReviewed?: boolean;
+    onSeeResults?: () => void;
 }
 
 const FlashCard: React.FC<FlashCardProps> = ({
                                                  word,
                                                  translation,
+                                                 exampleSentence,
                                                  onPrevious,
                                                  onNext,
                                                  onKnow,
                                                  onDontKnow,
                                                  hasPrevious = true,
-                                                 hasNext = true
+                                                 hasNext = true,
+                                                 allReviewed = false,
+                                                 onSeeResults
                                              }) => {
     const [isFlipped, setIsFlipped] = useState(false);
 
@@ -64,6 +70,9 @@ const FlashCard: React.FC<FlashCardProps> = ({
                     <div className={`card ${isFlipped ? 'flipped' : ''}`}>
                         <div className="front">
                             <h2>{word.toUpperCase()}</h2>
+                            {exampleSentence && (
+                                <p className="example-sentence">{exampleSentence}</p>
+                            )}
                             <p>Tap to see translation</p>
                         </div>
                         <div className="back">
@@ -77,8 +86,14 @@ const FlashCard: React.FC<FlashCardProps> = ({
             </div>
 
             <div className="actions">
-                <button onClick={handleKnow}>I know</button>
-                <button onClick={handleDontKnow}>I don't know</button>
+                {allReviewed ? (
+                    <button className="see-results-button" onClick={onSeeResults}>See Results</button>
+                ) : (
+                    <>
+                        <button onClick={handleKnow}>I know</button>
+                        <button className="dont-know-btn" onClick={handleDontKnow}>I don't know</button>
+                    </>
+                )}
             </div>
         </div>
     );

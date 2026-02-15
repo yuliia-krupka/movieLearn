@@ -1,3 +1,25 @@
+.flashcard-content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.learning-set-info {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.learning-set-info h2 {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #888;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
 .flashcard-container {
     display: flex;
     flex-direction: column;
@@ -69,7 +91,8 @@
     transform: rotateY(180deg);
 }
 
-.front, .back {
+.front,
+.back {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -94,12 +117,22 @@
     transform: rotateY(180deg);
 }
 
-.front p, .back p {
+.front p,
+.back p {
     font-size: 0.9rem;
     font-weight: 400;
     color: rgba(255, 255, 255, 0.7);
     margin-top: 12px;
     opacity: 0.8;
+}
+
+.example-sentence {
+    font-style: italic;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 16px 0;
+    padding: 0 20px;
+    line-height: 1.4;
 }
 
 .actions {
@@ -123,6 +156,15 @@
     background: #fff2e8;
 }
 
+.actions .dont-know-btn {
+    border-color: #5A73DB;
+    color: #5A73DB;
+}
+
+.actions .dont-know-btn:hover {
+    background: #eef1fb;
+}
+
 .flashcard-counter {
     margin-top: 16px;
     color: #888;
@@ -130,6 +172,28 @@
     text-align: center;
     width: 100%;
     font-size: 1rem;
+}
+
+.actions .see-results-button {
+    margin-top: 0;
+    padding: 14px 40px;
+    border-radius: 24px;
+    border: none;
+    background: #5A73DB;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.25s, transform 0.15s;
+}
+
+.actions .see-results-button:hover {
+    background: #4A63CB;
+    transform: translateY(-2px);
+}
+
+.see-results-button:active {
+    transform: translateY(0);
 }
 
 .nav-buttons-mobile {
@@ -164,7 +228,8 @@
         position: static;
     }
 
-    .nav-prev, .nav-next {
+    .nav-prev,
+    .nav-next {
         display: none;
     }
 
@@ -205,11 +270,19 @@
         padding: 12px 20px;
     }
 
-    .front, .back {
+    .front,
+    .back {
         font-size: 1.4rem;
     }
 
-    .front p, .back p {
+    .front p,
+    .back p {
         font-size: 0.8rem;
+    }
+
+    .example-sentence {
+        font-size: 0.85rem;
+        padding: 0 16px;
+        margin: 12px 0;
     }
 }

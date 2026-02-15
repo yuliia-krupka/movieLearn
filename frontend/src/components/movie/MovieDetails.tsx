@@ -85,7 +85,7 @@ const MovieDetails: React.FC = () => {
                 withCredentials: true,
             });
             setIsAdded(true);
-            navigate("/flash-cards");
+            navigate("/flash-cards", {state: {movieId: Number(id)}});
         } catch (error) {
             console.error('Error adding movie:', error);
         } finally {
