@@ -67,6 +67,7 @@ const MovieDetails: React.FC = () => {
         fetchMovie();
     }, [id, navigate]);
 
+
     const handleDelete = () => {
         axios.delete(`/api/movies/${id}`)
             .then(() => navigate('/movies'))
@@ -91,6 +92,10 @@ const MovieDetails: React.FC = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const goToTest = () => {
+        navigate("/tests", {state: {movieId: Number(id)}});
     };
 
     if (loading) return <Spin size="large" className="loading-spinner"/>;
@@ -140,7 +145,10 @@ const MovieDetails: React.FC = () => {
                                 <Button className="yellow-btn" onClick={addMovieToUser} disabled={isAdded}>
                                     Study Vocabulary
                                 </Button>
-                                <Button className="yellow-btn" onClick={addMovieToUser} disabled={isAdded}>
+                                <Button
+                                    className="yellow-btn"
+                                    onClick={goToTest}
+                                >
                                     Vocabulary Test
                                 </Button>
                             </div>

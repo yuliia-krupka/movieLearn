@@ -3,9 +3,14 @@ import FlashCard from './FlashCard';
 import ResultsPage from './ResultsPage';
 import MainLayout from "../layout/MainLayout.tsx";
 import '../css/Layout.css';
-import {type FlashCardData, type LearningSetDto, learningSetService} from '../../services/learningSetService';
-
-import {useLocation} from 'react-router-dom';
+import {
+    type FlashCardData,
+    type LearningSetDto,
+    type ItemStatusDto,
+    learningSetService
+} from '../../services/learningSetService';
+import {useAuth} from '../auth/useAuth';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 interface FlashCardsModuleProps {
     movieId?: number;
@@ -14,6 +19,8 @@ interface FlashCardsModuleProps {
 
 const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
     const location = useLocation();
+    const navigate = useNavigate();
+    const {currentUserId} = useAuth();
     const stateMovieId = location.state?.movieId;
     const movieId = props.movieId || stateMovieId;
     const learningSetId = props.learningSetId;
@@ -23,9 +30,9 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
     const [error, setError] = useState<string | null>(null);
     const [learningSet, setLearningSet] = useState<LearningSetDto | null>(null);
 
-    // Results tracking
     const [results, setResults] = useState<Map<number, boolean>>(new Map());
     const [showResults, setShowResults] = useState(false);
+    const [itemStatuses, setItemStatuses] = useState<ItemStatusDto[]>([]);
 
     const allReviewed = results.size === flashcards.length && flashcards.length > 0;
 
@@ -35,24 +42,11 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                 setLoading(true);
                 setError(null);
 
-                let learningSetData: LearningSetDto | null = null;
-
-                if (learningSetId) {
-                    learningSetData = await learningSetService.getLearningSet(learningSetId);
-                } else if (movieId) {
-                    learningSetData = await learningSetService.getLatestLearningSetByMovie(movieId);
-                    if (!learningSetData) {
-                        learningSetData = await learningSetService.generateLearningSet(movieId);
-                    }
-                } else {
-                    learningSetData = await learningSetService.getLatestLearningSetByMovie(1);
-                    if (!learningSetData) {
-                        learningSetData = await learningSetService.generateLearningSet(1);
-                    }
-                }
+                const targetMovieId = movieId || 1;
+                const learningSetData = await learningSetService.getOrCreateByMovie(targetMovieId);
 
                 setLearningSet(learningSetData);
-                const flashcardData = learningSetService.extractFlashCards(learningSetData);
+                const flashcardData = await learningSetService.getFlashCards(learningSetData.id);
                 setFlashcards(flashcardData);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load flashcards');
@@ -61,7 +55,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
             }
         };
 
-        loadFlashcards();
+        void loadFlashcards();
     }, [movieId, learningSetId]);
 
     const currentCard = flashcards[currentIndex];
@@ -83,10 +77,50 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
         }
     };
 
+    const handleSeeResults = () => {
+        // Show results immediately
+        setShowResults(true);
+
+        // Save answers and fetch statuses in the background
+        if (currentUserId && learningSet) {
+            const score = Array.from(results.values()).filter(Boolean).length;
+
+            // Fire completion independently so it doesn't fail with recordAnswer batch
+            learningSetService.completeFlashcards(currentUserId, learningSet.id, score)
+                .catch(err => console.error('Failed to complete flashcards:', err));
+
+            const answerPromises = Array.from(results.entries()).map(([index, correct]) => {
+                const card = flashcards[index];
+                if (card) {
+                    return learningSetService.recordAnswer(currentUserId, card.id, correct);
+                }
+                return Promise.resolve();
+            });
+
+            Promise.all(answerPromises)
+                .then(() => learningSetService.getItemStatuses(currentUserId, learningSet.id))
+                .then(statuses => setItemStatuses(statuses))
+                .catch(err => console.error('Failed to save answers:', err));
+        }
+    };
+
     const handleTryAgain = () => {
         setResults(new Map());
         setCurrentIndex(0);
         setShowResults(false);
+    };
+
+    const handleGoToTest = () => {
+        navigate('/tests', {state: {movieId: movieId || learningSet?.movieId}});
+    };
+
+    const handleBackToMovie = () => {
+        const mid = movieId || learningSet?.movieId;
+        if (mid) {
+            navigate(`/movies/${mid}`);
+        } else {
+            navigate('/movies');
+        }
     };
 
     if (loading) {
@@ -113,7 +147,6 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
         );
     }
 
-    // Show results page
     if (showResults) {
         return (
             <ResultsPage
@@ -121,6 +154,9 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                 results={results}
                 learningSetName={learningSet?.name || 'Learning Set'}
                 onTryAgain={handleTryAgain}
+                itemStatuses={itemStatuses}
+                onGoToTest={handleGoToTest}
+                onBackToMovie={handleBackToMovie}
             />
         );
     }
@@ -144,7 +180,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                 hasPrevious={currentIndex > 0}
                 hasNext={currentIndex < flashcards.length - 1}
                 allReviewed={allReviewed}
-                onSeeResults={() => setShowResults(true)}
+                onSeeResults={handleSeeResults}
             />
 
             <div className="flashcard-counter">

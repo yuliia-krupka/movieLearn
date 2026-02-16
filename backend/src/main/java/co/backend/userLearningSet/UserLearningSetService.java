@@ -4,11 +4,13 @@ import co.backend.learningSet.LearningSetRepository;
 import co.backend.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class UserLearningSetService {
 
     private final UserLearningSetRepository userLearningSetRepository;

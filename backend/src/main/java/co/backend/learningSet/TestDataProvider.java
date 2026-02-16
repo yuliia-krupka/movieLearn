@@ -71,29 +71,52 @@ public class TestDataProvider {
 
         // --- TEST items (множинний вибір) ---
         items.add(createTestItem(set, "What does 'endeavor' mean?",
-                List.of("A lazy attempt", "A serious effort or attempt", "A loud noise",
-                        "A type of food"),
-                "починання, зусилля"));
+                List.of("A lazy attempt", "A loud noise",
+                        "A serious effort or attempt", "A type of food"),
+                2, "починання, зусилля"));
 
         items.add(createTestItem(set, "Choose the correct synonym for 'reluctant':",
-                List.of("Eager", "Unwilling", "Happy", "Brave"),
-                "неохочий"));
+                List.of("Eager", "Happy", "Brave", "Unwilling"),
+                3, "неохочий"));
 
         items.add(createTestItem(set, "Which sentence uses 'compelling' correctly?",
                 List.of(
-                        "The boring movie was compelling.",
                         "She made a compelling argument for change.",
+                        "The boring movie was compelling.",
                         "He compelled his lunch quickly.",
                         "The compelling weather was nice."),
-                "переконливий"));
+                0, "переконливий"));
 
         items.add(createTestItem(set, "'Resilience' is closest in meaning to:",
-                List.of("Weakness", "Toughness and ability to recover", "Speed", "Intelligence"),
-                "стійкість"));
+                List.of("Weakness", "Speed", "Intelligence",
+                        "Toughness and ability to recover"),
+                3, "стійкість"));
 
         items.add(createTestItem(set, "Fill in the blank: 'The ___ by his ally shocked everyone.'",
-                List.of("resilience", "betrayal", "endeavor", "suspense"),
-                "зрада"));
+                List.of("resilience", "endeavor", "betrayal", "suspense"),
+                2, "зрада"));
+
+        items.add(createTestItem(set, "What is a synonym for 'inevitable'?",
+                List.of("Uncertain", "Unavoidable", "Unlikely", "Mistaken"),
+                1, "неминучий"));
+
+        items.add(createTestItem(set, "'Ambiguous' means:",
+                List.of("Funny", "Clear and precise", "Open to more than one interpretation", "Angry"),
+                2, "двозначний"));
+
+        items.add(createTestItem(set, "Choose the correct use of 'elaborate':",
+                List.of("He elaborate the dinner.", "Could you please elaborate on that idea?",
+                        "The elaborate was tasty.", "She walked elaborate."),
+                1, "деталізувати / складний"));
+
+        items.add(createTestItem(set, "'Subtle' is best described as:",
+                List.of("Loud and obvious", "Bright and colorful", "Delicate or precise",
+                        "Heavy and strong"),
+                2, "тонкий, ледь помітний"));
+
+        items.add(createTestItem(set, "Fill in the blank: 'She felt ___ after sharing her secret.'",
+                List.of("vulnerable", "ambiguous", "elaborate", "inevitable"),
+                0, "вразливий"));
 
         set.setLearningItems(items);
         return set;
@@ -109,11 +132,13 @@ public class TestDataProvider {
         return item;
     }
 
-    private LearningItem createTestItem(LearningSet set, String question, List<String> answers, String translation) {
+    private LearningItem createTestItem(LearningSet set, String question, List<String> answers,
+                                        int correctAnswerIndex, String translation) {
         LearningItem item = new LearningItem();
         item.setType(LearningItemType.TEST);
         item.setText(question);
         item.setAnswers(answers);
+        item.setCorrectAnswerIndex(correctAnswerIndex);
         item.setTranslation(translation);
         item.setLearningSet(set);
         return item;

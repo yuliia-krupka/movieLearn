@@ -1,18 +1,23 @@
 package co.backend.learningSet;
 
 import co.backend.learningItem.LearningItemDto;
+import co.backend.learningItem.LearningItemMapper;
+import co.backend.learningItem.LearningItemType;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class LearningSetService {
 
     private final LearningSetRepository learningSetRepository;
     private final LearningSetMapper learningSetMapper;
+    private final LearningItemMapper learningItemMapper;
     private final TestDataProvider testDataProvider;
 
     public LearningSetDto generateForMovie(Long movieId) {
@@ -27,9 +32,32 @@ public class LearningSetService {
                 .map(learningSetMapper::toDto);
     }
 
+    public LearningSetDto getOrCreateByMovieId(Long movieId) {
+        return getLatestByMovieId(movieId)
+                .orElseGet(() -> generateForMovie(movieId));
+    }
+
     public LearningSetDto getById(Long id) {
         LearningSet set = learningSetRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Learning set not found: " + id));
         return learningSetMapper.toDto(set);
+    }
+
+    public List<LearningItemDto> getFlashCardsByLearningSetId(Long learningSetId) {
+        LearningSet set = learningSetRepository.findById(learningSetId)
+                .orElseThrow(() -> new RuntimeException("Learning set not found: " + learningSetId));
+        return set.getLearningItems().stream()
+                .filter(item -> item.getType() == LearningItemType.FLASH_CARD)
+                .map(learningItemMapper::toDto)
+                .toList();
+    }
+
+    public List<LearningItemDto> getTestItemsByLearningSetId(Long learningSetId) {
+        LearningSet set = learningSetRepository.findById(learningSetId)
+                .orElseThrow(() -> new RuntimeException("Learning set not found: " + learningSetId));
+        return set.getLearningItems().stream()
+                .filter(item -> item.getType() == LearningItemType.TEST)
+                .map(learningItemMapper::toDto)
+                .toList();
     }
 }

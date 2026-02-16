@@ -3,6 +3,7 @@ package co.backend.userLearningItemStatus;
 import co.backend.learningItem.LearningItem;
 import co.backend.learningSet.LearningSet;
 import co.backend.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,14 +22,17 @@ public class UserLearningItemStatus {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"password", "role", "profilePictureUrl"})
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "learning_item_id")
+    @JsonIgnoreProperties({"learningSet"})
     private LearningItem learningItem;
 
     @ManyToOne
     @JoinColumn(name = "learning_set_id")
+    @JsonIgnoreProperties({"learningItems"})
     private LearningSet learningSet;
 
     @Enumerated(EnumType.STRING)

@@ -20,3 +20,14 @@
     background-color: #fff;
     border-radius: 8px;
 }
+
+/* Lock the entire layout to viewport when showing movies list */
+.account-root-layout:has(.content-movies) {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.account-root-layout:has(.content-movies) > .ant-layout {
+    height: 100vh;
+    overflow: hidden;
+}

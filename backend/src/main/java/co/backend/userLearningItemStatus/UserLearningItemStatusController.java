@@ -12,19 +12,25 @@ import java.util.List;
 public class UserLearningItemStatusController {
 
     private final UserLearningItemStatusService statusService;
+    private final UserLearningItemStatusMapper statusMapper;
 
     @PostMapping("/answer")
-    public ResponseEntity<UserLearningItemStatus> recordAnswer(
+    public ResponseEntity<UserLearningItemStatusDto> recordAnswer(
             @RequestParam Long userId,
             @RequestParam Long learningItemId,
             @RequestParam boolean correct) {
-        return ResponseEntity.ok(statusService.recordAnswer(userId, learningItemId, correct));
+        UserLearningItemStatus entity = statusService.recordAnswer(userId, learningItemId, correct);
+        return ResponseEntity.ok(statusMapper.toDto(entity));
     }
 
     @GetMapping("/set/{learningSetId}/user/{userId}")
-    public ResponseEntity<List<UserLearningItemStatus>> getStatusesBySet(
+    public ResponseEntity<List<UserLearningItemStatusDto>> getStatusesBySet(
             @PathVariable Long learningSetId,
             @PathVariable Long userId) {
-        return ResponseEntity.ok(statusService.getStatusesByLearningSet(userId, learningSetId));
+        List<UserLearningItemStatusDto> dtos = statusService.getStatusesByLearningSet(userId, learningSetId)
+                .stream()
+                .map(statusMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 }

@@ -22,8 +22,10 @@ public class UserLearningItemStatusService {
                     UserLearningItemStatus newStatus = new UserLearningItemStatus();
                     newStatus.setUser(userRepository.findById(userId)
                             .orElseThrow(() -> new RuntimeException("User not found")));
-                    newStatus.setLearningItem(learningItemRepository.findById(learningItemId)
-                            .orElseThrow(() -> new RuntimeException("Learning item not found")));
+                    var learningItem = learningItemRepository.findById(learningItemId)
+                            .orElseThrow(() -> new RuntimeException("Learning item not found"));
+                    newStatus.setLearningItem(learningItem);
+                    newStatus.setLearningSet(learningItem.getLearningSet());
                     newStatus.setCorrectAnswers(0);
                     newStatus.setTotalAttempts(0);
                     newStatus.setStatus(LearningStatus.IN_PROGRESS);
@@ -33,9 +35,11 @@ public class UserLearningItemStatusService {
         status.setTotalAttempts(status.getTotalAttempts() + 1);
         if (correct) {
             status.setCorrectAnswers(status.getCorrectAnswers() + 1);
+        } else {
+            status.setCorrectAnswers(0);
+            status.setStatus(LearningStatus.IN_PROGRESS);
         }
 
-        // Якщо відповів правильно 3 рази — вважаємо вивченим
         if (status.getCorrectAnswers() >= 3) {
             status.setStatus(LearningStatus.LEARNED);
         }

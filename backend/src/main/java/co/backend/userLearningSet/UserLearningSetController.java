@@ -10,36 +10,40 @@ import org.springframework.web.bind.annotation.*;
 public class UserLearningSetController {
 
     private final UserLearningSetService userLearningSetService;
+    private final UserLearningSetMapper userLearningSetMapper;
 
     @PostMapping("/start")
-    public ResponseEntity<UserLearningSet> start(
+    public ResponseEntity<UserLearningSetDto> start(
             @RequestParam Long userId,
             @RequestParam Long learningSetId) {
-        return ResponseEntity.ok(userLearningSetService.getOrCreate(userId, learningSetId));
+        return ResponseEntity
+                .ok(userLearningSetMapper.toDto(userLearningSetService.getOrCreate(userId, learningSetId)));
     }
 
     @PostMapping("/complete-flashcards")
-    public ResponseEntity<UserLearningSet> completeFlashcards(
+    public ResponseEntity<UserLearningSetDto> completeFlashcards(
             @RequestParam Long userId,
             @RequestParam Long learningSetId,
             @RequestParam int score) {
-        return ResponseEntity.ok(userLearningSetService.completeFlashcards(userId, learningSetId, score));
+        return ResponseEntity.ok(
+                userLearningSetMapper.toDto(userLearningSetService.completeFlashcards(userId, learningSetId, score)));
     }
 
     @PostMapping("/complete-tests")
-    public ResponseEntity<UserLearningSet> completeTests(
+    public ResponseEntity<UserLearningSetDto> completeTests(
             @RequestParam Long userId,
             @RequestParam Long learningSetId,
             @RequestParam int score) {
-        return ResponseEntity.ok(userLearningSetService.completeTests(userId, learningSetId, score));
+        return ResponseEntity
+                .ok(userLearningSetMapper.toDto(userLearningSetService.completeTests(userId, learningSetId, score)));
     }
 
     @GetMapping("/movie/{movieId}/user/{userId}")
-    public ResponseEntity<UserLearningSet> getByUserAndMovie(
+    public ResponseEntity<UserLearningSetDto> getByUserAndMovie(
             @PathVariable Long movieId,
             @PathVariable Long userId) {
         return userLearningSetService.getByUserAndMovie(userId, movieId)
-                .map(ResponseEntity::ok)
+                .map(uls -> ResponseEntity.ok(userLearningSetMapper.toDto(uls)))
                 .orElse(ResponseEntity.notFound().build());
     }
 }

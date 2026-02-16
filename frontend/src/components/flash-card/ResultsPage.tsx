@@ -1,5 +1,5 @@
 import React from 'react';
-import type {FlashCardData} from '../../services/learningSetService';
+import type {FlashCardData, ItemStatusDto} from '../../services/learningSetService';
 import MainLayout from '../layout/MainLayout';
 import '../css/Results.css';
 
@@ -8,6 +8,10 @@ interface ResultsPageProps {
     results: Map<number, boolean>;
     learningSetName: string;
     onTryAgain: () => void;
+    itemStatuses: ItemStatusDto[];
+    onGoToTest?: () => void;
+    onBackToMovie?: () => void;
+    onBackToFlashcards?: () => void;
 }
 
 function getMotivationalMessage(score: number, total: number): string {
@@ -19,22 +23,59 @@ function getMotivationalMessage(score: number, total: number): string {
     return 'Don\'t give up! Practice makes perfect.';
 }
 
-const ResultsPage: React.FC<ResultsPageProps> = ({flashcards, results, learningSetName, onTryAgain}) => {
+function getStatusLabel(status: string): string {
+    return status === 'LEARNED' ? 'Learned' : 'In progress';
+}
+
+function getStatusClass(status: string): string {
+    return status === 'LEARNED' ? 'status-learned' : 'status-in-progress';
+}
+
+const ResultsPage: React.FC<ResultsPageProps> = ({
+                                                     flashcards,
+                                                     results,
+                                                     learningSetName,
+                                                     onTryAgain,
+                                                     itemStatuses,
+                                                     onGoToTest,
+                                                     onBackToMovie,
+                                                     onBackToFlashcards
+                                                 }) => {
     const total = flashcards.length;
     const score = Array.from(results.values()).filter(Boolean).length;
+
+    // Build a map of learningItemId -> status for quick lookup
+    const statusMap = new Map(itemStatuses.map(s => [s.learningItemId, s.status]));
 
     return (
         <MainLayout className="results-content" contentStyle={{height: 'calc(100vh - 64px)', overflow: 'hidden'}}>
             <div className="results-container">
                 {/* Header */}
                 <div className="results-header">
+                    {onBackToMovie && (
+                        <button className="results-back-btn" onClick={onBackToMovie}>
+                            ← Back to Movie
+                        </button>
+                    )}
                     <div>
                         <p className="results-score">{score}/{total}</p>
                         <p className="results-message">{getMotivationalMessage(score, total)}</p>
                     </div>
-                    <button className="results-try-again" onClick={onTryAgain}>
-                        Try again
-                    </button>
+                    <div className="results-actions-row">
+                        <button className="results-try-again" onClick={onTryAgain}>
+                            Try again
+                        </button>
+                        {onGoToTest && (
+                            <button className="results-go-to-test" onClick={onGoToTest}>
+                                Take Vocabulary Test →
+                            </button>
+                        )}
+                        {onBackToFlashcards && (
+                            <button className="results-go-to-test" onClick={onBackToFlashcards}>
+                                ← Back to Flashcards
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <p className="results-movie-title">"{learningSetName}"</p>
@@ -42,6 +83,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({flashcards, results, learningS
                 <div className="results-list">
                     {flashcards.map((card, index) => {
                         const known = results.get(index) ?? false;
+                        const itemStatus = statusMap.get(card.id) || 'NOT_STARTED';
                         return (
                             <div key={card.id} className={`result-card ${known ? 'correct' : 'incorrect'}`}>
                                 <span className={`result-icon ${known ? 'correct' : 'incorrect'}`}>
@@ -54,6 +96,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({flashcards, results, learningS
                                     )}
                                     <span className="result-translation">{card.translation}</span>
                                 </div>
+                                <span className={`result-status-badge ${getStatusClass(itemStatus)}`}>
+                                    {getStatusLabel(itemStatus)}
+                                </span>
                             </div>
                         );
                     })}

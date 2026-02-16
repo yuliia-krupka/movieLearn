@@ -7,8 +7,7 @@ const MoviesList: React.FC = () => {
     return (
         <MainLayout className="content-movies" contentStyle={{
             overflow: 'auto',
-            height: 'calc(100vh - 64px)',
-            padding: '16px'
+            height: 'calc(100vh - 90px)',
         }}>
             <MoviesGrid
                 apiEndpoint="/api/movies"

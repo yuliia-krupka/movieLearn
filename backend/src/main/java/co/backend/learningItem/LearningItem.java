@@ -31,6 +31,8 @@ public class LearningItem {
 
     private String translation;
 
+    private Integer correctAnswerIndex;
+
     @ManyToOne
     @JoinColumn(name = "learning_set_id")
     private LearningSet learningSet;
