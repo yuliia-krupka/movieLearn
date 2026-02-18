@@ -7,9 +7,9 @@ CREATE TABLE users
     name          VARCHAR(255) NOT NULL,
     lastname      VARCHAR(255) NOT NULL,
     email         VARCHAR(255) NOT NULL UNIQUE,
-    password      VARCHAR(255),
     photo         LONGBLOB,
     english_level ENUM ('A1', 'A2', 'B1', 'B2', 'C1', 'C2') DEFAULT 'A1',
+    level         ENUM ('A1', 'A2', 'B1', 'B2', 'C1', 'C2') NOT NULL,
     interests     TEXT,
     role          ENUM ('ADMIN', 'USER') NOT NULL
 );
@@ -25,7 +25,6 @@ CREATE TABLE movie
     id          INT AUTO_INCREMENT PRIMARY KEY,
     title       VARCHAR(255) NOT NULL,
     description TEXT,
-    level       ENUM ('A1', 'A2', 'B1', 'B2', 'C1', 'C2') NOT NULL,
     image       LONGBLOB,
     script      LONGBLOB
 );
@@ -59,23 +58,26 @@ CREATE TABLE learning_set
 
 CREATE TABLE learning_item
 (
-    id               INT AUTO_INCREMENT PRIMARY KEY,
-    type             ENUM ('word', 'phrase', 'test'),
-    text             VARCHAR(255) NOT NULL,
-    answers          JSON,
-    example_sentence TEXT,
-    translation      TEXT,
-    learning_set_id  INT,
+    id                   INT AUTO_INCREMENT PRIMARY KEY,
+    type                 ENUM ('FLASH_CARD', 'TEST') NOT NULL,
+    text                 VARCHAR(255) NOT NULL,
+    answers              TEXT,
+    example_sentence     TEXT,
+    translation          TEXT,
+    learning_set_id      INT,
+    correct_answer_index INT DEFAULT NULL,
     FOREIGN KEY (learning_set_id) REFERENCES learning_set (id) ON DELETE CASCADE
 );
 
 CREATE TABLE user_learning_set
 (
-    id              INT AUTO_INCREMENT PRIMARY KEY,
-    user_id         INT,
-    learning_set_id INT,
-    completed_items INT,
-    score           INT,
+    id                   INT AUTO_INCREMENT PRIMARY KEY,
+    user_id              INT,
+    learning_set_id      INT,
+    flashcards_completed BOOLEAN DEFAULT FALSE,
+    tests_completed      BOOLEAN DEFAULT FALSE,
+    flashcards_score     INT     DEFAULT 0,
+    tests_score          INT     DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (learning_set_id) REFERENCES learning_set (id) ON DELETE CASCADE
 );
@@ -86,8 +88,9 @@ CREATE TABLE user_learning_item_status
     user_id          INT,
     learning_item_id INT,
     learning_set_id  INT,
-    status           ENUM ('not_started', 'in_progress', 'completed'),
-    attempts         INT,
+    status           ENUM ('NOT_STARTED', 'IN_PROGRESS', 'LEARNED', 'SKIPPED') NOT NULL DEFAULT 'NOT_STARTED',
+    total_attempts   INT DEFAULT 0,
+    correct_answers  INT DEFAULT 0,
     last_attempt_at  TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (learning_item_id) REFERENCES learning_item (id) ON DELETE CASCADE,

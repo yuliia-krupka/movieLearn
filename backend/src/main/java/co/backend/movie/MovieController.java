@@ -6,12 +6,15 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
+import jakarta.validation.Valid;
 
 @AllArgsConstructor
 @RestController
@@ -32,7 +35,6 @@ public class MovieController {
         }
     }
 
-
     @GetMapping("/{id}")
     public MovieDto getMovieById(@PathVariable Long id) {
         return movieService.getMovieById(id);
@@ -40,26 +42,28 @@ public class MovieController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize(value = "hasRole('ADMIN')")
     public void deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);
     }
 
     @PostMapping(consumes = {"multipart/form-data"})
     @ResponseStatus(HttpStatus.CREATED)
-    public MovieDto createMovie(@RequestPart("movieData") MovieDto movieDto,
+    @PreAuthorize(value = "hasRole('ADMIN')")
+    public MovieDto createMovie(@Valid @RequestPart("movieData") MovieDto movieDto,
                                 @RequestPart(value = "image", required = false) MultipartFile image,
                                 @RequestPart(value = "script", required = false) MultipartFile script) {
         return movieService.createMovie(movieDto, image, script);
     }
 
     @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
+    @PreAuthorize(value = "hasRole('ADMIN')")
     public MovieDto updateMovie(@PathVariable Long id,
-                                @RequestPart("movieData") MovieDto movieDto,
+                                @Valid @RequestPart("movieData") MovieDto movieDto,
                                 @RequestPart(value = "image", required = false) MultipartFile image,
                                 @RequestPart(value = "script", required = false) MultipartFile script) {
         return movieService.updateMovie(id, movieDto, image, script);
     }
-
 
     @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getMovieImage(@PathVariable Long id) {

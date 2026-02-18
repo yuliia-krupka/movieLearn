@@ -2,10 +2,10 @@ package co.backend.learningSet;
 
 import co.backend.learningItem.LearningItemDto;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/learning-sets")
@@ -15,34 +15,32 @@ public class LearningSetController {
     private final LearningSetService learningSetService;
 
     @PostMapping("/generate/{movieId}")
-    public ResponseEntity<LearningSetDto> generate(@PathVariable Long movieId) {
-        return ResponseEntity.ok(learningSetService.generateForMovie(movieId));
+    public LearningSetDto generate(@PathVariable Long movieId) {
+        return learningSetService.generateForMovie(movieId);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LearningSetDto> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(learningSetService.getById(id));
+    public LearningSetDto getById(@PathVariable Long id) {
+        return learningSetService.getById(id);
     }
 
     @GetMapping("/movie/{movieId}/latest")
-    public ResponseEntity<LearningSetDto> getLatestByMovie(@PathVariable Long movieId) {
-        return learningSetService.getLatestByMovieId(movieId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Optional<LearningSetDto> getLatestByMovie(@PathVariable Long movieId) {
+        return learningSetService.getLatestByMovieId(movieId);
     }
 
     @GetMapping("/movie/{movieId}")
-    public ResponseEntity<LearningSetDto> getOrCreateByMovie(@PathVariable Long movieId) {
-        return ResponseEntity.ok(learningSetService.getOrCreateByMovieId(movieId));
+    public LearningSetDto getOrCreateByMovie(@PathVariable Long movieId) {
+        return learningSetService.getOrCreateByMovieId(movieId);
     }
 
     @GetMapping("/{id}/flashcards")
-    public ResponseEntity<List<LearningItemDto>> getFlashCards(@PathVariable Long id) {
-        return ResponseEntity.ok(learningSetService.getFlashCardsByLearningSetId(id));
+    public List<LearningItemDto> getFlashCards(@PathVariable Long id) {
+        return learningSetService.getFlashCardsByLearningSetId(id);
     }
 
     @GetMapping("/{id}/tests")
-    public ResponseEntity<List<LearningItemDto>> getTestItems(@PathVariable Long id) {
-        return ResponseEntity.ok(learningSetService.getTestItemsByLearningSetId(id));
+    public List<LearningItemDto> getTestItems(@PathVariable Long id) {
+        return learningSetService.getTestItemsByLearningSetId(id);
     }
 }

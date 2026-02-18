@@ -1,8 +1,6 @@
 package co.backend.movie;
 
-import co.backend.exceptions.DuplicateEntityException;
-import co.backend.exceptions.FileUploadException;
-import co.backend.exceptions.NotFoundException;
+import co.backend.exceptions.*;
 import co.backend.genre.Genre;
 import co.backend.genre.GenreRepository;
 import co.backend.user.User;
@@ -14,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -34,14 +33,23 @@ public class MovieService {
     }
 
     public MovieDto getMovieById(Long id) {
+        if (id == null) {
+            throw new BadRequestException("Id must be provided");
+        }
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Movie with id " + id + " not found"));
         return movieMapper.toDto(movie);
     }
 
     public void deleteMovie(Long id) {
+        if (id == null) {
+            throw new BadRequestException("Id must be provided");
+        }
         if (!movieRepository.existsById(id)) {
             throw new NotFoundException("Movie with id " + id + " not found");
+        }
+        if (movieRepository.hasAnyLearningSets(id)) {
+            throw new DeleteException("Movie has associated learning sets. Can not be deleted!");
         }
         movieRepository.deleteById(id);
     }
@@ -91,9 +99,12 @@ public class MovieService {
         }
     }
 
-    public MovieDto updateMovie(Long movieId, MovieDto movieDto, MultipartFile image, MultipartFile script) {
-        Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(() -> new NotFoundException("Movie not found with id: " + movieId));
+    public MovieDto updateMovie(Long id, MovieDto movieDto, MultipartFile image, MultipartFile script) {
+        if (id == null) {
+            throw new BadRequestException("Id must be provided");
+        }
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Movie not found with id: " + id));
 
         if (movieDto != null) {
             if (movieDto.getTitle() != null &&
@@ -133,7 +144,7 @@ public class MovieService {
             throw new NotFoundException("Genres not found");
         }
 
-        List<Movie> movies = movieRepository.findByGenresIn(genres);
+        List<Movie> movies = movieRepository.findByGenresIn(Collections.singleton(genres));
 
         return movies.stream()
                 .map(movieMapper::toDto)

@@ -1,5 +1,6 @@
 package co.backend.userLearningItemStatus;
 
+import co.backend.exceptions.NotFoundException;
 import co.backend.learningItem.LearningItemRepository;
 import co.backend.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -14,16 +15,17 @@ public class UserLearningItemStatusService {
     private final UserLearningItemStatusRepository statusRepository;
     private final UserRepository userRepository;
     private final LearningItemRepository learningItemRepository;
+    private final UserLearningItemStatusMapper statusMapper;
 
-    public UserLearningItemStatus recordAnswer(Long userId, Long learningItemId, boolean correct) {
+    public UserLearningItemStatusDto recordAnswer(Long userId, Long learningItemId, boolean correct) {
         UserLearningItemStatus status = statusRepository
                 .findByUserIdAndLearningItemId(userId, learningItemId)
                 .orElseGet(() -> {
                     UserLearningItemStatus newStatus = new UserLearningItemStatus();
                     newStatus.setUser(userRepository.findById(userId)
-                            .orElseThrow(() -> new RuntimeException("User not found")));
+                            .orElseThrow(() -> new NotFoundException("User not found")));
                     var learningItem = learningItemRepository.findById(learningItemId)
-                            .orElseThrow(() -> new RuntimeException("Learning item not found"));
+                            .orElseThrow(() -> new NotFoundException("Learning item not found"));
                     newStatus.setLearningItem(learningItem);
                     newStatus.setLearningSet(learningItem.getLearningSet());
                     newStatus.setCorrectAnswers(0);
@@ -44,10 +46,13 @@ public class UserLearningItemStatusService {
             status.setStatus(LearningStatus.LEARNED);
         }
 
-        return statusRepository.save(status);
+        return statusMapper.toDto(statusRepository.save(status));
     }
 
-    public List<UserLearningItemStatus> getStatusesByLearningSet(Long userId, Long learningSetId) {
-        return statusRepository.findByUserIdAndLearningItemLearningSetId(userId, learningSetId);
+    public List<UserLearningItemStatusDto> getStatusesByLearningSet(Long userId, Long learningSetId) {
+        return statusRepository.findByUserIdAndLearningItemLearningSetId(userId, learningSetId)
+                .stream()
+                .map(statusMapper::toDto)
+                .toList();
     }
 }

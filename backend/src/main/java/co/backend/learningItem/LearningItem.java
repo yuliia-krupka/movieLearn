@@ -23,7 +23,6 @@ public class LearningItem {
     @Column(nullable = false)
     private String text;
 
-    @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = "TEXT")
     private List<String> answers;
 

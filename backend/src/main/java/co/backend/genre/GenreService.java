@@ -29,8 +29,13 @@ public class GenreService {
         return genreMapper.toDTO(genreRepository.save(genre));
     }
 
-    @Transactional
     public GenreDto updateGenre(Long id, GenreDto genreDTO) {
+        if (id == null) {
+            throw new BadRequestException("Id must be provided");
+        }
+        if (genreDTO.getName() == null || genreDTO.getName().trim().isEmpty()) {
+            throw new BadRequestException("Genre name must be provided");
+        }
         Genre existingGenre = genreRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found"));
 
@@ -50,6 +55,9 @@ public class GenreService {
     }
 
     public void deleteGenre(Long id) {
+        if (id == null) {
+            throw new BadRequestException("Id must be provided");
+        }
         if (!genreRepository.existsById(id)) {
             throw new NotFoundException("Genre with id " + id + " not found");
         }
@@ -64,6 +72,9 @@ public class GenreService {
     }
 
     public GenreDto getGenreById(Long id) {
+        if (id == null) {
+            throw new BadRequestException("Id must be provided");
+        }
         Genre genre = genreRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found"));
         return genreMapper.toDTO(genre);

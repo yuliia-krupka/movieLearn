@@ -26,8 +26,8 @@ public class Oauth2CustomSuccessHandler implements AuthenticationSuccessHandler 
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
-            HttpServletResponse response,
-            Authentication authentication) throws IOException {
+                                        HttpServletResponse response,
+                                        Authentication authentication) throws IOException {
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
         UserDto userDto = userService.createUserFromOAuth2(oauth2User);
 

@@ -1,5 +1,7 @@
 package co.backend.learningSet;
 
+import co.backend.exceptions.BadRequestException;
+import co.backend.exceptions.NotFoundException;
 import co.backend.learningItem.LearningItemDto;
 import co.backend.learningItem.LearningItemMapper;
 import co.backend.learningItem.LearningItemType;
@@ -38,14 +40,20 @@ public class LearningSetService {
     }
 
     public LearningSetDto getById(Long id) {
+        if (id == null) {
+            throw new BadRequestException("Id must be provided");
+        }
         LearningSet set = learningSetRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Learning set not found: " + id));
+                .orElseThrow(() -> new NotFoundException("Learning set not found: " + id));
         return learningSetMapper.toDto(set);
     }
 
     public List<LearningItemDto> getFlashCardsByLearningSetId(Long learningSetId) {
+        if (learningSetId == null) {
+            throw new BadRequestException("Id must be provided");
+        }
         LearningSet set = learningSetRepository.findById(learningSetId)
-                .orElseThrow(() -> new RuntimeException("Learning set not found: " + learningSetId));
+                .orElseThrow(() -> new NotFoundException("Learning set not found: " + learningSetId));
         return set.getLearningItems().stream()
                 .filter(item -> item.getType() == LearningItemType.FLASH_CARD)
                 .map(learningItemMapper::toDto)
@@ -53,8 +61,11 @@ public class LearningSetService {
     }
 
     public List<LearningItemDto> getTestItemsByLearningSetId(Long learningSetId) {
+        if (learningSetId == null) {
+            throw new BadRequestException("Id must be provided");
+        }
         LearningSet set = learningSetRepository.findById(learningSetId)
-                .orElseThrow(() -> new RuntimeException("Learning set not found: " + learningSetId));
+                .orElseThrow(() -> new NotFoundException("Learning set not found: " + learningSetId));
         return set.getLearningItems().stream()
                 .filter(item -> item.getType() == LearningItemType.TEST)
                 .map(learningItemMapper::toDto)

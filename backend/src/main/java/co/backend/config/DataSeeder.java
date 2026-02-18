@@ -16,7 +16,7 @@ public class DataSeeder implements CommandLineRunner {
     private final GenreRepository genreRepository;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         seedGenres();
     }
 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -29,7 +30,7 @@ public abstract class MovieMapper {
             List<Genre> genres = movieDto.getGenres().stream()
                     .map(String::trim)
                     .map(genreRepository::findByName)
-                    .filter(g -> g != null)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             movie.setGenres(genres);
         }

@@ -9,7 +9,4 @@ public interface LearningSetMapper {
 
     @Mapping(source = "movie.id", target = "movieId")
     LearningSetDto toDto(LearningSet learningSet);
-
-    @Mapping(source = "movieId", target = "movie.id")
-    LearningSet toEntity(LearningSetDto dto);
 }

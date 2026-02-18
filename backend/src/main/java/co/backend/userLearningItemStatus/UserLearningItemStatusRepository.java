@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface UserLearningItemStatusRepository extends JpaRepository<UserLearningItemStatus, Long> {
     List<UserLearningItemStatus> findByUserIdAndLearningItemLearningSetId(Long userId, Long learningSetId);
+
     Optional<UserLearningItemStatus> findByUserIdAndLearningItemId(Long userId, Long learningItemId);
 }

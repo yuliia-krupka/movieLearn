@@ -22,7 +22,7 @@ public class TestDataProvider {
                 .orElseThrow(() -> new RuntimeException("Movie not found: " + movieId));
 
         LearningSet set = new LearningSet();
-        set.setName("Vocabulary: " + movie.getTitle());
+        set.setName(movie.getTitle());
         set.setDate(LocalDateTime.now());
         set.setMovie(movie);
 

@@ -1,7 +1,7 @@
 package co.backend.learningItem;
 
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,23 +14,23 @@ public class LearningItemController {
     private final LearningItemService learningItemService;
 
     @GetMapping("/set/{learningSetId}")
-    public ResponseEntity<List<LearningItemDto>> getByLearningSet(@PathVariable Long learningSetId) {
-        return ResponseEntity.ok(learningItemService.getByLearningSetId(learningSetId));
+    public List<LearningItemDto> getByLearningSet(@PathVariable Long learningSetId) {
+        return learningItemService.getByLearningSetId(learningSetId);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LearningItemDto> update(@PathVariable Long id, @RequestBody LearningItemDto dto) {
-        return ResponseEntity.ok(learningItemService.update(id, dto));
+    public LearningItemDto update(@PathVariable Long id, @RequestBody LearningItemDto dto) {
+        return learningItemService.update(id, dto);
     }
 
     @PutMapping("/batch")
-    public ResponseEntity<List<LearningItemDto>> updateBatch(@RequestBody List<LearningItemDto> dtos) {
-        return ResponseEntity.ok(learningItemService.updateBatch(dtos));
+    public List<LearningItemDto> updateBatch(@RequestBody List<LearningItemDto> items) {
+        return learningItemService.updateBatch(items);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
         learningItemService.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
 }

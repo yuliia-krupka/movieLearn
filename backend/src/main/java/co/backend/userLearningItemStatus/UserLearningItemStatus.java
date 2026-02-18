@@ -22,7 +22,7 @@ public class UserLearningItemStatus {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties({"password", "role", "profilePictureUrl"})
+    @JsonIgnoreProperties({"role", "profilePictureUrl"})
     private User user;
 
     @ManyToOne

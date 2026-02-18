@@ -44,9 +44,7 @@ public class SecurityConfig {
                         .successHandler(oauth2CustomSuccessHandler)
                         .failureUrl(frontendUrl + "/?error=true"))
                 .logout(logout -> logout
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(200);
-                        })
+                        .logoutSuccessHandler((request, response, authentication) -> response.setStatus(200))
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID"))

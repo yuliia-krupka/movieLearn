@@ -1,16 +1,12 @@
 package co.backend.user;
 
-import co.backend.exceptions.FileSizeExceededException;
-import co.backend.exceptions.FileUploadException;
-import co.backend.exceptions.NotFoundException;
-import co.backend.exceptions.UnsupportedFileTypeException;
+import co.backend.exceptions.*;
 import co.backend.movie.Movie;
 import co.backend.movie.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,15 +36,31 @@ public class UserService {
     }
 
     public UserDto getUserById(Long id) {
+        if (id == null) {
+            throw new BadRequestException("Id must be provided");
+        }
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
         return userMapper.toDto(user);
     }
 
-    public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new NotFoundException("User with id " + id + " not found");
+    public void deleteUser(Long id, OAuth2User principal) {
+        if (id == null) {
+            throw new BadRequestException("Id must be provided");
         }
+
+        User currentUser = getCurrentUserByEmail(principal.getAttribute("email"));
+        if (currentUser.getId().equals(id)) {
+            throw new ForbiddenException("You cannot delete yourself");
+        }
+
+        User userToDelete = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
+
+        if (userToDelete.getRole() == Role.ADMIN) {
+            throw new ForbiddenException("Cannot delete other admins");
+        }
+
         userRepository.deleteById(id);
     }
 
@@ -133,17 +145,18 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void saveAvatar(MultipartFile file, OAuth2User oauth2User) throws IOException {
-        User user = getCurrentUserByEmail(oauth2User.getAttribute("email"));
-        validateFile(file);
-        byte[] avatarBytes = file.getBytes();
-        user.setPhoto(avatarBytes);
-        userRepository.save(user);
-    }
+    public void setUserRole(Long userId, String roleStr, OAuth2User principal) {
+        User currentUser = getCurrentUserByEmail(principal.getAttribute("email"));
+        if (currentUser.getId().equals(userId)) {
+            throw new ForbiddenException("You cannot modify your own role");
+        }
 
-    public void setUserRole(Long userId, String roleStr) {
-        User user = userRepository.findById(userId)
+        User targetUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+
+        if (targetUser.getRole() == Role.ADMIN) {
+            throw new ForbiddenException("Cannot modify other admin users");
+        }
 
         Role role;
         try {
@@ -152,8 +165,8 @@ public class UserService {
             throw new NotFoundException("Role not found: " + roleStr);
         }
 
-        user.setRole(role);
-        userRepository.save(user);
+        targetUser.setRole(role);
+        userRepository.save(targetUser);
     }
 
     public void addMovieToUser(Long movieId, Long userId) {
@@ -166,18 +179,6 @@ public class UserService {
         }
         user.getMovies().add(movie);
         userRepository.save(user);
-    }
-
-    private void validateFile(MultipartFile file) {
-        String fileType = file.getContentType();
-        if (fileType == null || !fileType.startsWith("image/")) {
-            throw new UnsupportedFileTypeException("Uploaded file must be an image");
-        }
-
-        long maxSize = 5 * 1024 * 1024;
-        if (file.getSize() > maxSize) {
-            throw new FileSizeExceededException("File size exceeds the limit of 5MB");
-        }
     }
 
     private byte[] downloadImage(String imageUrl) {
