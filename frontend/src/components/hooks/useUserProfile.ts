@@ -2,27 +2,18 @@ import {useState, useCallback} from 'react';
 import axios, {type AxiosError} from 'axios';
 import {message} from 'antd';
 
-export interface UserProfile {
-    id: number;
-    name: string;
-    lastname: string;
-    email: string;
-    englishLevel: string;
-    interests: string[];
-    photo?: string;
-    role: string;
-}
+import type {User} from '../../types/auth';
 
 interface UseUserProfileReturn {
-    user: UserProfile | null;
+    user: User | null;
     loading: boolean;
     error: string | null;
     fetchUserProfile: () => Promise<void>;
-    updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
+    updateUserProfile: (data: Partial<User>) => Promise<void>;
 }
 
 export const useUserProfile = (): UseUserProfileReturn => {
-    const [user, setUser] = useState<UserProfile | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +21,7 @@ export const useUserProfile = (): UseUserProfileReturn => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get<UserProfile>('/api/users/account', {withCredentials: true});
+            const response = await axios.get<User>('/api/users/account', {withCredentials: true});
             setUser(response.data);
         } catch (err) {
             const axiosError = err as AxiosError<{ message: string }>;
@@ -42,7 +33,7 @@ export const useUserProfile = (): UseUserProfileReturn => {
         }
     }, []);
 
-    const updateUserProfile = useCallback(async (data: Partial<UserProfile>) => {
+    const updateUserProfile = useCallback(async (data: Partial<User>) => {
         setLoading(true);
         setError(null);
         try {

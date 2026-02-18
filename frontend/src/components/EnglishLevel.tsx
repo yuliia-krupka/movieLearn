@@ -5,6 +5,7 @@ import useMessage from 'antd/es/message/useMessage';
 import {type FC} from 'react';
 import "./css/EnglishLevel.css";
 import Logo from "./Logo.tsx";
+import {englishLevels} from "../constants/common.ts";
 
 const {Text} = Typography;
 
@@ -12,7 +13,6 @@ const EnglishLevel: FC = () => {
     const navigate = useNavigate();
     const [customMessage, contextHolder] = useMessage();
 
-    const levels: string[] = ['A1', 'A2', 'B1', 'B2', 'C1'];
 
     const handleLevelSelect = async (level: string): Promise<void> => {
         try {
@@ -37,7 +37,7 @@ const EnglishLevel: FC = () => {
             <Text className="subtitle">Tell us your level of English</Text>
 
             <div className="buttons">
-                {levels.map((level) => (
+                {englishLevels.map((level) => (
                     <Button
                         key={level}
                         className="level-button"

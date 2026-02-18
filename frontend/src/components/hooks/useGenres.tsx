@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import axios from 'axios';
-import {type Genre, type NewGenreData} from '../types/movies.ts';
+import {type Genre} from '../../types/genre';
+import {type NewGenreData} from '../../types/movie';
 import useMessage from 'antd/es/message/useMessage';
 
 export const useGenres = () => {
@@ -8,10 +9,10 @@ export const useGenres = () => {
     const [loading, setLoading] = useState(false);
     const [customMessage] = useMessage();
 
-    const fetchGenres = async (): Promise<void> => {
+    const fetchGenres = useCallback(async (): Promise<void> => {
         try {
             setLoading(true);
-            const response = await axios.get('/api/genres', { withCredentials: true });
+            const response = await axios.get('/api/genres', {withCredentials: true});
             setGenres(response.data);
         } catch (err) {
             console.error('Failed to fetch genres:', err);
@@ -19,13 +20,13 @@ export const useGenres = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [customMessage]);
 
     const addGenre = async (genreData: NewGenreData): Promise<boolean> => {
         try {
             const response = await axios.post('/api/genres', genreData, {
                 withCredentials: true,
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
             });
 
             const newGenre: Genre = {
@@ -38,24 +39,23 @@ export const useGenres = () => {
             return true;
         } catch (err: unknown) {
             console.error('Failed to add genre:', err);
-            // Don't show message here, let the calling component handle it
-            throw err; // Re-throw the error so the calling component can handle it
+            throw err;
         }
     };
 
     const updateGenre = async (id: number, data: { name: string }) => {
-        await axios.put(`/api/genres/${id}`, data, { withCredentials: true });
+        await axios.put(`/api/genres/${id}`, data, {withCredentials: true});
         await fetchGenres();
     };
 
     const deleteGenre = async (id: number) => {
-        await axios.delete(`/api/genres/${id}`, { withCredentials: true });
+        await axios.delete(`/api/genres/${id}`, {withCredentials: true});
         await fetchGenres();
     };
 
     useEffect(() => {
-        fetchGenres();
-    }, []);
+        void fetchGenres();
+    }, [fetchGenres]);
 
-    return { genres, loading, addGenre, updateGenre, deleteGenre, fetchGenres };
+    return {genres, loading, addGenre, updateGenre, deleteGenre, fetchGenres};
 };

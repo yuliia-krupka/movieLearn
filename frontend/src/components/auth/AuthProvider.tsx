@@ -1,12 +1,12 @@
-import React, { useState, useEffect, type ReactNode } from 'react';
-import type { User } from '../types/auth';
-import { AuthContext } from './AuthContext';
+import React, {useState, useEffect, type ReactNode} from 'react';
+import type {User} from '../../types/auth';
+import {AuthContext} from './AuthContext';
 
 interface AuthProviderProps {
     children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const [user, setUser] = useState<User & { id?: number } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -36,24 +36,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const isAdmin = user?.role === 'ADMIN';
 
+    const login = () => {
+        window.location.href = '/oauth2/authorization/google';
+    };
+
+    const logout = async () => {
+        try {
+            await fetch('/logout', {method: 'POST'});
+            setUser(null);
+            window.location.href = '/';
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    };
+
     const value = {
         user,
-        login: () => {
-            window.location.href = "/oauth2/authorization/google";
-        },
-        logout: async () => {
-            try {
-                await fetch('/logout', { method: 'POST', credentials: 'include' });
-                setUser(null);
-                window.location.href = '/';
-            } catch (error) {
-                console.error('Logout failed:', error);
-            }
-        },
         isAdmin,
         isLoading,
         isAuthenticated: !!user,
         currentUserId: user?.id,
+        login,
+        logout
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

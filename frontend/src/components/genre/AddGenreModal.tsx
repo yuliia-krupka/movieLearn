@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Form, Input, Button, Space } from 'antd';
-import {type NewGenreData } from '../types/movies.ts';
+import { type NewGenreData } from '../../types/movie';
 
 interface AddGenreModalProps {
     visible: boolean;
@@ -10,11 +10,11 @@ interface AddGenreModalProps {
 }
 
 const AddGenreModal: React.FC<AddGenreModalProps> = ({
-                                                         visible,
-                                                         loading,
-                                                         onCancel,
-                                                         onSubmit,
-                                                     }) => {
+    visible,
+    loading,
+    onCancel,
+    onSubmit,
+}) => {
     const [form] = Form.useForm();
 
     const handleSubmit = async (values: NewGenreData) => {
@@ -46,8 +46,8 @@ const AddGenreModal: React.FC<AddGenreModalProps> = ({
                         { required: true, message: 'Please enter genre name' },
                         { min: 2, message: 'Name must be at least 2 characters' },
                         {
-                            pattern: /^[A-Za-z\s]+$/,
-                            message: 'Only English letters and spaces are allowed',
+                            pattern: /^[A-Za-z\s-]+$/,
+                            message: 'Only English letters, dashes, and spaces are allowed',
                         },
                     ]}
                 >

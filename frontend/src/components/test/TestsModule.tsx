@@ -4,13 +4,8 @@ import ResultsPage from '../flash-card/ResultsPage';
 import MainLayout from '../layout/MainLayout';
 import '../css/Layout.css';
 import '../css/Test.css';
-import {
-    type TestItemData,
-    type LearningSetDto,
-    type FlashCardData,
-    type ItemStatusDto,
-    learningSetService
-} from '../../services/learningSetService';
+import {learningSetService} from '../../services/learningSetService';
+import type {TestItemData, LearningSetDto, FlashCardData, ItemStatusDto} from '../../types/learningSet';
 import {useAuth} from '../auth/useAuth';
 import {useLocation, useNavigate} from 'react-router-dom';
 
@@ -40,10 +35,8 @@ const TestsModule: React.FC = () => {
 
                 const items = await learningSetService.getTestItems(learningSetData.id);
 
-                // Shuffle answers so correct answer isn't always in the same position
                 const shuffledItems = items.map(item => {
                     const indices = item.answers.map((_, i) => i);
-                    // Fisher-Yates shuffle
                     for (let i = indices.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
                         [indices[i], indices[j]] = [indices[j], indices[i]];

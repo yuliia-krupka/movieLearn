@@ -14,7 +14,7 @@ export const ProtectedRoute = ({children, requireAuth = true, requireAdmin = fal
     useEffect(() => {
         if (!isLoading) {
             if (requireAuth && !isAuthenticated) {
-                message.error('Please log in first');
+                void message.error('Please log in first');
                 navigate('/', {replace: true});
             } else if (requireAdmin && !isAdmin) {
                 navigate('/access-denied', {replace: true});

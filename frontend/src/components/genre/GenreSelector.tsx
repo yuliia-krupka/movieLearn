@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Form, Select, Button, Popconfirm, Input, Modal } from 'antd';
-import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { type Genre } from '../types/movies.ts';
+import React, {useState} from 'react';
+import {Form, Select, Button, Popconfirm, Input, Modal} from 'antd';
+import {PlusOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
+import {type Genre} from '../../types/genre';
 import axios from 'axios';
 import type useMessage from "antd/es/message/useMessage";
 import '../css/GenreSelector.css';
 
-const { Option } = Select;
+const {Option} = Select;
 
 interface GenreSelectorProps {
     genres: Genre[];
@@ -17,12 +17,12 @@ interface GenreSelectorProps {
 }
 
 const GenreSelector: React.FC<GenreSelectorProps> = ({
-    genres,
-    onAddGenre,
-    onGenreDeleted,
-    onGenreUpdated,
-    messageApi
-}) => {
+                                                         genres,
+                                                         onAddGenre,
+                                                         onGenreDeleted,
+                                                         onGenreUpdated,
+                                                         messageApi
+                                                     }) => {
     const [editingGenre, setEditingGenre] = useState<Genre | null>(null);
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [editForm] = Form.useForm();
@@ -47,7 +47,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
     const handleEditGenre = (genre: Genre) => {
         setEditingGenre(genre);
         setEditModalVisible(true);
-        editForm.setFieldsValue({ name: genre.name });
+        editForm.setFieldsValue({name: genre.name});
     };
 
     const handleUpdateGenre = async () => {
@@ -101,7 +101,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                         <span>Genres</span>
                         <Button
                             className='yellow-btn add-genre-btn'
-                            icon={<PlusOutlined />}
+                            icon={<PlusOutlined/>}
                             size="small"
                             onClick={onAddGenre}
                         >
@@ -110,12 +110,12 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                     </div>
                 }
                 name="genres"
-                rules={[{ required: true, message: 'Please select genres' }]}
+                rules={[{required: true, message: 'Please select genres'}]}
             >
                 <Select
                     mode="multiple"
                     placeholder="Select genres"
-                    style={{ width: '100%' }}
+                    style={{width: '100%'}}
                     maxTagCount="responsive"
                 >
                     {genres.map((genre) => (
@@ -126,7 +126,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                                     <Button
                                         type="text"
                                         size="small"
-                                        icon={<EditOutlined />}
+                                        icon={<EditOutlined/>}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleEditGenre(genre);
@@ -135,10 +135,10 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                                     />
                                     <Popconfirm
                                         title="Delete Genre"
-                                        description={`Are you sure you want to delete "${genre.name}"?`}
+                                        description={`Are you sure you want to delete "${genre.name}" ? `}
                                         onConfirm={(e) => {
                                             e?.stopPropagation();
-                                            handleDeleteGenre(genre.id, genre.name);
+                                            void handleDeleteGenre(genre.id, genre.name);
                                         }}
                                         onCancel={(e) => e?.stopPropagation()}
                                         okText="Yes"
@@ -148,7 +148,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                                         <Button
                                             type="text"
                                             size="small"
-                                            icon={<DeleteOutlined />}
+                                            icon={<DeleteOutlined/>}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                             }}
@@ -179,12 +179,12 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                         name="name"
                         label="Genre Name"
                         rules={[
-                            { required: true, message: 'Please enter genre name' },
-                            { min: 2, message: 'Genre name must be at least 2 characters' },
-                            { max: 50, message: 'Genre name must not exceed 50 characters' },
+                            {required: true, message: 'Please enter genre name'},
+                            {min: 2, message: 'Genre name must be at least 2 characters'},
+                            {max: 50, message: 'Genre name must not exceed 50 characters'},
                             {
-                                pattern: /^[A-Za-z\s]+$/,
-                                message: 'Genre name must contain only English letters and spaces'
+                                pattern: /^[A-Za-z\s-]+$/,
+                                message: 'Genre name must contain only English letters, dashes, and spaces'
                             }
                         ]}
                     >

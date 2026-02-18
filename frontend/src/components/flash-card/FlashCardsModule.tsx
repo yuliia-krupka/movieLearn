@@ -3,12 +3,8 @@ import FlashCard from './FlashCard';
 import ResultsPage from './ResultsPage';
 import MainLayout from "../layout/MainLayout.tsx";
 import '../css/Layout.css';
-import {
-    type FlashCardData,
-    type LearningSetDto,
-    type ItemStatusDto,
-    learningSetService
-} from '../../services/learningSetService';
+import {learningSetService} from '../../services/learningSetService';
+import type {FlashCardData, LearningSetDto, ItemStatusDto} from '../../types/learningSet';
 import {useAuth} from '../auth/useAuth';
 import {useLocation, useNavigate} from 'react-router-dom';
 
@@ -78,14 +74,11 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
     };
 
     const handleSeeResults = () => {
-        // Show results immediately
         setShowResults(true);
 
-        // Save answers and fetch statuses in the background
         if (currentUserId && learningSet) {
             const score = Array.from(results.values()).filter(Boolean).length;
 
-            // Fire completion independently so it doesn't fail with recordAnswer batch
             learningSetService.completeFlashcards(currentUserId, learningSet.id, score)
                 .catch(err => console.error('Failed to complete flashcards:', err));
 

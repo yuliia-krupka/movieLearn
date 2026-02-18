@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Avatar,
     Input,
@@ -11,15 +11,16 @@ import {
     Tag,
     Typography
 } from 'antd';
-import { DeleteOutlined, UserOutlined } from '@ant-design/icons';
+import {DeleteOutlined, UserOutlined} from '@ant-design/icons';
 import MainLayout from "./layout/MainLayout.tsx";
-import { useAuth } from "./auth/useAuth.tsx";
-import { useAdminUsers, type User } from "./hooks/useAdminUsers.ts";
+import {useAuth} from "./auth/useAuth.tsx";
+import type {User} from "../types/auth";
+import {useAdminUsers} from "./hooks/useAdminUsers.ts";
 import './css/UsersPanel.css';
 
-const { Text } = Typography;
-const { Option } = Select;
-const { Search } = Input;
+const {Text} = Typography;
+const {Option} = Select;
+const {Search} = Input;
 
 const roleColors: Record<string, string> = {
     ADMIN: 'red',
@@ -28,11 +29,10 @@ const roleColors: Record<string, string> = {
 
 const UserList: React.FC = () => {
     const [message, contextHolder] = antMessage.useMessage();
-    const { user: currentUser } = useAuth();
+    const {user: currentUser} = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Use custom hook
-    const { users, loading, actionLoading, fetchUsers, updateUserRole, deleteUser } = useAdminUsers(message);
+    const {users, loading, actionLoading, fetchUsers, updateUserRole, deleteUser} = useAdminUsers(message);
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -45,7 +45,7 @@ const UserList: React.FC = () => {
         try {
             await updateUserRole(userId, newRole);
         } catch (error) {
-            // Error handled in hook
+            console.error('Failed to change user role:', error);
         }
     };
 
@@ -60,31 +60,31 @@ const UserList: React.FC = () => {
                 try {
                     await deleteUser(user.id);
                 } catch (error) {
-                    // Error handled in hook
+                    console.error('Error deleting user:', error);
                 }
             }
         });
     };
 
     return (
-        <MainLayout messageContext={contextHolder} className="content-movies" contentStyle={{ padding: '24px' }}>
+        <MainLayout messageContext={contextHolder} className="content-movies" contentStyle={{padding: '24px'}}>
             <div className="userList-container">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                    <h2 className="userList-title" style={{ marginBottom: 0 }}>User Management</h2>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16}}>
+                    <h2 className="userList-title" style={{marginBottom: 0}}>User Management</h2>
                     <Search
                         placeholder="Search by email"
                         allowClear
                         onSearch={(value) => setSearchTerm(value)}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{ width: 300 }}
+                        style={{width: 300}}
                     />
                 </div>
                 <List
                     loading={loading}
                     itemLayout="horizontal"
                     dataSource={users}
-                    locale={{ emptyText: 'No users found' }}
-                    renderItem={(user) => {
+                    locale={{emptyText: 'No users found'}}
+                    renderItem={(user: User) => {
                         const isCurrentUser = user.id === currentUser?.id;
                         const isUserAdmin = user.role.toUpperCase() === 'ADMIN';
                         const canEdit = !isCurrentUser && !isUserAdmin;
@@ -108,10 +108,10 @@ const UserList: React.FC = () => {
                                             type="text"
                                             danger
                                             size="small"
-                                            icon={<DeleteOutlined />}
+                                            icon={<DeleteOutlined/>}
                                             loading={actionLoading[user.id]}
                                             onClick={() => void handleDeleteUser(user)}
-                                            style={{ color: '#ff4d4f' }}
+                                            style={{color: '#ff4d4f'}}
                                         >
                                             Delete
                                         </Button>
@@ -123,7 +123,7 @@ const UserList: React.FC = () => {
                                         <Avatar
                                             size={48}
                                             src={user.photo ? `/api/users/photo/${user.id}` : undefined}
-                                            icon={!user.photo ? <UserOutlined /> : undefined}
+                                            icon={!user.photo ? <UserOutlined/> : undefined}
                                             alt={`${user.name} ${user.lastname}`}
                                             className={!user.photo ? 'avatar-default' : ''}
                                         />
@@ -132,7 +132,7 @@ const UserList: React.FC = () => {
                                         <div className="user-name-tag">
                                             <span className="user-name">{user.name} {user.lastname}</span>
                                             <Tag color={roleColors[user.role] || 'default'}
-                                                className="role-tag">
+                                                 className="role-tag">
                                                 {user.role}
                                             </Tag>
                                             {isCurrentUser && <Tag className="you-tag">YOU</Tag>}

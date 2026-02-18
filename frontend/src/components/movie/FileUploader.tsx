@@ -1,6 +1,6 @@
 import React from 'react';
-import { Form, Upload, Button, Image } from 'antd';
-import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
+import {Form, Upload, Button, Image} from 'antd';
+import {UploadOutlined, DeleteOutlined} from '@ant-design/icons';
 
 interface FileUploaderProps {
     label: string;
@@ -35,7 +35,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                         maxCount={1}
                         accept={accept}
                     >
-                        <Button icon={<UploadOutlined />}>
+                        <Button icon={<UploadOutlined/>}>
                             {uploadButtonText}
                         </Button>
                     </Upload>
@@ -59,7 +59,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                             <Button
                                 danger
                                 size="small"
-                                icon={<DeleteOutlined />}
+                                icon={<DeleteOutlined/>}
                                 onClick={onFileRemove}
                             >
                                 Remove
@@ -68,7 +68,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                     </div>
                 )}
             </div>
-            {error && <div style={{ color: 'red', marginTop: 4 }}>{error}</div>}
+            {error && <div style={{color: 'red', marginTop: 4}}>{error}</div>}
         </Form.Item>
     );
 };

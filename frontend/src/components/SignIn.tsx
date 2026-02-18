@@ -72,26 +72,25 @@ function SignIn() {
                 </div>
             </div>
 
-            {/* Info Section */}
             <div className="info-section" ref={infoSectionRef}>
                 <h2>Master English with Movies <span role="img" aria-label="popcorn">🍿</span></h2>
                 <Row gutter={[32, 32]} justify="center" className="steps-row">
                     <Col xs={24} md={8}>
-                        <Card className="step-card" bordered={false}>
+                        <Card className="step-card">
                             <PlayCircleOutlined className="step-icon"/>
                             <h3>1. Choose a Movie</h3>
                             <p>Select from our collection of popular movies and TV shows you love.</p>
                         </Card>
                     </Col>
                     <Col xs={24} md={8}>
-                        <Card className="step-card" bordered={false}>
+                        <Card className="step-card">
                             <ReadOutlined className="step-icon"/>
                             <h3>2. Learn Vocabulary</h3>
                             <p>Study key words and phrases extracted directly from the movie script.</p>
                         </Card>
                     </Col>
                     <Col xs={24} md={8}>
-                        <Card className="step-card" bordered={false}>
+                        <Card className="step-card">
                             <CheckCircleOutlined className="step-icon"/>
                             <h3>3. Test Yourself</h3>
                             <p>Take interactive tests to reinforce your learning and track progress.</p>

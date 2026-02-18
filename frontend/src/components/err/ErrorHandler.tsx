@@ -1,10 +1,6 @@
-import { AxiosError } from 'axios';
+import {AxiosError} from 'axios';
 
-export interface ErrorResponse {
-    message?: string;
-    error?: string;
-    details?: string;
-}
+import type {ErrorResponse} from '../../types/common';
 
 export class ErrorHandler {
     static isDuplicateError(error: AxiosError<ErrorResponse>): boolean {

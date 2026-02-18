@@ -1,4 +1,3 @@
-/* ===== Test Card Layout ===== */
 .test-card {
     display: flex;
     flex-direction: column;
@@ -9,7 +8,6 @@
     width: 100%;
 }
 
-/* ===== Question Card (orange, like flashcard) ===== */
 .test-question-card {
     width: 100%;
     border-radius: 20px;
@@ -18,7 +16,6 @@
     margin-bottom: 20px;
     transition: box-shadow 0.3s;
     position: relative;
-    /* For absolute feedback */
     background: linear-gradient(135deg, #fa8c16, #ffbb96);
 }
 
@@ -29,7 +26,6 @@
 .test-question-card-body {
     background: transparent;
     padding: 40px 32px 50px;
-    /* Extra bottom padding for feedback */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,14 +64,12 @@
     color: #cf1322;
 }
 
-/* ===== 2×2 Answer Grid ===== */
 .test-answers-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     width: 100%;
     margin-bottom: 20px;
-    /* Reserve space for actions */
 }
 
 .test-option-btn {
@@ -100,7 +94,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Answered states */
 .test-option-btn.correct {
     border-color: #52c41a;
     background: #f6ffed;
@@ -120,14 +113,12 @@
     color: #8c8c8c;
 }
 
-/* ===== Actions ===== */
 .test-actions {
     width: 100%;
     display: flex;
     justify-content: center;
     position: relative;
     min-height: 48px;
-    /* Reserve height to prevent layout jump */
 }
 
 .test-next-btn {
@@ -159,7 +150,6 @@
     background: #d87a10;
 }
 
-/* ===== Counter ===== */
 .test-counter {
     margin-top: 16px;
     color: #888;
@@ -168,7 +158,6 @@
     font-size: 1rem;
 }
 
-/* ===== Progress Bar ===== */
 .test-progress {
     width: 100%;
     max-width: 600px;
@@ -186,7 +175,6 @@
     transition: width 0.4s ease;
 }
 
-/* ===== Responsive ===== */
 @media (max-width: 578px) {
     .test-card {
         padding: 16px 12px 32px;

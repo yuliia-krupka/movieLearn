@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState, useCallback, useMemo} from 'react';
 
 interface FileState {
     file: File | null;
@@ -13,8 +13,8 @@ export const useFileUpload = (errorMessage: string) => {
         error: null,
     });
 
-    const handleFileChange = (file: File, generatePreview = false): boolean => {
-        setFileState(prev => ({ ...prev, file, error: null }));
+    const handleFileChange = useCallback((file: File, generatePreview = false): boolean => {
+        setFileState(prev => ({...prev, file, error: null}));
 
         if (generatePreview && file.type.startsWith('image/')) {
             const reader = new FileReader();
@@ -28,28 +28,33 @@ export const useFileUpload = (errorMessage: string) => {
         }
 
         return false;
-    };
+    }, []);
 
-    const handleFileRemove = (): void => {
+    const handleFileRemove = useCallback((): void => {
         setFileState({
             file: null,
             previewUrl: null,
             error: errorMessage,
         });
-    };
+    }, [errorMessage]);
 
-    const validateFile = (): boolean => {
+    const setPreviewUrl = useCallback((url: string | null) => {
+        setFileState(prev => ({...prev, previewUrl: url}));
+    }, []);
+
+    const validateFile = useCallback((): boolean => {
         if (!fileState.file) {
-            setFileState(prev => ({ ...prev, error: errorMessage }));
+            setFileState(prev => ({...prev, error: errorMessage}));
             return false;
         }
         return true;
-    };
+    }, [fileState.file, errorMessage]);
 
-    return {
+    return useMemo(() => ({
         ...fileState,
         handleFileChange,
         handleFileRemove,
+        setPreviewUrl,
         validateFile,
-    };
+    }), [fileState, handleFileChange, handleFileRemove, setPreviewUrl, validateFile]);
 };

@@ -1,9 +1,5 @@
-import type { MenuProps } from "antd";
-import {
-    HomeOutlined,
-    VideoCameraOutlined,
-    UserOutlined,
-} from "@ant-design/icons";
+import type {MenuProps} from "antd";
+import {HomeOutlined, UserOutlined, VideoCameraOutlined,} from "@ant-design/icons";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -26,28 +22,24 @@ export const getMenuItems = (
         navigateAndClose(key);
     };
 
-    const items: MenuItem[] = [
+    return [
         {
             key: "/home",
-            icon: <HomeOutlined />,
+            icon: <HomeOutlined/>,
             label: "Home",
             onClick: () => handleClick("/home"),
         },
         {
             key: "/movies",
-            icon: <VideoCameraOutlined />,
+            icon: <VideoCameraOutlined/>,
             label: "Movies List",
             onClick: () => handleClick("/movies"),
         },
         {
             key: "/account",
-            icon: <UserOutlined />,
+            icon: <UserOutlined/>,
             label: "Account",
             onClick: () => handleClick("/account"),
         },
     ];
-
-
-
-    return items;
 };

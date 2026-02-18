@@ -28,7 +28,6 @@ const TestCard: React.FC<TestCardProps> = ({
 
     return (
         <div className="test-card">
-            {/* Question card */}
             <div className="test-question-card">
                 <div className="test-question-card-body">
                     <h2>{question}</h2>
@@ -39,7 +38,6 @@ const TestCard: React.FC<TestCardProps> = ({
                 </div>
             </div>
 
-            {/* 2x2 answer grid */}
             <div className="test-answers-grid">
                 {answers.map((answer, index) => {
                     let className = 'test-option-btn';
@@ -66,7 +64,6 @@ const TestCard: React.FC<TestCardProps> = ({
                 })}
             </div>
 
-            {/* Next / See Results - Always render container to prevent jump */}
             <div className="test-actions">
                 {answered ? (
                     isLast ? (
@@ -79,7 +76,7 @@ const TestCard: React.FC<TestCardProps> = ({
                         </button>
                     )
                 ) : (
-                    <div style={{height: '46px'}}/> /* Placeholder to match button height */
+                    <div/>
                 )}
             </div>
         </div>

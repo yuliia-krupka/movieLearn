@@ -1,42 +1,11 @@
-export interface LearningItemDto {
-    id: number;
-    type: 'FLASH_CARD' | 'TEST';
-    text: string;
-    answers?: string[];
-    exampleSentence?: string;
-    translation: string;
-    learningSetId: number;
-}
-
-export interface LearningSetDto {
-    id: number;
-    name: string;
-    date: string;
-    movieId: number;
-    learningItems: LearningItemDto[];
-}
-
-export interface FlashCardData {
-    word: string;
-    translation: string;
-    exampleSentence?: string;
-    id: number;
-}
-
-export interface ItemStatusDto {
-    learningItemId: number;
-    status: 'NOT_STARTED' | 'IN_PROGRESS' | 'LEARNED' | 'SKIPPED';
-    correctAnswers: number;
-    totalAttempts: number;
-}
-
-export interface TestItemData {
-    id: number;
-    question: string;
-    answers: string[];
-    correctAnswerIndex: number;
-    translation: string;
-}
+import type {
+    LearningSetDto,
+    ItemStatusDto,
+    FlashCardData,
+    TestItemData,
+    ApiFlashCard,
+    ApiTestItem
+} from '../types/learningSet';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
@@ -74,8 +43,8 @@ export const learningSetService = {
             {credentials: 'include'}
         );
         if (!response.ok) return [];
-        const data = await response.json();
-        return data.map((item: any) => ({
+        const data: ItemStatusDto[] = await response.json();
+        return data.map((item) => ({
             learningItemId: item.learningItemId,
             status: item.status,
             correctAnswers: item.correctAnswers,
@@ -107,8 +76,8 @@ export const learningSetService = {
             throw new Error(`Failed to get flash cards: ${response.statusText}`);
         }
 
-        const items = await response.json();
-        return items.map((item: any) => ({
+        const items: ApiFlashCard[] = await response.json();
+        return items.map((item) => ({
             word: item.text,
             translation: item.translation,
             exampleSentence: item.exampleSentence,
@@ -125,8 +94,8 @@ export const learningSetService = {
             throw new Error(`Failed to get test items: ${response.statusText}`);
         }
 
-        const items = await response.json();
-        return items.map((item: any) => ({
+        const items: ApiTestItem[] = await response.json();
+        return items.map((item) => ({
             id: item.id,
             question: item.text,
             answers: item.answers,

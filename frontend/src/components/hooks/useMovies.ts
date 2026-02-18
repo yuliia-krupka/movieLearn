@@ -2,13 +2,7 @@ import {useState, useCallback, useEffect} from 'react';
 import axios from 'axios';
 import {message} from 'antd';
 
-export interface Movie {
-    id: number;
-    title: string;
-    description: string;
-    genres: string[];
-    image: string;
-}
+import type {Movie} from '../../types/movie';
 
 interface UseMoviesProps {
     apiEndpoint: string;

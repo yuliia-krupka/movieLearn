@@ -1,31 +1,29 @@
-import { useState } from "react";
+import {useState} from "react";
 import axios from "axios";
-import { Avatar, Button, Card, Space, Typography, Spin, Alert } from "antd";
-import { EditOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import {Avatar, Button, Card, Space, Typography, Spin, Alert} from "antd";
+import {EditOutlined} from "@ant-design/icons";
+import {useNavigate} from "react-router-dom";
+import {useEffect} from "react";
 
 import MainLayout from "../layout/MainLayout.tsx";
-import { useUserProfile } from "../hooks/useUserProfile.ts";
+import {useUserProfile} from "../hooks/useUserProfile.ts";
 import '../css/Account.css';
 import '../css/Layout.css'
 
-const { Title, Text } = Typography;
-
-
+const {Title, Text} = Typography;
 
 
 const Account = () => {
-    const { user, loading: userLoading, error, fetchUserProfile } = useUserProfile();
+    const {user, loading: userLoading, error, fetchUserProfile} = useUserProfile();
     const [moviesStarted, setMoviesStarted] = useState<number>(0);
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchUserProfile();
+        void fetchUserProfile();
     }, [fetchUserProfile]);
 
     useEffect(() => {
-        axios.get('/api/movies/count', { withCredentials: true })
+        axios.get('/api/movies/count', {withCredentials: true})
             .then(res => setMoviesStarted(res.data))
             .catch(err => console.error("Failed to fetch movie count:", err));
     }, []);
@@ -33,8 +31,8 @@ const Account = () => {
     if (userLoading) {
         return (
             <MainLayout>
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                    <Spin size="large" />
+                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%'}}>
+                    <Spin size="large"/>
                 </div>
             </MainLayout>
         );
@@ -43,7 +41,7 @@ const Account = () => {
     if (error) {
         return (
             <MainLayout>
-                <Alert message="Error" description={error} type="error" showIcon />
+                <Alert message="Error" description={error} type="error" showIcon/>
             </MainLayout>
         );
     }
@@ -63,10 +61,10 @@ const Account = () => {
                 </div>
 
                 <Card className="profile-card">
-                    <Space direction="vertical" size="large" style={{ width: "100%" }}>
-                        <ProfileDetail label="Email:" value={user?.email || "Not available"} />
-                        <ProfileDetail label="English level:" value={user?.englishLevel || "Not set"} />
-                        <ProfileDetail label="Movies started:" value={moviesStarted} />
+                    <Space direction="vertical" size="large" style={{width: "100%"}}>
+                        <ProfileDetail label="Email:" value={user?.email || "Not available"}/>
+                        <ProfileDetail label="English level:" value={user?.englishLevel || "Not set"}/>
+                        <ProfileDetail label="Movies started:" value={moviesStarted}/>
 
                         <div className="profile-detail">
                             <Text className="profile-label">Interests:</Text>
@@ -85,7 +83,7 @@ const Account = () => {
 
                         <Button
                             className="update-profile-btn"
-                            icon={<EditOutlined />}
+                            icon={<EditOutlined/>}
                             onClick={() => navigate("/account/update")}
                         >
                             Update Profile
@@ -99,8 +97,8 @@ const Account = () => {
 
 
 const ProfileDetail = ({
-    label, value
-}: { label: string; value: string | number }) => (
+                           label, value
+                       }: { label: string; value: string | number }) => (
     <div className="profile-detail">
         <Text className="profile-label">{label}</Text>
         <Text>{value}</Text>

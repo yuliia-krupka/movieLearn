@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,8 +24,10 @@ public class LearningItem {
     @Column(nullable = false)
     private String text;
 
-    @Column(columnDefinition = "TEXT")
-    private List<String> answers;
+    @ElementCollection
+    @CollectionTable(name = "learning_item_answers", joinColumns = @JoinColumn(name = "learning_item_id"))
+    @Column(name = "answer")
+    private List<String> answers = new ArrayList<>();
 
     private String exampleSentence;
 

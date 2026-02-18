@@ -12,7 +12,7 @@ import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import {useGenres} from '../hooks/useGenres.tsx';
 import {useFileUpload} from '../hooks/useFileUpload.tsx';
-import {type MovieFormData, type NewGenreData} from '../types/movies.ts';
+import {type MovieFormData, type NewGenreData} from '../../types/movie';
 import GenreSelector from '../genre/GenreSelector.tsx';
 import FileUploader from './FileUploader.tsx';
 import AddGenreModal from '../genre/AddGenreModal.tsx';
@@ -154,8 +154,8 @@ const CreateMovieForm: React.FC = () => {
                 <GenreSelector
                     genres={genres}
                     onAddGenre={() => setIsGenreModalVisible(true)}
-                    onGenreUpdated={() => fetchGenres()}
-                    onGenreDeleted={() => fetchGenres()}
+                    onGenreUpdated={() => void fetchGenres()}
+                    onGenreDeleted={() => void fetchGenres()}
                     messageApi={customMessage}
                 />
 
@@ -211,8 +211,8 @@ const CreateMovieForm: React.FC = () => {
     }
 
     return (
-        <MainLayout messageContext={contextHolder}>
-            <Title level={2}>Add New Movie</Title>
+        <MainLayout fullHeight messageContext={contextHolder}>
+            <Title level={2} style={{textAlign: 'center'}}>Add New Movie</Title>
             {renderFormContent()}
             <AddGenreModal
                 visible={isGenreModalVisible}

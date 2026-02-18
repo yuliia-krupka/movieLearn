@@ -8,13 +8,8 @@ import '../css/Layout.css'
 import useMessage from "antd/es/message/useMessage";
 
 const {Title} = Typography;
+import {interestsList, englishLevels} from "../../constants/common.ts";
 
-const interestsList: string[] = [
-    "Sport", "Fashion", "Food", "Space",
-    "Art", "Traveling", "Literature", "Humor", "Music", "Science"
-];
-
-const englishLevels = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 type UserData = {
     name: string;
@@ -32,7 +27,7 @@ const UpdateAccount = () => {
     const {user, loading, error, fetchUserProfile, updateUserProfile} = useUserProfile();
 
     useEffect(() => {
-        fetchUserProfile();
+        void fetchUserProfile();
     }, [fetchUserProfile]);
 
     useEffect(() => {
@@ -41,7 +36,7 @@ const UpdateAccount = () => {
                 name: user.name,
                 lastname: user.lastname,
             });
-            setSelectedLevel(user.englishLevel);
+            setSelectedLevel(user.englishLevel || "");
             setSelectedInterests(user.interests || []);
         }
     }, [user, form]);
@@ -69,7 +64,7 @@ const UpdateAccount = () => {
             await updateUserProfile(updatedData);
             customMessage.success('Profile updated successfully');
             setTimeout(() => navigate("/account"), 1000);
-        } catch (err) {
+        } catch {
             customMessage.error('Failed to update profile.');
         }
     };

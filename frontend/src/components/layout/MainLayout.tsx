@@ -11,21 +11,23 @@ interface MainLayoutProps {
     className?: string;
     messageContext?: ReactNode;
     contentStyle?: CSSProperties;
+    fullHeight?: boolean;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({
                                                    children,
                                                    className = 'content',
                                                    messageContext,
-                                                   contentStyle
+                                                   contentStyle,
+                                                   fullHeight = false
                                                }) => {
     return (
-        <Layout className="account-root-layout">
+        <Layout className={`account-root-layout ${fullHeight ? 'fixed-layout' : ''}`}>
             <Sidebar/>
             <Layout>
                 {messageContext}
                 <TopBar/>
-                <Content className={className} style={contentStyle}>
+                <Content className={className} style={{...contentStyle, ...(fullHeight ? {overflowY: 'auto'} : {})}}>
                     {children}
                 </Content>
             </Layout>

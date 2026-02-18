@@ -30,14 +30,14 @@ const MovieDetails: React.FC = () => {
 
     useEffect(() => {
         if (errorMsg) {
-            message.error(errorMsg);
+            void message.error(errorMsg);
             setErrorMsg(null);
         }
     }, [errorMsg, message]);
 
     useEffect(() => {
         if (successMsg) {
-            message.success(successMsg);
+            void message.success(successMsg);
             setSuccessMsg(null);
         }
     }, [successMsg, message]);
@@ -64,17 +64,18 @@ const MovieDetails: React.FC = () => {
             }
         };
 
-        fetchMovie();
+        fetchMovie().catch(console.error);
     }, [id, navigate]);
 
 
-    const handleDelete = () => {
-        axios.delete(`/api/movies/${id}`)
-            .then(() => navigate('/movies'))
-            .catch(error => {
-                console.error('Error deleting movie:', error);
-                setErrorMsg('Error deleting movie');
-            });
+    const handleDelete = async () => {
+        try {
+            await axios.delete(`/api/movies/${id}`);
+            navigate('/movies');
+        } catch (error) {
+            console.error('Error deleting movie:', error);
+            setErrorMsg('Error deleting movie');
+        }
     };
 
     const addMovieToUser = async () => {

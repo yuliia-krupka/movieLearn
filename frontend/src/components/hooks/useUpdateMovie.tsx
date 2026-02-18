@@ -1,27 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Form, message } from 'antd';
-import axios, { AxiosError } from 'axios';
-import { useNavigate, useParams } from "react-router-dom";
-import { useFileUpload } from './useFileUpload';
-import { useGenres } from './useGenres';
+import {useState, useEffect} from 'react';
+import {Form, message} from 'antd';
+import axios, {AxiosError} from 'axios';
+import {useNavigate, useParams} from "react-router-dom";
+import {useFileUpload} from './useFileUpload';
+import {useGenres} from './useGenres';
 
-interface Movie {
-    id: number;
-    title: string;
-    description: string;
-    genres: string[];
-    image: string | null;
-}
-
-interface FormValues {
-    title: string;
-    description: string;
-    genres: string[];
-}
-
-interface ApiError {
-    message?: string;
-}
+import type {Movie, FormValues} from '../../types/movie';
+import type {ApiError} from '../../types/common';
 
 const useUpdateMovie = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -31,10 +16,10 @@ const useUpdateMovie = () => {
     const [currentScriptInfo, setCurrentScriptInfo] = useState<{ name: string, size: string } | null>(null);
 
     const navigate = useNavigate();
-    const { id } = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>();
     const [form] = Form.useForm();
 
-    const { genres, loading: genresLoading, addGenre, deleteGenre, fetchGenres } = useGenres();
+    const {genres, loading: genresLoading, addGenre, deleteGenre, fetchGenres} = useGenres();
     const imageUpload = useFileUpload('Please select an image file');
     const scriptUpload = useFileUpload('Please select a script file');
 
@@ -47,6 +32,7 @@ const useUpdateMovie = () => {
     };
 
     useEffect(() => {
+        let isMounted = true;
         const fetchMovie = async () => {
             if (!id) {
                 setLoading(false);
@@ -55,8 +41,11 @@ const useUpdateMovie = () => {
 
             try {
                 const response = await axios.get<Movie>(`/api/movies/${id}`);
+                if (!isMounted) return;
+
                 setMovie(response.data);
 
+                // Initialize form values ONLY when movie data is successfully fetched
                 form.setFieldsValue({
                     title: response.data.title,
                     description: response.data.description,
@@ -67,11 +56,11 @@ const useUpdateMovie = () => {
                     const imageResponse = await axios.get(`/api/movies/${id}/image`, {
                         responseType: 'arraybuffer'
                     });
-                    if (imageResponse.data && imageResponse.data.byteLength > 0) {
-                        const blob = new Blob([imageResponse.data], { type: 'image/jpeg' });
+                    if (imageResponse.data && imageResponse.data.byteLength > 0 && isMounted) {
+                        const blob = new Blob([imageResponse.data], {type: 'image/jpeg'});
                         const imageUrl = URL.createObjectURL(blob);
                         setCurrentImageUrl(imageUrl);
-                        imageUpload.previewUrl = imageUrl;
+                        imageUpload.setPreviewUrl(imageUrl);
                     }
                 } catch (error) {
                     if (axios.isAxiosError(error) && error.response?.status !== 404) {
@@ -81,7 +70,7 @@ const useUpdateMovie = () => {
 
                 try {
                     const scriptResponse = await axios.head(`/api/movies/${id}/script`);
-                    if (scriptResponse.status === 200) {
+                    if (scriptResponse.status === 200 && isMounted) {
                         const contentLength = scriptResponse.headers['content-length'];
                         const size = contentLength ? formatFileSize(parseInt(contentLength)) : 'Unknown size';
                         setCurrentScriptInfo({
@@ -96,17 +85,23 @@ const useUpdateMovie = () => {
                 }
 
             } catch (error) {
-                console.error('Error fetching movie details:', error);
-                message.error('Error fetching movie');
-                navigate('/admin');
+                if (isMounted) {
+                    console.error('Error fetching movie details:', error);
+                    void message.error('Error fetching movie');
+                    navigate('/admin');
+                }
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
 
         void fetchMovie();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
+        return () => {
+            isMounted = false;
+        };
+    }, [id, form, navigate]); // Removed imageUpload from dependencies to prevent infinite loops/resets
 
     const handleSubmit = async (values: FormValues) => {
         if (!id) return;
@@ -139,21 +134,21 @@ const useUpdateMovie = () => {
                 }
             });
 
-            message.success('Movie updated successfully!');
+            void message.success('Movie updated successfully!');
 
             form.resetFields();
             imageUpload.handleFileRemove();
             scriptUpload.handleFileRemove();
 
-            navigate('/admin');
+            navigate(`/movies/${id}`);
         } catch (error: unknown) {
             const axiosError = error as AxiosError<ApiError>;
             if (axiosError.response) {
-                message.error(`Error updating movie: ${axiosError.response.data?.message || 'Server error'}`);
+                void message.error(`Error updating movie: ${axiosError.response.data?.message || 'Server error'}`);
             } else if (axiosError.request) {
-                message.error('Error connecting to server. Please check your internet connection.');
+                void message.error('Error connecting to server. Please check your internet connection.');
             } else {
-                message.error(`Error updating movie: ${axiosError.message}`);
+                void message.error(`Error updating movie: ${axiosError.message}`);
             }
         } finally {
             setSubmitting(false);
@@ -184,11 +179,11 @@ const useUpdateMovie = () => {
         const isLt2M = file.size / 1024 / 1024 < 2;
 
         if (!isImage) {
-            message.error('You can only upload image files!');
+            void message.error('You can only upload image files!');
             return false;
         }
         if (!isLt2M) {
-            message.error('Image must be smaller than 2MB!');
+            void message.error('Image must be smaller than 2MB!');
             return false;
         }
         return imageUpload.handleFileChange(file, true);
@@ -202,11 +197,11 @@ const useUpdateMovie = () => {
         const isLt5M = file.size / 1024 / 1024 < 5;
 
         if (!isPdf && !isDoc && !isText) {
-            message.error('You can only upload PDF, DOC, DOCX or TXT files!');
+            void message.error('You can only upload PDF, DOC, DOCX or TXT files!');
             return false;
         }
         if (!isLt5M) {
-            message.error('Script must be smaller than 5MB!');
+            void message.error('Script must be smaller than 5MB!');
             return false;
         }
         return scriptUpload.handleFileChange(file, false);

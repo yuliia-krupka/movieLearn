@@ -2,10 +2,11 @@ export interface User {
     id: number;
     email: string;
     name: string;
+    lastname?: string;
     englishLevel?: string;
     interests?: string[];
     photo?: string;
-    role?: "USER" | "ADMIN";
+    role: string;
 }
 
 export interface AuthContextType {

@@ -36,7 +36,6 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/api/**").authenticated()
-                        .requestMatchers("/api/users/auth/status").permitAll()
                         .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
@@ -44,7 +43,8 @@ public class SecurityConfig {
                         .successHandler(oauth2CustomSuccessHandler)
                         .failureUrl(frontendUrl + "/?error=true"))
                 .logout(logout -> logout
-                        .logoutSuccessHandler((request, response, authentication) -> response.setStatus(200))
+                        .logoutSuccessHandler((request, response, authentication) -> response
+                                .setStatus(200))
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID"))

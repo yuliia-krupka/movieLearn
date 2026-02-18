@@ -1,5 +1,5 @@
 import React from 'react';
-import type {FlashCardData, ItemStatusDto} from '../../services/learningSetService';
+import type {FlashCardData, ItemStatusDto} from '../../types/learningSet';
 import MainLayout from '../layout/MainLayout';
 import '../css/Results.css';
 
@@ -44,13 +44,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
     const total = flashcards.length;
     const score = Array.from(results.values()).filter(Boolean).length;
 
-    // Build a map of learningItemId -> status for quick lookup
     const statusMap = new Map(itemStatuses.map(s => [s.learningItemId, s.status]));
 
     return (
         <MainLayout className="results-content" contentStyle={{height: 'calc(100vh - 64px)', overflow: 'hidden'}}>
             <div className="results-container">
-                {/* Header */}
                 <div className="results-header">
                     {onBackToMovie && (
                         <button className="results-back-btn" onClick={onBackToMovie}>

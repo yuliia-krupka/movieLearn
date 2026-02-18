@@ -8,15 +8,12 @@ import Logo from "./Logo.tsx";
 
 const {Text} = Typography;
 
+import {interestsList} from "../constants/common.ts";
+
 const Interests: React.FC = () => {
     const navigate = useNavigate();
     const [customMessage, contextHolder] = useMessage();
     const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-
-    const interestsList: string[] = [
-        'Sport', 'Fashion', 'Food', 'Space',
-        'Art', 'Traveling', 'Literature', 'Humor', 'Music', 'Science'
-    ];
 
     const toggleInterest = (interest: string) => {
         setSelectedInterests(prevState =>

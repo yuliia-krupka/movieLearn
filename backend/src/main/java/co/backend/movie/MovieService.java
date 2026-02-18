@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -144,7 +143,7 @@ public class MovieService {
             throw new NotFoundException("Genres not found");
         }
 
-        List<Movie> movies = movieRepository.findByGenresIn(Collections.singleton(genres));
+        List<Movie> movies = movieRepository.findByGenresIn(genres);
 
         return movies.stream()
                 .map(movieMapper::toDto)

@@ -3,24 +3,7 @@ import axios, {type AxiosError} from 'axios';
 import {message as antMessage} from 'antd';
 import type {MessageInstance} from 'antd/es/message/interface';
 
-export interface User {
-    id: number;
-    name: string;
-    lastname: string;
-    email: string;
-    role: string;
-    photo?: string;
-    englishLevel?: string;
-}
-
-interface UseAdminUsersReturn {
-    users: User[];
-    loading: boolean;
-    actionLoading: { [key: number]: boolean };
-    fetchUsers: (email?: string) => Promise<void>;
-    updateUserRole: (userId: number, newRole: string) => Promise<void>;
-    deleteUser: (userId: number) => Promise<void>;
-}
+import type {User, UseAdminUsersReturn} from "../../types/admin";
 
 const rolePriority: Record<string, number> = {
     ADMIN: 1,
