@@ -1,0 +1,145 @@
+.admin-movies-container {
+    height: 100%;
+}
+
+.admin-movies-header {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.admin-movies-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1f2937;
+}
+
+.admin-movies-subtitle {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.add-movie-btn {
+    background-color: #6366f1;
+    /* Indigo color from design */
+    border-color: #6366f1;
+    border-radius: 20px;
+    font-weight: 500;
+    padding: 0 24px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+    transition: all 0.3s ease;
+}
+
+.add-movie-btn:hover {
+    background-color: #6366f1 !important;
+    border-color: #6366f1 !important;
+    opacity: 0.8;
+}
+
+/* Admin Movie Card Styles */
+.admin-movie-card-container {
+    width: 100%;
+    max-width: 270px;
+    /* Match MovieCard max-width */
+    margin: 0 auto;
+    /* Center in column if smaller */
+}
+
+.admin-movie-card {
+    border-radius: 0;
+    /* Square corners as per design (or slight radius) */
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.admin-movie-card .ant-card-cover {
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-movie-card .ant-card-cover img {
+    width: 100%;
+    height: 130px;
+    /* Match MovieCard height */
+    object-fit: cover;
+    display: block;
+}
+
+.admin-movie-card .ant-card-body {
+    padding: 12px 12px 0 12px;
+    /* Add horizontal padding */
+}
+
+.admin-movie-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-movie-genre {
+    font-size: 12px;
+    color: #5A73DB;
+    /* Blue color from main page */
+    font-style: italic;
+    text-transform: capitalize;
+    /* Optional: changed from lowercase to match main page if needed, or keep lowercase */
+    margin-bottom: 12px;
+    /* Add more space below */
+}
+
+.admin-card-actions {
+    display: flex;
+    border-top: 1px solid #f0f0f0;
+    background: #e5e7eb;
+    /* Light grey background for actions */
+    border-radius: 0 0 8px 8px;
+    /* Rounded bottom corners */
+    overflow: hidden;
+}
+
+.admin-action-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 10px 0;
+    color: #374151;
+    /* Dark grey icon color */
+    transition: background 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+}
+
+.admin-action-btn:not(:last-child) {
+    border-right: 1px solid #d1d5db;
+    /* Separator line */
+}
+
+.admin-action-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.admin-action-btn.delete:hover {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+/* Pagination centering */
+.ant-pagination {
+    margin-top: 32px;
+    text-align: center;
+}

@@ -6,6 +6,7 @@ import {type FC} from 'react';
 import "./css/EnglishLevel.css";
 import Logo from "./Logo.tsx";
 import {englishLevels} from "../constants/common.ts";
+import LogoDesign from "./LogoDesign.tsx";
 
 const {Text} = Typography;
 
@@ -32,6 +33,7 @@ const EnglishLevel: FC = () => {
     return (
         <div className="container">
             {contextHolder}
+            <LogoDesign/>
             <Logo level={1}/>
 
             <Text className="subtitle">Tell us your level of English</Text>

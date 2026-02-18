@@ -9,6 +9,7 @@ import Logo from "./Logo.tsx";
 const {Text} = Typography;
 
 import {interestsList} from "../constants/common.ts";
+import LogoDesign from "./LogoDesign.tsx";
 
 const Interests: React.FC = () => {
     const navigate = useNavigate();
@@ -45,6 +46,7 @@ const Interests: React.FC = () => {
     return (
         <div className="container">
             {contextHolder}
+            <LogoDesign/>
             <Logo level={1}/>
             <Text className="subtitle">Tell us your interests</Text>
             <div className="buttons">

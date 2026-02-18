@@ -16,6 +16,8 @@ import FlashCardsModule from "./components/flash-card/FlashCardsModule.tsx";
 import TestsModule from "./components/test/TestsModule.tsx";
 import AdminDashboard from "./components/admin/AdminDashboard.tsx";
 import AccessDenied from "./components/err/AccessDenied.tsx";
+import UpdateFlashCards from "./components/flash-card/UpdateFlashCards.tsx";
+import AdminMoviesList from "./components/movie/AdminMoviesList.tsx";
 
 function App() {
     return (
@@ -93,6 +95,14 @@ function App() {
                         }
                     />
                     <Route
+                        path="/admin/movies"
+                        element={
+                            <ProtectedRoute requireAdmin requireAuth={true}>
+                                <AdminMoviesList/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
                         path="/admin/movies/new"
                         element={
                             <ProtectedRoute requireAdmin requireAuth={true}>
@@ -129,6 +139,14 @@ function App() {
                         element={
                             <ProtectedRoute requireAuth={true}>
                                 <TestsModule/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/learning-sets/:id/update"
+                        element={
+                            <ProtectedRoute requireAuth={true}>
+                                <UpdateFlashCards/>
                             </ProtectedRoute>
                         }
                     />

@@ -9,7 +9,6 @@ CREATE TABLE users
     email         VARCHAR(255) NOT NULL UNIQUE,
     photo         LONGBLOB,
     english_level ENUM ('A1', 'A2', 'B1', 'B2', 'C1', 'C2') DEFAULT 'A1',
-    level         ENUM ('A1', 'A2', 'B1', 'B2', 'C1', 'C2') NOT NULL,
     interests     TEXT,
     role          ENUM ('ADMIN', 'USER') NOT NULL
 );
@@ -106,3 +105,8 @@ CREATE TABLE learning_item_answers
 );
 
 ALTER TABLE learning_item DROP COLUMN answers;
+
+--changeset antigravity:03-add-transcription-field
+ALTER TABLE learning_item
+    ADD COLUMN transcription VARCHAR(255) DEFAULT NULL;
+

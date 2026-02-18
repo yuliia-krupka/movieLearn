@@ -8,6 +8,7 @@
     display: inline-block;
     animation: logoFadeIn 1.8s ease-in-out;
     transition: transform 1s ease, filter 0.8s ease;
+    margin-top: 10px;
 }
 
 .logo:hover {

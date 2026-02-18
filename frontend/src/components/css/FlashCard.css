@@ -10,6 +10,11 @@
 .learning-set-info {
     text-align: center;
     margin-bottom: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 0 10px;
 }
 
 .learning-set-info h2 {
@@ -18,6 +23,24 @@
     color: #888;
     letter-spacing: 0.5px;
     margin: 0;
+}
+
+.finish-study-btn {
+    position: absolute;
+    right: 0;
+    background: none;
+    border: 1px solid #5A73DB;
+    color: #5A73DB;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.finish-study-btn:hover {
+    background: #5A73DB;
+    color: white;
 }
 
 .flashcard-container {
@@ -133,6 +156,59 @@
     margin: 16px 0;
     padding: 0 20px;
     line-height: 1.4;
+}
+
+.front h2 {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    line-height: 1.2;
+}
+
+.transcription {
+    font-size: 5rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 4px 0 20px 0;
+    font-family: "Lucida Console", Monaco, monospace;
+    text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.5);
+    letter-spacing: 1.5px;
+}
+
+.status-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    color: white;
+    backdrop-filter: blur(4px);
+}
+
+.status-known {
+    background: rgba(82, 196, 26, 0.3);
+    border-color: #52c41a;
+}
+
+.status-unknown {
+    background: rgba(255, 77, 79, 0.3);
+    border-color: #ff4d4f;
+}
+
+.active-known {
+    background: #fa8c16 !important;
+    color: white !important;
+    transform: scale(1.05);
+}
+
+.active-unknown {
+    background: #5A73DB !important;
+    color: white !important;
+    transform: scale(1.05);
 }
 
 .actions {

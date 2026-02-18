@@ -67,7 +67,7 @@ const AdminDashboard: React.FC = () => {
                     <Col xs={24} sm={24} md={12} lg={8}>
                         <Card
                             className="stat-card"
-                            onClick={() => navigate('/admin/movies/new')}
+                            onClick={() => navigate('/admin/movies')}
                         >
                             <div className="action-arrow"><ArrowRightOutlined/></div>
                             <div className="stat-icon-wrapper icon-movies">

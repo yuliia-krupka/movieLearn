@@ -159,6 +159,11 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
             {learningSet && (
                 <div className="learning-set-info">
                     <h2>{learningSet.name}</h2>
+                    {results.size > 0 && (
+                        <button className="finish-study-btn" onClick={handleSeeResults}>
+                            Finish Review
+                        </button>
+                    )}
                 </div>
             )}
 
@@ -166,6 +171,8 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                 word={currentCard.word}
                 translation={currentCard.translation}
                 exampleSentence={currentCard.exampleSentence}
+                transcription={currentCard.transcription}
+                status={results.get(currentIndex)}
                 onPrevious={handlePrevious}
                 onNext={handleNext}
                 onKnow={handleKnow}

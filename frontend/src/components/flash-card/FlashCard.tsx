@@ -5,6 +5,8 @@ interface FlashCardProps {
     word: string;
     translation: string;
     exampleSentence?: string;
+    transcription?: string;
+    status?: boolean;
     onPrevious?: () => void;
     onNext?: () => void;
     onKnow?: () => void;
@@ -19,6 +21,8 @@ const FlashCard: React.FC<FlashCardProps> = ({
                                                  word,
                                                  translation,
                                                  exampleSentence,
+                                                 transcription,
+                                                 status,
                                                  onPrevious,
                                                  onNext,
                                                  onKnow,
@@ -69,7 +73,15 @@ const FlashCard: React.FC<FlashCardProps> = ({
                 <div className="card-wrapper" onClick={handleCardClick}>
                     <div className={`card ${isFlipped ? 'flipped' : ''}`}>
                         <div className="front">
+                            {status !== undefined && (
+                                <div className={`status-badge ${status ? 'status-known' : 'status-unknown'}`}>
+                                    {status ? 'KNOWN' : "DON'T KNOW"}
+                                </div>
+                            )}
                             <h2>{word.toUpperCase()}</h2>
+                            {transcription && (
+                                <p className="transcription">{transcription}</p>
+                            )}
                             {exampleSentence && (
                                 <p className="example-sentence">{exampleSentence}</p>
                             )}
@@ -90,8 +102,18 @@ const FlashCard: React.FC<FlashCardProps> = ({
                     <button className="see-results-button" onClick={onSeeResults}>See Results</button>
                 ) : (
                     <>
-                        <button onClick={handleKnow}>I know</button>
-                        <button className="dont-know-btn" onClick={handleDontKnow}>I don't know</button>
+                        <button
+                            className={status === true ? 'active-known' : ''}
+                            onClick={handleKnow}
+                        >
+                            I know
+                        </button>
+                        <button
+                            className={`dont-know-btn ${status === false ? 'active-unknown' : ''}`}
+                            onClick={handleDontKnow}
+                        >
+                            I don't know
+                        </button>
                     </>
                 )}
             </div>

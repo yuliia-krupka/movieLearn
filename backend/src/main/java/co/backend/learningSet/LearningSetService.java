@@ -35,8 +35,28 @@ public class LearningSetService {
     }
 
     public LearningSetDto getOrCreateByMovieId(Long movieId) {
-        return getLatestByMovieId(movieId)
-                .orElseGet(() -> generateForMovie(movieId));
+        LearningSetDto potentialSet = getLatestByMovieId(movieId).orElse(null);
+
+        if (potentialSet == null) {
+            return generateForMovie(movieId);
+        }
+
+        // If the set exists but is empty (e.g. all items deleted), regenerate it.
+        // This ensures the user always has a valid set to start with from Movie
+        // Details.
+        if (potentialSet.getLearningItems() == null || potentialSet.getLearningItems().isEmpty()) {
+            try {
+                // Try to clean up the empty set to avoid clutter
+                learningSetRepository.deleteById(potentialSet.getId());
+            } catch (Exception e) {
+                // If deletion fails (e.g. FK constraints from user progress),
+                // we ignore it and just create a fresh set which will become the latest.
+                System.out.println("Could not delete empty set " + potentialSet.getId() + ": " + e.getMessage());
+            }
+            return generateForMovie(movieId);
+        }
+
+        return potentialSet;
     }
 
     public LearningSetDto getById(Long id) {

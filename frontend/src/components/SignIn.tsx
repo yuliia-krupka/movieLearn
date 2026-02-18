@@ -5,6 +5,7 @@ import {useAuth} from './auth/useAuth.tsx';
 import {useNavigate} from 'react-router-dom';
 import Logo from "./Logo.tsx";
 import "./css/SignIn.css";
+import LogoDesign from "./LogoDesign.tsx";
 
 function SignIn() {
     const {isAuthenticated, login} = useAuth();
@@ -47,9 +48,9 @@ function SignIn() {
 
     return (
         <div className="signin-page">
-            {/* Hero Section */}
             <div className="hero-section">
                 <div className="login-container">
+                    <LogoDesign/>
                     <Logo level={1}/>
                     <div className="subtitle">
                         Study English with scripts of your favorite movies!

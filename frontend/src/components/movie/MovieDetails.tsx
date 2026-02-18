@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Spin, Button, Row, Col, message as antMessage} from 'antd';
+import {ArrowLeftOutlined, SettingOutlined} from '@ant-design/icons';
 import axios from "axios";
 import MainLayout from "../layout/MainLayout.tsx";
 import {useAuth} from '../auth/useAuth';
+import {learningSetService} from '../../services/learningSetService';
 import '../css/MovieDetails.css';
 import '../css/movies.css';
 import '../css/Layout.css';
@@ -99,6 +101,19 @@ const MovieDetails: React.FC = () => {
         navigate("/tests", {state: {movieId: Number(id)}});
     };
 
+    const handleRefine = async () => {
+        try {
+            setLoading(true);
+            const set = await learningSetService.getOrCreateByMovie(Number(id));
+            navigate(`/learning-sets/${set.id}/update`);
+        } catch (e) {
+            console.error(e);
+            void message.error('Could not load learning set');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (loading) return <Spin size="large" className="loading-spinner"/>;
     if (!movie) return null;
 
@@ -142,25 +157,52 @@ const MovieDetails: React.FC = () => {
                         </div>
 
                         {!isAdmin && (
-                            <div className="movie-actions">
-                                <Button className="yellow-btn" onClick={addMovieToUser} disabled={isAdded}>
-                                    Study Vocabulary
-                                </Button>
+                            <div className="user-actions-container">
+                                <div className="movie-actions">
+                                    <Button className="primary-action-btn" onClick={addMovieToUser} disabled={isAdded}>
+                                        Study Vocabulary
+                                    </Button>
+                                    <Button
+                                        className="secondary-action-btn"
+                                        onClick={goToTest}
+                                    >
+                                        Vocabulary Test
+                                    </Button>
+                                    <Button
+                                        className="icon-action-btn"
+                                        icon={<SettingOutlined/>}
+                                        onClick={handleRefine}
+                                        title="Refine Learning Set"
+                                    />
+                                </div>
                                 <Button
-                                    className="yellow-btn"
-                                    onClick={goToTest}
+                                    type="link"
+                                    className="back-link-btn"
+                                    icon={<ArrowLeftOutlined/>}
+                                    onClick={() => navigate('/movies')}
                                 >
-                                    Vocabulary Test
+                                    Back to Movies
                                 </Button>
                             </div>
                         )}
                         {isAdmin && (
-                            <div className="movie-actions">
-                                <Button className="yellow-btn" onClick={() => navigate(`/admin/movies/${id}/update`)}>
-                                    Edit
-                                </Button>
-                                <Button className="yellow-btn" onClick={handleDelete}>
-                                    Delete
+                            <div className="admin-actions-container">
+                                <div className="movie-actions">
+                                    <Button className="yellow-btn"
+                                            onClick={() => navigate(`/admin/movies/${id}/update`)}>
+                                        Edit
+                                    </Button>
+                                    <Button className="yellow-btn" onClick={handleDelete}>
+                                        Delete
+                                    </Button>
+                                </div>
+                                <Button
+                                    type="link"
+                                    className="back-link-btn"
+                                    icon={<ArrowLeftOutlined/>}
+                                    onClick={() => navigate('/admin/movies')}
+                                >
+                                    Back to List
                                 </Button>
                             </div>
                         )}

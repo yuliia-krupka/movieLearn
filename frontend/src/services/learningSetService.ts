@@ -40,7 +40,7 @@ export const learningSetService = {
     async getItemStatuses(userId: number, learningSetId: number): Promise<ItemStatusDto[]> {
         const response = await fetch(
             `${API_BASE_URL}/user-learning-status/set/${learningSetId}/user/${userId}`,
-            {credentials: 'include'}
+            { credentials: 'include' }
         );
         if (!response.ok) return [];
         const data: ItemStatusDto[] = await response.json();
@@ -81,6 +81,7 @@ export const learningSetService = {
             word: item.text,
             translation: item.translation,
             exampleSentence: item.exampleSentence,
+            transcription: item.transcription,
             id: item.id
         }));
     },
@@ -101,6 +102,82 @@ export const learningSetService = {
             answers: item.answers,
             correctAnswerIndex: item.correctAnswerIndex,
             translation: item.translation
+        }));
+    },
+
+    async getById(id: number): Promise<LearningSetDto> {
+        const response = await fetch(`${API_BASE_URL}/learning-sets/${id}`, {
+            credentials: 'include',
+        });
+        if (!response.ok) throw new Error('Failed to get learning set');
+        return response.json();
+    },
+
+    async createItem(item: Partial<ApiFlashCard> & { learningSetId: number, type: string }): Promise<ApiFlashCard> {
+        const response = await fetch(`${API_BASE_URL}/learning-items`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item),
+            credentials: 'include',
+        });
+        if (!response.ok) throw new Error('Failed to create item');
+        return response.json();
+    },
+
+    async updateItem(id: number, item: Partial<ApiFlashCard> & {
+        learningSetId: number,
+        type: string
+    }): Promise<ApiFlashCard> {
+        const response = await fetch(`${API_BASE_URL}/learning-items/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item),
+            credentials: 'include',
+        });
+        if (!response.ok) throw new Error('Failed to update item');
+        return response.json();
+    },
+
+    async deleteItem(id: number): Promise<void> {
+        const response = await fetch(`${API_BASE_URL}/learning-items/${id}`, {
+            method: 'DELETE',
+            credentials: 'include',
+        });
+        if (!response.ok) throw new Error('Failed to delete item');
+    },
+
+    async generateCustomItems(request: string, learningSetId: number): Promise<FlashCardData[]> {
+        const params = new URLSearchParams({ request, learningSetId: String(learningSetId) });
+        const response = await fetch(`${API_BASE_URL}/learning-items/generate-custom?${params}`, {
+            method: 'POST',
+            credentials: 'include',
+        });
+        if (!response.ok) throw new Error('Failed to generate items');
+        const items: ApiFlashCard[] = await response.json();
+        return items.map((item) => ({
+            word: item.text,
+            translation: item.translation,
+            exampleSentence: item.exampleSentence,
+            transcription: item.transcription,
+            id: item.id
+        }));
+    },
+
+    async regenerate(learningSetId: number, feedback: string, itemIds: number[]): Promise<FlashCardData[]> {
+        const response = await fetch(`${API_BASE_URL}/learning-items/regenerate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ learningSetId, feedback, itemIds }),
+            credentials: 'include',
+        });
+        if (!response.ok) throw new Error('Failed to regenerate items');
+        const items: ApiFlashCard[] = await response.json();
+        return items.map((item) => ({
+            word: item.text,
+            translation: item.translation,
+            exampleSentence: item.exampleSentence,
+            transcription: item.transcription,
+            id: item.id
         }));
     }
 };

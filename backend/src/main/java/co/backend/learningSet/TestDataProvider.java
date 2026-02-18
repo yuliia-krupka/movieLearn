@@ -31,43 +31,43 @@ public class TestDataProvider {
         // --- FLASH CARD items ---
         items.add(createFlashCard(set, "endeavor",
                 "A journey is a great endeavor that requires courage.",
-                "починання, зусилля"));
+                "починання, зусилля", "[ɪnˈdɛv.ər]"));
 
         items.add(createFlashCard(set, "reluctant",
                 "She was reluctant to leave the safety of her home.",
-                "неохочий, з небажанням"));
+                "неохочий, з небажанням", "[rɪˈlʌk.tənt]"));
 
         items.add(createFlashCard(set, "compelling",
                 "The story was so compelling that I couldn't stop watching.",
-                "переконливий, захопливий"));
+                "переконливий, захопливий", "[kəmˈpɛl.ɪŋ]"));
 
         items.add(createFlashCard(set, "resilience",
                 "His resilience helped him overcome every obstacle.",
-                "стійкість, витривалість"));
+                "стійкість, витривалість", "[rɪˈzɪl.jəns]"));
 
         items.add(createFlashCard(set, "betrayal",
                 "The betrayal by his closest friend left him devastated.",
-                "зрада"));
+                "зрада", "[bɪˈtreɪ.əl]"));
 
         items.add(createFlashCard(set, "suspense",
                 "The suspense kept the audience on the edge of their seats.",
-                "напруга, невизначеність"));
+                "напруга, невизначеність", "[səˈspɛns]"));
 
         items.add(createFlashCard(set, "revelation",
                 "The final revelation changed everything they believed in.",
-                "відкриття, одкровення"));
+                "відкриття, одкровення", "[ˌrɛv.əˈleɪ.ʃən]"));
 
         items.add(createFlashCard(set, "ominous",
                 "Dark clouds gathered in an ominous sky.",
-                "зловісний, загрозливий"));
+                "зловісний, загрозливий", "[ˈɒm.ɪ.nəs]"));
 
         items.add(createFlashCard(set, "pursue",
                 "He decided to pursue his dreams no matter the cost.",
-                "переслідувати, прагнути"));
+                "переслідувати, прагнути", "[pəˈsjuː]"));
 
         items.add(createFlashCard(set, "treacherous",
                 "The path through the mountains was treacherous.",
-                "підступний, зрадливий"));
+                "підступний, зрадливий", "[ˈtrɛtʃ.ər.əs]"));
 
         // --- TEST items (множинний вибір) ---
         items.add(createTestItem(set, "What does 'endeavor' mean?",
@@ -122,12 +122,14 @@ public class TestDataProvider {
         return set;
     }
 
-    private LearningItem createFlashCard(LearningSet set, String word, String sentence, String translation) {
+    private LearningItem createFlashCard(LearningSet set, String word, String sentence, String translation,
+                                         String transcription) {
         LearningItem item = new LearningItem();
         item.setType(LearningItemType.FLASH_CARD);
         item.setText(word);
         item.setExampleSentence(sentence);
         item.setTranslation(translation);
+        item.setTranscription(transcription);
         item.setLearningSet(set);
         return item;
     }

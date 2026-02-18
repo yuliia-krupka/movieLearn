@@ -31,6 +31,8 @@ public class LearningItem {
 
     private String exampleSentence;
 
+    private String transcription;
+
     private String translation;
 
     private Integer correctAnswerIndex;

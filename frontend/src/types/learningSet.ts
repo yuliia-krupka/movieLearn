@@ -4,6 +4,7 @@ export interface LearningItemDto {
     text: string;
     answers?: string[];
     exampleSentence?: string;
+    transcription?: string;
     translation: string;
     learningSetId: number;
 }
@@ -20,6 +21,7 @@ export interface FlashCardData {
     word: string;
     translation: string;
     exampleSentence?: string;
+    transcription?: string;
     id: number;
 }
 
@@ -43,6 +45,8 @@ export interface ApiFlashCard {
     text: string;
     translation: string;
     exampleSentence?: string;
+    transcription?: string;
+    answers?: string[];
 }
 
 export interface ApiTestItem {

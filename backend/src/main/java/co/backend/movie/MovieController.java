@@ -37,7 +37,12 @@ public class MovieController {
 
     @GetMapping("/{id}")
     public MovieDto getMovieById(@PathVariable Long id) {
-        return movieService.getMovieById(id);
+        MovieDto dto = movieService.getMovieById(id);
+        System.out.println("Debugging getMovieById for id: " + id);
+        System.out.println("DTO Title: " + dto.getTitle());
+        System.out.println("DTO Genres: " + dto.getGenres());
+        System.out.println("DTO Description: " + dto.getDescription());
+        return dto;
     }
 
     @DeleteMapping("/{id}")

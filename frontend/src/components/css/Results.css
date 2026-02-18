@@ -14,7 +14,7 @@
     overflow: hidden;
 }
 
-.results-content ~ *,
+.results-content~*,
 .results-content {
     overflow: hidden;
 }
@@ -24,7 +24,7 @@
     overflow: hidden;
 }
 
-.account-root-layout:has(.results-content) > .ant-layout {
+.account-root-layout:has(.results-content)>.ant-layout {
     height: 100vh;
     overflow: hidden;
 }
@@ -61,6 +61,7 @@
     margin: 8px 0 0;
 }
 
+/* Try Again - Blue */
 .results-try-again {
     padding: 12px 32px;
     border-radius: 24px;
@@ -70,17 +71,18 @@
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.25s, transform 0.15s;
+    transition: all 0.3s;
     white-space: nowrap;
 }
 
 .results-try-again:hover {
-    background: #4A63CB;
-    transform: translateY(-1px);
+    background: #5A73DB;
+    opacity: 0.8;
+    transform: none;
 }
 
 .results-try-again:active {
-    transform: translateY(0);
+    transform: none;
 }
 
 .results-actions-row {
@@ -89,22 +91,24 @@
     align-items: center;
 }
 
+/* Go to Test / Back to Flashcards - Yellow */
 .results-go-to-test {
     padding: 12px 32px;
     border-radius: 24px;
     border: none;
-    background: #fa8c16;
+    background: #F49E4C;
     color: #fff;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.25s, transform 0.15s;
+    transition: all 0.3s;
     white-space: nowrap;
 }
 
 .results-go-to-test:hover {
-    background: #d87a10;
-    transform: translateY(-1px);
+    background: #F49E4C;
+    opacity: 0.8;
+    transform: none;
 }
 
 .results-back-btn {
@@ -235,6 +239,14 @@
     font-weight: 700;
     font-size: 1rem;
     color: #333;
+}
+
+.result-transcription {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #666;
+    font-family: "Lucida Console", Monaco, monospace;
+    letter-spacing: 0.5px;
 }
 
 .result-sentence {

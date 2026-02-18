@@ -11,6 +11,7 @@ public class LearningItemDto {
     private String text;
     private List<String> answers;
     private String exampleSentence;
+    private String transcription;
     private String translation;
     private Integer correctAnswerIndex;
     private Long learningSetId;
