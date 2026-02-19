@@ -15,6 +15,7 @@ interface FlashCardProps {
     hasNext?: boolean;
     allReviewed?: boolean;
     onSeeResults?: () => void;
+    completionHint?: string;
 }
 
 const FlashCard: React.FC<FlashCardProps> = ({
@@ -30,7 +31,8 @@ const FlashCard: React.FC<FlashCardProps> = ({
                                                  hasPrevious = true,
                                                  hasNext = true,
                                                  allReviewed = false,
-                                                 onSeeResults
+                                                 onSeeResults,
+                                                 completionHint
                                              }) => {
     const [isFlipped, setIsFlipped] = useState(false);
 
@@ -117,6 +119,11 @@ const FlashCard: React.FC<FlashCardProps> = ({
                     </>
                 )}
             </div>
+            {completionHint && (
+                <div style={{textAlign: 'center', marginTop: '10px', fontStyle: 'italic', color: '#888'}}>
+                    {completionHint}
+                </div>
+            )}
         </div>
     );
 };

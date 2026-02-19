@@ -44,13 +44,19 @@ public class MovieService {
         if (id == null) {
             throw new BadRequestException("Id must be provided");
         }
-        if (!movieRepository.existsById(id)) {
-            throw new NotFoundException("Movie with id " + id + " not found");
-        }
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Movie with id " + id + " not found"));
+
         if (movieRepository.hasAnyLearningSets(id)) {
             throw new DeleteException("Movie has associated learning sets. Can not be deleted!");
         }
-        movieRepository.deleteById(id);
+
+        for (User user : movie.getUsers()) {
+            user.getMovies().remove(movie);
+            userRepository.save(user);
+        }
+
+        movieRepository.delete(movie);
     }
 
     public MovieDto createMovie(MovieDto movieDto, MultipartFile image, MultipartFile script) {

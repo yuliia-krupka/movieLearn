@@ -1,79 +1,34 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
-import {learningSetService} from '../../services/learningSetService';
-import type {FlashCardData, LearningSetDto} from '../../types/learningSet';
-import {CloseOutlined, CheckOutlined, PlusOutlined} from '@ant-design/icons';
-import {message} from 'antd';
+import {CloseOutlined, CheckOutlined, PlusOutlined, CaretRightOutlined} from '@ant-design/icons';
+import {useAuth} from '../auth/useAuth';
 import '../css/UpdateFlashCards.css';
-
-interface EditableFlashCard extends Partial<FlashCardData> {
-    isNew?: boolean;
-    isEditing?: boolean;
-    tempId?: number;
-}
+import {useFlashCards} from '../../hooks/useFlashCards';
 
 const UpdateFlashCards: React.FC = () => {
     const {id: routeId} = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const [learningSetId, setLearningSetId] = useState<number | null>(null);
-    const [learningSet, setLearningSet] = useState<LearningSetDto | null>(null);
-    const [flashcards, setFlashcards] = useState<EditableFlashCard[]>([]);
-    const [feedback, setFeedback] = useState('');
-    const [regenerating, setRegenerating] = useState(false);
-    const [selectedCardIds, setSelectedCardIds] = useState<number[]>([]);
+    const {currentUserId} = useAuth();
 
-    useEffect(() => {
-        const loadData = async () => {
-            if (!routeId) return;
-            try {
-                const setId = parseInt(routeId);
-                setLearningSetId(setId);
-
-                const set = await learningSetService.getById(setId);
-                setLearningSet(set);
-
-                const cards = await learningSetService.getFlashCards(setId);
-                setFlashcards(cards);
-            } catch (error) {
-                console.error('Failed to load learning set:', error);
-                message.error('Failed to load flashcards');
-            }
-        };
-        loadData();
-    }, [routeId]);
-
-    const handleRegenerate = async () => {
-        if (!feedback.trim() || !learningSetId || selectedCardIds.length === 0) {
-            message.warning('Please select items to regenerate and provide feedback');
-            return;
-        }
-
-        try {
-            setRegenerating(true);
-            const newCards = await learningSetService.regenerate(learningSetId, feedback, selectedCardIds);
-
-            // Remove regenerated items from current list and add new ones
-            // Actually regenerate endpoint backend implementation might return ONLY new items or ALL items? 
-            // Based on my backend impl, it returns only NEW items.
-            // So we need to filter out the old ones and add new ones.
-
-            setFlashcards(prev => {
-                const remaining = prev.filter(c => c.id && !selectedCardIds.includes(c.id));
-                const formattedNewCards = newCards.map(c => ({...c, isNew: true}));
-                return [...remaining, ...formattedNewCards];
-            });
-
-            setSelectedCardIds([]);
-            message.success('Regenerated selected words');
-            setFeedback('');
-        } catch (error) {
-            console.error('Failed to regenerate items:', error);
-            message.error('Failed to regenerate items');
-        } finally {
-            setRegenerating(false);
-        }
-    };
+    const {
+        learningSet,
+        flashcards,
+        selectedCardIds,
+        feedback,
+        setFeedback,
+        regenerating,
+        isTestUnlocked,
+        isRefineExpanded,
+        setIsRefineExpanded,
+        handleRegenerate,
+        handleSaveCard,
+        handleDeleteCard,
+        toggleEdit,
+        toggleSelection,
+        updateCardState,
+        handleAddCustomCard
+    } = useFlashCards(routeId, currentUserId);
 
     const handleStartLearning = () => {
         if (learningSet?.movieId) {
@@ -83,146 +38,103 @@ const UpdateFlashCards: React.FC = () => {
         }
     };
 
-    const handleSaveCard = async (card: EditableFlashCard) => {
-        if (!learningSetId) return;
-        if (!card.word || !card.translation) {
-            message.warning('Word and translation are required');
-            return;
+    const handleGoToTest = () => {
+        if (learningSet?.movieId) {
+            navigate('/tests', {state: {movieId: learningSet.movieId}});
+        } else {
+            navigate('/tests');
         }
-
-        try {
-            if (card.id) {
-                await learningSetService.updateItem(card.id, {
-                    id: card.id,
-                    text: card.word!,
-                    translation: card.translation!,
-                    exampleSentence: card.exampleSentence || '',
-                    transcription: card.transcription || '',
-                    type: 'FLASH_CARD',
-                    answers: [],
-                    learningSetId: learningSetId
-                });
-                message.success('Card updated');
-                setFlashcards(prev => prev.map(c => c.id === card.id ? {...card, isEditing: false} : c));
-            } else {
-                // Should not happen in Review mode typically unless we allow adding new cards manually too
-                // For now keeping it for robustness
-                const savedItem = await learningSetService.createItem({
-                    text: card.word!,
-                    translation: card.translation!,
-                    exampleSentence: card.exampleSentence || '',
-                    transcription: card.transcription || '',
-                    type: 'FLASH_CARD',
-                    answers: [],
-                    learningSetId: learningSetId
-                });
-                message.success('Card created');
-                setFlashcards(prev => prev.map(c =>
-                    (c.tempId === card.tempId) ? {
-                        ...c,
-                        id: savedItem.id,
-                        word: savedItem.text,
-                        translation: savedItem.translation,
-                        exampleSentence: savedItem.exampleSentence,
-                        transcription: savedItem.transcription,
-                        isNew: false,
-                        isEditing: false
-                    } : c
-                ));
-            }
-        } catch (error) {
-            console.error('Failed to save card:', error);
-            message.error('Failed to save card');
-        }
-    };
-
-    const handleDeleteCard = async (card: EditableFlashCard) => {
-        try {
-            if (card.id) {
-                await learningSetService.deleteItem(card.id);
-                message.success('Card removed');
-            }
-            setFlashcards(prev => prev.filter(c =>
-                (card.id && c.id !== card.id) ||
-                (card.tempId && c.tempId !== card.tempId)
-            ));
-        } catch (error) {
-            console.error('Failed to delete card:', error);
-            message.error('Failed to delete card');
-        }
-    };
-
-    const toggleEdit = (card: EditableFlashCard) => {
-        setFlashcards(prev => prev.map(c =>
-            (c.id && c.id === card.id) || (c.tempId && c.tempId === card.tempId)
-                ? {...c, isEditing: !c.isEditing}
-                : c
-        ));
-    };
-
-    const toggleSelection = (id: number) => {
-        setSelectedCardIds(prev =>
-            prev.includes(id)
-                ? prev.filter(i => i !== id)
-                : [...prev, id]
-        );
-    };
-
-    const updateCardState = (id: number | undefined, tempId: number | undefined, field: 'word' | 'translation' | 'exampleSentence' | 'transcription', value: string) => {
-        setFlashcards(prev => prev.map(c =>
-            (id && c.id === id) || (tempId && c.tempId === tempId)
-                ? {...c, [field]: value}
-                : c
-        ));
-    };
-
-    const handleAddCustomCard = () => {
-        const newCard: EditableFlashCard = {
-            tempId: Date.now(),
-            word: '',
-            translation: '',
-            exampleSentence: '',
-            transcription: '',
-            isEditing: true,
-            isNew: true
-        };
-        setFlashcards(prev => [newCard, ...prev]);
     };
 
     return (
         <MainLayout className="update-flashcards-container">
+
+            <div className="study-dashboard-card">
+                <div className="dashboard-title">Start Learning</div>
+                <div className="dashboard-subtitle">Master your vocabulary with flashcards and tests</div>
+
+                <div className="dashboard-actions">
+                    <div className="dashboard-action-item">
+                        <button
+                            className="dashboard-btn flashcards-btn"
+                            onClick={handleStartLearning}
+                        >
+                            Flash Cards
+                        </button>
+                        <span className="action-description">Learn new words</span>
+                    </div>
+
+                    <div className="dashboard-action-item">
+                        <button
+                            className={`dashboard-btn tests-btn ${!isTestUnlocked ? 'locked' : ''}`}
+                            onClick={handleGoToTest}
+                            disabled={!isTestUnlocked}
+                            title={!isTestUnlocked ? "Complete flashcards to unlock" : ""}
+                        >
+                            Tests {!isTestUnlocked && <span className="lock-icon">🔒</span>}
+                        </button>
+                        <span className="action-description">
+                            {isTestUnlocked ? "Test your knowledge" : "Unlock by learning words"}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="info-message" style={{
+                    marginTop: '16px',
+                    color: '#8c8c8c',
+                    fontSize: '0.9rem',
+                    textAlign: 'center',
+                    fontStyle: 'italic'
+                }}>
+                    Tip: Clicking 'I know' 3 times marks the word as learned and unlocks test.
+                </div>
+            </div>
+
             <div className="custom-request-card">
-                <div className="custom-request-title">Refine Flashcards</div>
-                <div className="custom-request-subtitle">
-                    Select words you don't like and describe how to improve them (e.g., "Too easy", "Make it more
-                    formal").
+                <div
+                    className="custom-request-title"
+                    onClick={() => setIsRefineExpanded(!isRefineExpanded)}
+                    style={{cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}
+                >
+                    Refine Flashcards
+                    <CaretRightOutlined
+                        style={{
+                            transform: isRefineExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.3s',
+                            color: '#faad14',
+                            fontSize: '20px'
+                        }}
+                    />
                 </div>
 
-                <label className="request-label">Feedback for Regeneration</label>
-                <textarea
-                    className="request-textarea"
-                    placeholder="Feedback for selected cards..."
-                    value={feedback}
-                    onChange={(e) => setFeedback(e.target.value)}
-                    disabled={selectedCardIds.length === 0}
-                />
+                {isRefineExpanded && (
+                    <div className="refine-content" style={{marginTop: '16px'}}>
+                        <div className="custom-request-subtitle">
+                            Select words you don't like and describe how to improve them (e.g., "Too easy", "Make it
+                            more
+                            formal").
+                        </div>
 
-                <div className="action-buttons">
-                    <button
-                        className="generate-btn"
-                        onClick={handleRegenerate}
-                        disabled={regenerating || selectedCardIds.length === 0}
-                    >
-                        {regenerating ? 'Regenerating...' : `Regenerate Selected (${selectedCardIds.length})`}
-                    </button>
+                        <label className="request-label">Feedback for Regeneration</label>
+                        <textarea
+                            className="request-textarea"
+                            placeholder="Feedback for selected cards..."
+                            value={feedback}
+                            onChange={(e) => setFeedback(e.target.value)}
+                            disabled={selectedCardIds.length === 0}
+                        />
 
-                    <button
-                        className="start-learning-btn"
-                        onClick={handleStartLearning}
-                    >
-                        Start Learning
-                    </button>
-                </div>
+                        <div className="action-buttons">
+                            <button
+                                className="generate-btn"
+                                onClick={handleRegenerate}
+                                disabled={regenerating || selectedCardIds.length === 0}
+                            >
+                                {regenerating ? 'Regenerating...' : `Regenerate Selected (${selectedCardIds.length})`}
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="suggested-words-header">

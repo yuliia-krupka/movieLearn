@@ -51,6 +51,8 @@ const TestCard: React.FC<TestCardProps> = ({
                         }
                     }
 
+                    const label = String.fromCharCode(65 + index); // A, B, C, D...
+
                     return (
                         <button
                             key={index}
@@ -58,7 +60,8 @@ const TestCard: React.FC<TestCardProps> = ({
                             onClick={() => !answered && onSelectAnswer(index)}
                             disabled={answered}
                         >
-                            {answer}
+                            <span className="option-label">{label}</span>
+                            <span className="option-text">{answer}</span>
                         </button>
                     );
                 })}

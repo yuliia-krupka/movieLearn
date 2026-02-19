@@ -1,5 +1,5 @@
 import React from 'react';
-import type { FlashCardData, ItemStatusDto } from '../../types/learningSet';
+import type {FlashCardData, ItemStatusDto} from '../../types/learningSet';
 import MainLayout from '../layout/MainLayout';
 import '../css/Results.css';
 
@@ -12,7 +12,11 @@ interface ResultsPageProps {
     onGoToTest?: () => void;
     onBackToMovie?: () => void;
     onBackToFlashcards?: () => void;
+    showStatus?: boolean;
+    isTestDisabled?: boolean;
+    isTestResult?: boolean;
 }
+
 
 function getMotivationalMessage(score: number, total: number): string {
     const pct = total > 0 ? score / total : 0;
@@ -32,22 +36,25 @@ function getStatusClass(status: string): string {
 }
 
 const ResultsPage: React.FC<ResultsPageProps> = ({
-    flashcards,
-    results,
-    learningSetName,
-    onTryAgain,
-    itemStatuses,
-    onGoToTest,
-    onBackToMovie,
-    onBackToFlashcards
-}) => {
+                                                     flashcards,
+                                                     results,
+                                                     learningSetName,
+                                                     onTryAgain,
+                                                     itemStatuses,
+                                                     onGoToTest,
+                                                     onBackToMovie,
+                                                     onBackToFlashcards,
+                                                     showStatus = true,
+                                                     isTestDisabled = false,
+                                                     isTestResult = false
+                                                 }) => {
     const total = flashcards.length;
     const score = Array.from(results.values()).filter(Boolean).length;
 
     const statusMap = new Map(itemStatuses.map(s => [s.learningItemId, s.status]));
 
     return (
-        <MainLayout className="results-content" contentStyle={{ height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <MainLayout className="results-content" contentStyle={{height: 'calc(100vh - 64px)', overflow: 'hidden'}}>
             <div className="results-container">
                 <div className="results-header">
                     {onBackToMovie && (
@@ -63,11 +70,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
                         <button className="results-try-again" onClick={onTryAgain}>
                             Try again
                         </button>
-                        {onGoToTest && (
+                        {onGoToTest && !isTestDisabled && (
                             <button className="results-go-to-test" onClick={onGoToTest}>
                                 Take Vocabulary Test →
                             </button>
                         )}
+
                         {onBackToFlashcards && (
                             <button className="results-go-to-test" onClick={onBackToFlashcards}>
                                 ← Back to Flashcards
@@ -89,17 +97,24 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
                                 </span>
                                 <div className="result-card-content">
                                     <span className="result-word">{card.word}</span>
-                                    {card.transcription && (
-                                        <span className="result-transcription">{card.transcription}</span>
-                                    )}
-                                    {card.exampleSentence && (
-                                        <span className="result-sentence">"{card.exampleSentence}"</span>
+
+                                    {!isTestResult && (
+                                        <>
+                                            {card.transcription && (
+                                                <span className="result-transcription">{card.transcription}</span>
+                                            )}
+                                            {card.exampleSentence && (
+                                                <span className="result-sentence">"{card.exampleSentence}"</span>
+                                            )}
+                                        </>
                                     )}
                                     <span className="result-translation">{card.translation}</span>
                                 </div>
-                                <span className={`result-status-badge ${getStatusClass(itemStatus)}`}>
-                                    {getStatusLabel(itemStatus)}
-                                </span>
+                                {showStatus && (
+                                    <span className={`result-status-badge ${getStatusClass(itemStatus)}`}>
+                                        {getStatusLabel(itemStatus)}
+                                    </span>
+                                )}
                             </div>
                         );
                     })}

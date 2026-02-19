@@ -24,21 +24,25 @@ const AdminMoviesList: React.FC = () => {
         try {
             await axios.delete(`/api/movies/${id}`, {withCredentials: true});
             message.success('Movie deleted successfully');
-            void fetchMovies(); // Refresh list
-        } catch (error) {
+            void fetchMovies();
+        } catch (error: any) {
             console.error('Error deleting movie:', error);
-            message.error('Failed to delete movie');
+            const errorMsg = error.response?.data?.message || error.response?.data || 'Failed to delete movie';
+            // If the backend returns a string directly as data (which the screenshot suggests: "Movie has associated...")
+            const displayMsg = typeof error.response?.data === 'string' ? error.response.data : errorMsg;
+            message.error(displayMsg);
         }
     };
 
-    // Pagination logic
+
     const pageSize = 8;
     const paginatedMovies = movies.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     return (
-        <MainLayout className="content-movies" contentStyle={{padding: '24px'}}>
-            <div className="admin-movies-container">
-                <div className="admin-movies-header">
+        <MainLayout className="content-movies"
+                    contentStyle={{padding: '0 24px', height: 'calc(100vh - 90px)', overflow: 'hidden'}}>
+            <div className="admin-movies-container" style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+                <div className="admin-movies-header" style={{flexShrink: 0, marginTop: '24px'}}>
                     <div>
                         <div className="admin-movies-title">Movies List (Admin)</div>
                         <div className="admin-movies-subtitle">You can manage all available movies here!</div>
@@ -56,27 +60,37 @@ const AdminMoviesList: React.FC = () => {
                 </div>
 
                 {loading ? (
-                    <div style={{textAlign: 'center', padding: '50px'}}>
+                    <div style={{textAlign: 'center', padding: '50px', flex: 1}}>
                         <Spin size="large"/>
                     </div>
                 ) : (
                     <>
-                        <Row gutter={[24, 24]}>
-                            {paginatedMovies.map((movie) => (
-                                <Col key={movie.id} xs={24} sm={12} md={8} lg={6}
-                                     style={{display: 'flex', justifyContent: 'center'}}>
-                                    <AdminMovieCard movie={movie} onDelete={handleDelete}/>
-                                </Col>
-                            ))}
-                        </Row>
+                        <div style={{flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingBottom: '16px'}}>
+                            <Row gutter={[24, 24]}>
+                                {paginatedMovies.map((movie) => (
+                                    <Col key={movie.id} xs={24} sm={12} md={8} lg={6}
+                                         style={{display: 'flex', justifyContent: 'center'}}>
+                                        <AdminMovieCard movie={movie} onDelete={handleDelete}/>
+                                    </Col>
+                                ))}
+                            </Row>
+                        </div>
                         {movies.length > 0 && (
-                            <Pagination
-                                current={currentPage}
-                                total={movies.length}
-                                pageSize={pageSize}
-                                onChange={setCurrentPage}
-                                showSizeChanger={false}
-                            />
+                            <div style={{
+                                flexShrink: 0,
+                                padding: '16px 0',
+                                borderTop: '1px solid #f0f0f0',
+                                backgroundColor: '#fff'
+                            }}>
+                                <Pagination
+                                    current={currentPage}
+                                    total={movies.length}
+                                    pageSize={pageSize}
+                                    onChange={setCurrentPage}
+                                    showSizeChanger={false}
+                                    style={{margin: 0}}
+                                />
+                            </div>
                         )}
                     </>
                 )}

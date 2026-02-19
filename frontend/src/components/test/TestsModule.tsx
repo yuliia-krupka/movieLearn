@@ -139,7 +139,7 @@ const TestsModule: React.FC = () => {
     if (showResults) {
         const flashcardData: FlashCardData[] = testItems.map(item => ({
             word: item.question,
-            translation: item.translation,
+            translation: item.answers[item.correctAnswerIndex],
             id: item.id
         }));
 
@@ -160,6 +160,8 @@ const TestsModule: React.FC = () => {
                 itemStatuses={itemStatuses}
                 onBackToMovie={handleBackToMovie}
                 onBackToFlashcards={handleBackToFlashcards}
+                showStatus={false}
+                isTestResult={true}
             />
         );
     }

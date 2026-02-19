@@ -1,32 +1,18 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Layout, Avatar, Typography, Input, message as antMessage, Button, Tooltip} from "antd";
 import {useNavigate} from "react-router-dom";
 import {DashboardOutlined} from "@ant-design/icons";
 import "../css/TopBar.css";
-import axios from "axios";
+import {useAuth} from "../auth/useAuth";
 
 const {Header} = Layout;
 const {Text} = Typography;
 const {Search} = Input;
 
-interface User {
-    id: number;
-    name?: string;
-    lastname?: string;
-    photo?: string;
-    role?: string;
-}
-
 const TopBar: React.FC = () => {
     const navigate = useNavigate();
-    const [user, setUser] = useState<User | null>(null);
+    const {user} = useAuth();
     const [message, contextHolder] = antMessage.useMessage();
-
-    useEffect(() => {
-        axios.get<User>('/api/users/account', {withCredentials: true})
-            .then(res => setUser(res.data))
-            .catch(error => console.log("ERROR OCCURRED: " + error))
-    }, []);
 
     const onSearch = async (value: string) => {
         if (!value.trim()) {

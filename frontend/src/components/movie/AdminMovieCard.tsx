@@ -43,7 +43,7 @@ const AdminMovieCard: React.FC<AdminMovieCardProps> = ({movie, onDelete}) => {
         <div className="admin-movie-card-container">
             <Card
                 className="admin-movie-card"
-                bordered={false}
+                variant="borderless"
                 onClick={() => navigate(`/movies/${movie.id}`)}
                 cover={
                     imageSource ? (

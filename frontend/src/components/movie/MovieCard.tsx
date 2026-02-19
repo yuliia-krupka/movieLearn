@@ -52,12 +52,8 @@ const MovieCard: React.FC<MovieCardProps> = ({movie}) => {
                 }
             />
             <div className="movie-card-genres">
-                {movie.genres.map((genre, index) => (
-                    <span key={index} className="movie-card-genre">
-                        {genre}
-                        {index < movie.genres.length - 1 && ', '}
-                    </span>
-                ))}
+                {movie.genres.slice(0, 2).join(', ')}
+                {movie.genres.length > 2 && ` +${movie.genres.length - 2}`}
             </div>
         </Card>
     );

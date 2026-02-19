@@ -13,7 +13,7 @@
     border-radius: 20px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     overflow: hidden;
-    margin-bottom: 20px;
+    margin-bottom: 50px;
     transition: box-shadow 0.3s;
     position: relative;
     background: linear-gradient(135deg, #fa8c16, #ffbb96);
@@ -73,32 +73,63 @@
 }
 
 .test-option-btn {
-    padding: 14px 16px;
-    border: 1px solid #d9d9d9;
+    padding: 16px 20px;
+    border: 1px solid #eee;
     border-radius: 12px;
-    background: #f5f5f5;
+    background: #fff;
     color: #333;
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.25s;
-    text-align: center;
+    text-align: left;
     line-height: 1.4;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .test-option-btn:hover:not(:disabled) {
-    background: #e6e6e6;
-    border-color: #bfbfbf;
+    background: #fff;
+    border-color: #fa8c16;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 16px rgba(250, 140, 22, 0.15);
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #f5f5f5;
+    color: #666;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.test-option-btn:hover .option-label {
+    background: #fff7e6;
+    color: #fa8c16;
+}
+
+.option-text {
+    flex: 1;
 }
 
 .test-option-btn.correct {
     border-color: #52c41a;
     background: #f6ffed;
     color: #389e0d;
-    font-weight: 600;
+}
+
+.test-option-btn.correct .option-label {
+    background: #52c41a;
+    color: #fff;
 }
 
 .test-option-btn.incorrect {
@@ -107,10 +138,14 @@
     color: #cf1322;
 }
 
+.test-option-btn.incorrect .option-label {
+    background: #ff4d4f;
+    color: #fff;
+}
+
 .test-option-btn.dimmed {
-    opacity: 0.4;
-    border-color: #d9d9d9;
-    color: #8c8c8c;
+    opacity: 0.5;
+    filter: grayscale(100%);
 }
 
 .test-actions {

@@ -14,7 +14,7 @@
     overflow: hidden;
 }
 
-.results-content~*,
+.results-content ~ *,
 .results-content {
     overflow: hidden;
 }
@@ -24,7 +24,7 @@
     overflow: hidden;
 }
 
-.account-root-layout:has(.results-content)>.ant-layout {
+.account-root-layout:has(.results-content) > .ant-layout {
     height: 100vh;
     overflow: hidden;
 }
@@ -261,7 +261,7 @@
 }
 
 /* --- Responsive --- */
-@media (max-width: 578px) {
+@media (max-width: 768px) {
     .results-container {
         padding: 0 16px;
     }
@@ -273,15 +273,41 @@
     }
 
     .results-score {
-        font-size: 2.4rem;
+        font-size: 2.5rem;
     }
 
-    .results-try-again {
+    .results-actions-row {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .results-try-again,
+    .results-go-to-test,
+    .results-back-btn {
         width: 100%;
         text-align: center;
+        justify-content: center;
     }
 
     .result-card {
         padding: 14px 16px;
+        flex-direction: column;
+        /* Stack content vertically on mobile */
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .result-icon {
+        font-size: 1.25rem;
+        width: 24px;
+        height: 24px;
+    }
+
+    .result-status-badge {
+        margin-left: 0;
+        /* Left align badge */
+        align-self: flex-start;
     }
 }

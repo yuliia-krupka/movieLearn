@@ -99,40 +99,43 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
     const isLoading = loading || (showGenreFilter && genresLoading);
 
     return (
-        <div style={{width: '100%', padding: '0 20px'}}>
+        <div style={{width: '100%', padding: '0 20px', display: 'flex', flexDirection: 'column', height: '100%'}}>
             {contextHolder}
-            <Row justify="space-between" align="middle" style={{marginBottom: '24px'}}>
-                <Col>
-                    <Title level={5} className="subtitle">
-                        {searchQuery ? `Search results for: "${searchQuery}"` : title}
-                    </Title>
-                </Col>
-                {showGenreFilter && !searchQuery && (
+            <div style={{flexShrink: 0}}>
+                <Row justify="space-between" align="middle" style={{marginBottom: '16px'}}>
                     <Col>
-                        <Space>
-                            <Select
-                                mode="multiple"
-                                placeholder="Filter by genre"
-                                style={{width: 200}}
-                                onChange={setSelectedGenres}
-                                value={selectedGenres}
-                                allowClear
-                            >
-                                {genres.map(({id, name}) => (
-                                    <Option key={id} value={name}>{name}</Option>
-                                ))}
-                            </Select>
-                        </Space>
+                        <Title level={5} className="subtitle">
+                            {searchQuery ? `Search results for: "${searchQuery}"` : title}
+                        </Title>
                     </Col>
-                )}
-            </Row>
+                    {showGenreFilter && !searchQuery && (
+                        <Col>
+                            <Space>
+                                <Select
+                                    mode="multiple"
+                                    placeholder="Filter by genre"
+                                    style={{width: 200}}
+                                    onChange={setSelectedGenres}
+                                    value={selectedGenres}
+                                    allowClear
+                                    maxTagCount={2}
+                                >
+                                    {genres.map(({id, name}) => (
+                                        <Option key={id} value={name}>{name}</Option>
+                                    ))}
+                                </Select>
+                            </Space>
+                        </Col>
+                    )}
+                </Row>
+            </div>
 
             {isLoading ? (
-                <div style={{display: 'flex', justifyContent: 'center', padding: '50px 0'}}>
+                <div style={{display: 'flex', justifyContent: 'center', padding: '50px 0', flex: 1}}>
                     <Spin size="large"/>
                 </div>
             ) : filteredMovies.length === 0 ? (
-                <div style={{display: 'flex', justifyContent: 'center', padding: '50px 0'}}>
+                <div style={{display: 'flex', justifyContent: 'center', padding: '50px 0', flex: 1}}>
                     <Empty description={
                         searchQuery
                             ? `No movies found for "${searchQuery}"`
@@ -143,32 +146,41 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                 </div>
             ) : (
                 <>
-                    <Row gutter={[12, 12]} style={{marginBottom: '16px'}}>
-                        {currentMovies.map(movie => (
-                            <Col
-                                key={movie.id}
-                                xs={24}
-                                sm={colSpan}
-                                md={colSpan}
-                                lg={colSpan}
-                                xl={colSpan}
-                                style={{display: 'flex', justifyContent: 'flex-start'}} // Вирівнюємо картки ліворуч
-                            >
-                                <MovieCard movie={movie}/>
-                            </Col>
-                        ))}
-                    </Row>
+                    <div style={{flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingBottom: '16px'}}>
+                        <Row gutter={[12, 12]}>
+                            {currentMovies.map(movie => (
+                                <Col
+                                    key={movie.id}
+                                    xs={24}
+                                    sm={colSpan}
+                                    md={colSpan}
+                                    lg={colSpan}
+                                    xl={colSpan}
+                                    style={{display: 'flex', justifyContent: 'center'}}
+                                >
+                                    <MovieCard movie={movie}/>
+                                </Col>
+                            ))}
+                        </Row>
+                    </div>
 
-                    <Pagination
-                        current={currentPage}
-                        onChange={setCurrentPage}
-                        total={filteredMovies.length}
-                        pageSize={cardsPerPage}
-                        showSizeChanger={false}
-                        showQuickJumper={false}
-                        responsive={true}
-                        style={{textAlign: 'center', margin: '16px 0'}}
-                    />
+                    <div style={{
+                        flexShrink: 0,
+                        padding: '16px 0',
+                        borderTop: '1px solid #f0f0f0',
+                        backgroundColor: '#fff'
+                    }}>
+                        <Pagination
+                            current={currentPage}
+                            onChange={setCurrentPage}
+                            total={filteredMovies.length}
+                            pageSize={cardsPerPage}
+                            showSizeChanger={false}
+                            showQuickJumper={false}
+                            responsive={true}
+                            style={{textAlign: 'center', margin: 0}}
+                        />
+                    </div>
                 </>
             )}
         </div>

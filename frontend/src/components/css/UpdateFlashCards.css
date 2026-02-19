@@ -326,3 +326,96 @@
     cursor: pointer;
     font-size: 13px;
 }
+
+.study-dashboard-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.dashboard-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+}
+
+.dashboard-subtitle {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 32px;
+}
+
+.dashboard-actions {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.dashboard-action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.dashboard-btn {
+    width: 200px;
+    height: 120px;
+    border-radius: 16px;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.flashcards-btn {
+    background: linear-gradient(135deg, #fa8c16 0%, #ffbb96 100%);
+    color: white;
+}
+
+.flashcards-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(250, 140, 22, 0.3);
+}
+
+.tests-btn {
+    background: linear-gradient(135deg, #7367f0 0%, #a09bf5 100%);
+    color: white;
+}
+
+.tests-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(115, 103, 240, 0.3);
+}
+
+.tests-btn.locked {
+    background: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.tests-btn.locked:hover {
+    transform: none;
+}
+
+.action-description {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.lock-icon {
+    font-size: 18px;
+}

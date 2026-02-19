@@ -1,7 +1,7 @@
 .ant-pagination {
     display: flex !important;
     justify-content: center !important;
-    margin: 16px 0 !important;
+    margin: 0 !important;
 }
 
 .loading-container {
@@ -10,4 +10,3 @@
     color: #666;
     font-size: 16px;
 }
-

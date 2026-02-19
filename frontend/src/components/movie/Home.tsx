@@ -5,7 +5,7 @@ import MainLayout from "../layout/MainLayout.tsx";
 
 const HomePage: React.FC = () => {
     return (
-        <MainLayout className="content-movies">
+        <MainLayout className="content-movies" contentStyle={{height: 'calc(100vh - 90px)', overflow: 'hidden'}}>
             <MoviesGrid
                 apiEndpoint="/api/movies/home"
                 title="Lessons you started!"

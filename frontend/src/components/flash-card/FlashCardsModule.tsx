@@ -141,6 +141,11 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
     }
 
     if (showResults) {
+        const allLearned = flashcards.length > 0 && flashcards.every(card => {
+            const status = itemStatuses.find(s => s.learningItemId === card.id);
+            return status?.status === 'LEARNED' || status?.status === 'SKIPPED';
+        });
+
         return (
             <ResultsPage
                 flashcards={flashcards}
@@ -149,6 +154,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                 onTryAgain={handleTryAgain}
                 itemStatuses={itemStatuses}
                 onGoToTest={handleGoToTest}
+                isTestDisabled={!allLearned}
                 onBackToMovie={handleBackToMovie}
             />
         );
@@ -159,11 +165,6 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
             {learningSet && (
                 <div className="learning-set-info">
                     <h2>{learningSet.name}</h2>
-                    {results.size > 0 && (
-                        <button className="finish-study-btn" onClick={handleSeeResults}>
-                            Finish Review
-                        </button>
-                    )}
                 </div>
             )}
 
@@ -181,6 +182,11 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                 hasNext={currentIndex < flashcards.length - 1}
                 allReviewed={allReviewed}
                 onSeeResults={handleSeeResults}
+                completionHint={
+                    (currentIndex === flashcards.length - 1 && !allReviewed)
+                        ? "Finish all flash cards to see result"
+                        : undefined
+                }
             />
 
             <div className="flashcard-counter">

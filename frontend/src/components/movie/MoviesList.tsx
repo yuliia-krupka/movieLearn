@@ -6,7 +6,7 @@ import '../css/Layout.css';
 const MoviesList: React.FC = () => {
     return (
         <MainLayout className="content-movies" contentStyle={{
-            overflow: 'auto',
+            overflow: 'hidden',
             height: 'calc(100vh - 90px)',
         }}>
             <MoviesGrid

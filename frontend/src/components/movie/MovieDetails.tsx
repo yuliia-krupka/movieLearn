@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Spin, Button, Row, Col, message as antMessage} from 'antd';
-import {ArrowLeftOutlined, SettingOutlined} from '@ant-design/icons';
+import {ArrowLeftOutlined} from '@ant-design/icons';
 import axios from "axios";
 import MainLayout from "../layout/MainLayout.tsx";
 import {useAuth} from '../auth/useAuth';
@@ -23,7 +23,6 @@ const MovieDetails: React.FC = () => {
     const {id} = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [movie, setMovie] = useState<MovieDetails | null>(null);
-    const [isAdded, setIsAdded] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -73,42 +72,28 @@ const MovieDetails: React.FC = () => {
     const handleDelete = async () => {
         try {
             await axios.delete(`/api/movies/${id}`);
+            antMessage.success('Movie deleted successfully');
             navigate('/movies');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error deleting movie:', error);
-            setErrorMsg('Error deleting movie');
+            const errorMsg = error.response?.data?.message || error.response?.data || 'Error deleting movie';
+            // If the backend returns a string directly as data
+            const displayMsg = typeof error.response?.data === 'string' ? error.response.data : errorMsg;
+            setErrorMsg(displayMsg);
         }
     };
-
-    const addMovieToUser = async () => {
-        if (isAdded) return;
-
-        setLoading(true);
+    const handleStartStudying = async () => {
         try {
+            setLoading(true);
             await axios.put(`/api/users/movies/${id}`, null, {
                 withCredentials: true,
             });
-            setIsAdded(true);
-            navigate("/flash-cards", {state: {movieId: Number(id)}});
-        } catch (error) {
-            console.error('Error adding movie:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
-    const goToTest = () => {
-        navigate("/tests", {state: {movieId: Number(id)}});
-    };
-
-    const handleRefine = async () => {
-        try {
-            setLoading(true);
             const set = await learningSetService.getOrCreateByMovie(Number(id));
             navigate(`/learning-sets/${set.id}/update`);
         } catch (e) {
             console.error(e);
-            void message.error('Could not load learning set');
+            void message.error('Could not start studying');
         } finally {
             setLoading(false);
         }
@@ -159,30 +144,22 @@ const MovieDetails: React.FC = () => {
                         {!isAdmin && (
                             <div className="user-actions-container">
                                 <div className="movie-actions">
-                                    <Button className="primary-action-btn" onClick={addMovieToUser} disabled={isAdded}>
-                                        Study Vocabulary
-                                    </Button>
                                     <Button
-                                        className="secondary-action-btn"
-                                        onClick={goToTest}
+                                        type="link"
+                                        className="back-link-btn"
+                                        icon={<ArrowLeftOutlined/>}
+                                        onClick={() => navigate('/movies')}
+                                        style={{marginRight: '16px'}}
                                     >
-                                        Vocabulary Test
+                                        Back to Movies
                                     </Button>
                                     <Button
-                                        className="icon-action-btn"
-                                        icon={<SettingOutlined/>}
-                                        onClick={handleRefine}
-                                        title="Refine Learning Set"
-                                    />
+                                        className="primary-action-btn"
+                                        onClick={handleStartStudying}
+                                    >
+                                        Start Studying
+                                    </Button>
                                 </div>
-                                <Button
-                                    type="link"
-                                    className="back-link-btn"
-                                    icon={<ArrowLeftOutlined/>}
-                                    onClick={() => navigate('/movies')}
-                                >
-                                    Back to Movies
-                                </Button>
                             </div>
                         )}
                         {isAdmin && (
