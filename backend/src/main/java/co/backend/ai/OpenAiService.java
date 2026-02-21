@@ -45,20 +45,7 @@ public class OpenAiService {
 
     public List<LearningItemDto> generateFlashcards(String movieTitle, String description, byte[] scriptBytes,
                                                     String interests, String level) {
-        String scriptContent = "";
-        if (scriptBytes != null && scriptBytes.length > 0) {
-            if (isPdf(scriptBytes)) {
-                try (PDDocument document = PDDocument.load(scriptBytes)) {
-                    PDFTextStripper stripper = new PDFTextStripper();
-                    scriptContent = stripper.getText(document);
-                } catch (Exception e) {
-                    log.error("Error parsing PDF script, falling back to text parsing.", e);
-                    scriptContent = new String(scriptBytes, StandardCharsets.UTF_8);
-                }
-            } else {
-                scriptContent = new String(scriptBytes, StandardCharsets.UTF_8);
-            }
-        }
+        String scriptContent = parseScript(scriptBytes);
 
         String userPrompt = String.format(
                 """
@@ -81,15 +68,28 @@ public class OpenAiService {
         return callOpenAiList(userPrompt);
     }
 
-    public LearningItemDto regenerateItem(LearningItemDto original, String instructions) {
+    public LearningItemDto regenerateItem(LearningItemDto original, String instructions, String movieTitle,
+                                          String description, String scriptContent, String level, String interests) {
         String userPrompt = String.format("""
-                Update the following flashcard based on these instructions: "%s"
-                Original Item: %s
-                
-                Return the updated item as a single JSON object.
-                """, instructions, toJson(original));
+                        Update the following flashcard based on these instructions: "%s"
+                        Movie: "%s"
+                        Description: "%s"
+                        Script Excerpt: %s
+                        User English Level: %s
+                        User Interests: %s
+                        
+                        Original Item to CHANGE (Text: "%s"):
+                        %s
+                        
+                        CRITICAL INSTRUCTIONS:
+                        1. You MUST provide a DIFFERENT English "text" than the original. Do not echo back "%s".
+                        2. If the original was good, provide a better synonym or a more advanced phrase from the script.
+                        3. Return ONLY one updated flashcard as a single JSON object.
+                        4. Do NOT include tests or questions.
+                        """, instructions, movieTitle, description, scriptContent, level, interests, original.getText(),
+                toJson(original), original.getText());
 
-        return callOpenAiSingle(userPrompt, original);
+        return callOpenAiSingle(userPrompt, original, 1.0);
     }
 
     public List<LearningItemDto> generateTests(List<LearningItemDto> flashcards) {
@@ -141,16 +141,50 @@ public class OpenAiService {
         return callOpenAiList(userPrompt);
     }
 
-    public List<LearningItemDto> regenerateBatch(List<LearningItemDto> originalItems, String instructions) {
+    public List<LearningItemDto> regenerateBatch(List<LearningItemDto> originalItems, String instructions,
+                                                 String movieTitle, String description, String scriptContent, String level, String interests) {
+        String originalTexts = String.join(", ", originalItems.stream().map(LearningItemDto::getText).toList());
         String itemsJson = toJson(originalItems);
-        String userPrompt = String.format("""
-                Update the following flashcards based on these instructions: "%s"
-                Original Items: %s
-                
-                Return the updated items as a JSON array.
-                """, instructions, itemsJson);
+        String userPrompt = String.format(
+                """
+                        Update the following flashcards based on these instructions: "%s"
+                        Movie: "%s"
+                        Description: "%s"
+                        Script Excerpt: %s
+                        User English Level: %s
+                        User Interests: %s
+                        
+                        Original Items to CHANGE:
+                        %s
+                        
+                        CRITICAL INSTRUCTIONS:
+                        1. For EVERY item in "Original Items", you MUST provide a NEW English word or phrase.
+                        2. DO NOT ECHO BACK these words: [%s].
+                        3. If the user asks to "add N more", add N NEW items from the movie script in addition to the updated originals.
+                        4. Return the results as a JSON array.
+                        5. Do NOT include test items. Return ONLY vocabulary flashcards.
+                        6. Total items returned MUST BE (Number of Originals) + (Number of New requested).
+                        """,
+                instructions, movieTitle, description, scriptContent, level, interests, itemsJson, originalTexts);
 
-        return callOpenAiList(userPrompt);
+        return callOpenAiList(userPrompt, 1.0);
+    }
+
+    public String parseScript(byte[] scriptBytes) {
+        if (scriptBytes == null || scriptBytes.length == 0) {
+            return "";
+        }
+        if (isPdf(scriptBytes)) {
+            try (PDDocument document = PDDocument.load(scriptBytes)) {
+                PDFTextStripper stripper = new PDFTextStripper();
+                return stripper.getText(document);
+            } catch (Exception e) {
+                log.error("Error parsing PDF script, falling back to text parsing.", e);
+                return new String(scriptBytes, StandardCharsets.UTF_8);
+            }
+        } else {
+            return new String(scriptBytes, StandardCharsets.UTF_8);
+        }
     }
 
     private String toJson(Object obj) {
@@ -179,21 +213,25 @@ public class OpenAiService {
     }
 
     private List<LearningItemDto> callOpenAiList(String userPrompt) {
+        return callOpenAiList(userPrompt, 0.7);
+    }
+
+    private List<LearningItemDto> callOpenAiList(String userPrompt, double temperature) {
         try {
-            return callWithModel(userPrompt, modelName);
+            return callWithModel(userPrompt, modelName, temperature);
         } catch (HttpClientErrorException.NotFound e) {
             log.warn("Model {} not found, falling back to {}", modelName, FALLBACK_MODEL);
-            return callWithModel(userPrompt, FALLBACK_MODEL);
+            return callWithModel(userPrompt, FALLBACK_MODEL, temperature);
         } catch (Exception e) {
-            log.error("Error calling OpenAI for list", e);
+            log.error("Error calling OpenAI for list. Prompt: {}, Error: {}", userPrompt, e.getMessage(), e);
             throw new RuntimeException("AI operation failed: " + e.getMessage());
         }
     }
 
-    private List<LearningItemDto> callWithModel(String userPrompt, String model) {
+    private List<LearningItemDto> callWithModel(String userPrompt, String model, double temperature) {
         ChatRequest request = new ChatRequest(model, List.of(
                 new Message("system", SYSTEM_PROMPT),
-                new Message("user", userPrompt)));
+                new Message("user", userPrompt)), temperature);
 
         try {
             List<LearningItemDto> generatedItems = getLearningItemDtos(request);
@@ -204,12 +242,16 @@ public class OpenAiService {
     }
 
     private LearningItemDto callOpenAiSingle(String userPrompt, LearningItemDto fallback) {
+        return callOpenAiSingle(userPrompt, fallback, 0.7);
+    }
+
+    private LearningItemDto callOpenAiSingle(String userPrompt, LearningItemDto fallback, double temperature) {
         try {
-            return callSingleWithModel(userPrompt, modelName, fallback);
+            return callSingleWithModel(userPrompt, modelName, fallback, temperature);
         } catch (HttpClientErrorException.NotFound e) {
             log.warn("Model {} not found, falling back to {}", modelName, FALLBACK_MODEL);
             try {
-                return callSingleWithModel(userPrompt, FALLBACK_MODEL, fallback);
+                return callSingleWithModel(userPrompt, FALLBACK_MODEL, fallback, temperature);
             } catch (Exception ex) {
                 return fallback;
             }
@@ -219,10 +261,11 @@ public class OpenAiService {
         }
     }
 
-    private LearningItemDto callSingleWithModel(String userPrompt, String model, LearningItemDto fallback) {
+    private LearningItemDto callSingleWithModel(String userPrompt, String model, LearningItemDto fallback,
+                                                double temperature) {
         ChatRequest request = new ChatRequest(model, List.of(
                 new Message("system", SYSTEM_PROMPT),
-                new Message("user", userPrompt)));
+                new Message("user", userPrompt)), temperature);
 
         try {
             LearningItemDto generatedItem = getLearningItemDto(request);
@@ -262,6 +305,11 @@ public class OpenAiService {
             String content = response.getChoices().get(0).getMessage().getContent();
             content = cleanJsonContent(content);
 
+            if (content.startsWith("{")) {
+                GeneratedItem item = objectMapper.readValue(content, GeneratedItem.class);
+                return List.of(mapToDto(item));
+            }
+
             List<GeneratedItem> generatedItems = objectMapper.readValue(content, new TypeReference<>() {
             });
 
@@ -271,6 +319,7 @@ public class OpenAiService {
     }
 
     private String cleanJsonContent(String content) {
+        content = content.trim();
         if (content.startsWith("```json")) {
             content = content.substring(7);
         } else if (content.startsWith("```")) {

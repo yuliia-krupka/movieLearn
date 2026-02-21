@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +44,8 @@ public class LearningSetService {
 
         if (user.getEnglishLevel() != null && user.getInterests() != null) {
             System.out.println("Looking for suitable shared set...");
-            Optional<LearningSetDto> suitableSet = findSuitableSet(movieId, user.getEnglishLevel(), user.getInterests());
+            Optional<LearningSetDto> suitableSet = findSuitableSet(movieId, user.getEnglishLevel(),
+                    user.getInterests());
             if (suitableSet.isPresent()) {
                 System.out.println("[BACKEND] Found suitable shared set, reusing: " + suitableSet.get().getId());
                 userLearningSetService.getOrCreate(userId, suitableSet.get().getId());
@@ -55,14 +57,16 @@ public class LearningSetService {
 
         if (user.getEnglishLevel() != null) {
             System.out.println("Looking for user's existing set with same level...");
-            Optional<LearningSetDto> existingSet = getLatestByUserAndMovieWithLevel(userId, movieId, user.getEnglishLevel());
+            Optional<LearningSetDto> existingSet = getLatestByUserAndMovieWithLevel(userId, movieId,
+                    user.getEnglishLevel());
             if (existingSet.isPresent()) {
                 String userInterests = user.getInterests();
                 String existingInterests = existingSet.get().getInterests();
 
                 boolean interestsMatch = interestsMatch(userInterests, existingInterests);
 
-                System.out.println("User interests: '" + userInterests + "', Existing interests: '" + existingInterests + "', Match: " + interestsMatch);
+                System.out.println("User interests: '" + userInterests + "', Existing interests: '" + existingInterests
+                        + "', Match: " + interestsMatch);
 
                 if (interestsMatch) {
                     System.out.println("[BACKEND] Found matching user set, reusing: " + existingSet.get().getId());
@@ -97,7 +101,8 @@ public class LearningSetService {
 
         userLearningSetService.getOrCreate(userId, savedSet.getId());
 
-        System.out.println("[BACKEND] Generated new learning set: " + savedSet.getId() + " with " + generatedItems.size() + " items");
+        System.out.println("[BACKEND] Generated new learning set: " + savedSet.getId() + " with "
+                + generatedItems.size() + " items");
         return learningSetMapper.toDto(savedSet);
     }
 
@@ -125,7 +130,6 @@ public class LearningSetService {
 
     public Optional<LearningSetDto> findSuitableSet(Long movieId, co.backend.user.EnglishLevel level,
                                                     String interests) {
-        // First try exact match
         Optional<LearningSetDto> exactMatch = learningSetRepository
                 .findTopByMovieIdAndEnglishLevelAndInterestsOrderByDateDesc(movieId, level, interests)
                 .map(learningSetMapper::toDto);
@@ -134,7 +138,6 @@ public class LearningSetService {
             return exactMatch;
         }
 
-        // If no exact match, try flexible interest matching
         List<LearningSet> candidateSets = learningSetRepository
                 .findByMovieIdAndEnglishLevelOrderByDateDesc(movieId, level);
 
@@ -150,14 +153,14 @@ public class LearningSetService {
     }
 
     private boolean interestsMatch(String userInterests, String existingInterests) {
-        if (userInterests == null && existingInterests == null) return true;
-        if (userInterests == null || existingInterests == null) return false;
+        if (userInterests == null && existingInterests == null)
+            return true;
+        if (userInterests == null || existingInterests == null)
+            return false;
 
-        // Split by commas and normalize
         String[] userInterestsArray = userInterests.toLowerCase().split("[,\\s]+");
         String[] existingInterestsArray = existingInterests.toLowerCase().split("[,\\s]+");
 
-        // Remove empty strings and trim
         java.util.Set<String> userSet = java.util.Arrays.stream(userInterestsArray)
                 .filter(s -> !s.trim().isEmpty())
                 .map(String::trim)
@@ -218,8 +221,16 @@ public class LearningSetService {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Item not found in set: " + itemId));
 
+        co.backend.movie.Movie movie = set.getMovie();
+        String movieTitle = movie != null ? movie.getTitle() : "Unknown";
+        String movieDescription = movie != null ? movie.getDescription() : "";
+        String scriptContent = movie != null ? openAiService.parseScript(movie.getScript()) : "";
+        String englishLevel = set.getEnglishLevel() != null ? set.getEnglishLevel().name() : "Intermediate";
+        String interests = set.getInterests() != null ? set.getInterests() : "";
+
         LearningItemDto currentDto = learningItemMapper.toDto(item);
-        LearningItemDto updatedDto = openAiService.regenerateItem(currentDto, instructions);
+        LearningItemDto updatedDto = openAiService.regenerateItem(currentDto, instructions, movieTitle,
+                movieDescription, scriptContent, englishLevel, interests);
 
         item.setText(updatedDto.getText());
         item.setTranslation(updatedDto.getTranslation());
@@ -256,19 +267,21 @@ public class LearningSetService {
             return existingTests.stream().map(learningItemMapper::toDto).toList();
         }
 
-        java.time.LocalDateTime latestFlashcardUpdate = flashcards.stream()
-                .map(flashcard -> flashcard.getUpdatedAt() != null ? flashcard.getUpdatedAt() : flashcard.getCreatedAt())
+        LocalDateTime latestFlashcardUpdate = flashcards.stream()
+                .map(flashcard -> flashcard.getUpdatedAt() != null ? flashcard.getUpdatedAt()
+                        : flashcard.getCreatedAt())
                 .max(Comparator.naturalOrder())
                 .orElse(null);
 
-        java.time.LocalDateTime latestTestCreation = existingTests.stream()
+        LocalDateTime latestTestCreation = existingTests.stream()
                 .map(LearningItem::getCreatedAt)
                 .max(Comparator.naturalOrder())
                 .orElse(null);
 
         if (latestFlashcardUpdate.isAfter(latestTestCreation)) {
             System.out.println("Flashcards updated after tests, regenerating tests for learning set: " + learningSetId);
-            System.out.println("Latest flashcard update: " + latestFlashcardUpdate + ", Latest test creation: " + latestTestCreation);
+            System.out.println("Latest flashcard update: " + latestFlashcardUpdate + ", Latest test creation: "
+                    + latestTestCreation);
 
             deleteTestsForSet(learningSetId);
             return generateTestsForSet(learningSetId);
@@ -285,7 +298,8 @@ public class LearningSetService {
                 .toList();
 
         if (!testsToDelete.isEmpty()) {
-            System.out.println("Deleting " + testsToDelete.size() + " existing tests for learning set: " + learningSetId);
+            System.out
+                    .println("Deleting " + testsToDelete.size() + " existing tests for learning set: " + learningSetId);
             learningItemRepository.deleteAll(testsToDelete);
             set.getLearningItems().removeAll(testsToDelete);
             learningSetRepository.save(set);

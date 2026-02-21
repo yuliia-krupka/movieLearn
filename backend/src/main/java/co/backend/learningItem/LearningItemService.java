@@ -6,6 +6,7 @@ import co.backend.exceptions.NotFoundException;
 import co.backend.learningSet.LearningSet;
 import co.backend.learningSet.LearningSetRepository;
 import co.backend.movie.Movie;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class LearningItemService {
     private final LearningItemRepository learningItemRepository;
     private final LearningSetRepository learningSetRepository;
@@ -95,18 +97,38 @@ public class LearningItemService {
 
         List<LearningItemDto> dtos = items.stream().map(learningItemMapper::toDto).toList();
 
-        List<LearningItemDto> regeneratedDtos = openAiService.regenerateBatch(dtos, feedback);
+        Movie movie = learningSet.getMovie();
+        String movieTitle = movie != null ? movie.getTitle() : "Unknown";
+        String movieDescription = movie != null ? movie.getDescription() : "";
+        String scriptContent = movie != null ? openAiService.parseScript(movie.getScript()) : "";
+        String englishLevel = learningSet.getEnglishLevel() != null ? learningSet.getEnglishLevel().name()
+                : "Intermediate";
+        String interests = learningSet.getInterests() != null ? learningSet.getInterests() : "";
 
-        learningItemRepository.deleteAll(items);
+        System.out.println("[BACKEND] Regenerating " + dtos.size() + " items for set " + learningSetId
+                + " with feedback: " + feedback);
+        List<LearningItemDto> regeneratedDtos = openAiService.regenerateBatch(dtos, feedback, movieTitle,
+                movieDescription, scriptContent, englishLevel, interests);
+        System.out.println("[BACKEND] AI returned " + regeneratedDtos.size() + " regenerated items");
+
+        // Use the managed collection to ensure orphan removal and sync
+        learningSet.getLearningItems().removeAll(items);
 
         List<LearningItem> newItems = regeneratedDtos.stream().map(dto -> {
             LearningItem item = learningItemMapper.toEntity(dto);
             item.setLearningSet(learningSet);
+            if (item.getType() == null) {
+                item.setType(co.backend.learningItem.LearningItemType.FLASH_CARD);
+            }
             return item;
         }).toList();
 
-        List<LearningItem> savedItems = learningItemRepository.saveAll(newItems);
-        return savedItems.stream()
+        learningSet.getLearningItems().addAll(newItems);
+        learningSetRepository.save(learningSet);
+
+        System.out.println("[BACKEND] Successfully added " + newItems.size() + " new items to set " + learningSetId);
+
+        return newItems.stream()
                 .map(learningItemMapper::toDto)
                 .toList();
     }

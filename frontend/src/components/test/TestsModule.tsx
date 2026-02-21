@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import TestCard from './TestCard';
 import ResultsPage from '../flash-card/ResultsPage';
 import MainLayout from '../layout/MainLayout';
+import {Spin} from 'antd';
 import '../css/Layout.css';
 import '../css/Test.css';
 import {learningSetService} from '../../services/learningSetService';
@@ -71,7 +72,7 @@ const TestsModule: React.FC = () => {
                         ...item,
                         answers: shuffledAnswers,
                         correctAnswerIndex: newCorrectIndex,
-                        question: item.text // Add question property for TestCard
+                        question: item.text
                     };
                 });
 
@@ -148,7 +149,9 @@ const TestsModule: React.FC = () => {
     if (loading) {
         return (
             <MainLayout className="flashcard-content">
-                <div className="loading">Loading test...</div>
+                <div className="loading-spinner-container">
+                    <Spin size="large"/>
+                </div>
             </MainLayout>
         );
     }

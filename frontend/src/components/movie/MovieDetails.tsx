@@ -101,12 +101,10 @@ const MovieDetails: React.FC = () => {
         try {
             setIsChecking(true);
 
-            // Add movie to user's library
             await axios.put(`/api/users/movies/${id}`, null, {
                 withCredentials: true,
             });
 
-            // Try to get existing set first, or generate new one if none exists
             const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
             console.log('Checking for existing learning set...', {
                 movieId: id,
@@ -136,7 +134,6 @@ const MovieDetails: React.FC = () => {
                 console.log('Generated new learning set:', learningSet.id);
             }
 
-            // Redirect to appropriate page based on set status
             if (learningSet.status === 'REVIEW') {
                 navigate(`/learning-sets/${learningSet.id}/update`);
             } else {

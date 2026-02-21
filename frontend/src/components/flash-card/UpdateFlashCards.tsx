@@ -31,9 +31,15 @@ const UpdateFlashCards: React.FC = () => {
         handleAddCustomCard
     } = useFlashCards(routeId, currentUserId);
 
-    const handleStartLearning = () => {
+    const handleStartLearning = async () => {
         if (learningSet?.id) {
-            navigate(`/learning-sets/${learningSet.id}/flashcards`);
+            try {
+                await learningSetService.approveSet(learningSet.id);
+                navigate(`/learning-sets/${learningSet.id}/flashcards`);
+            } catch (error) {
+                console.error("Failed to approve set and navigate", error);
+                navigate(`/learning-sets/${learningSet.id}/flashcards`);
+            }
         } else {
             navigate('/movies');
         }
@@ -145,18 +151,6 @@ const UpdateFlashCards: React.FC = () => {
                 <div style={{display: 'flex', gap: '10px'}}>
                     <button className="add-custom-btn" onClick={handleAddCustomCard}>
                         <PlusOutlined/> Add Custom Word
-                    </button>
-                    <button
-                        className="add-custom-btn"
-                        style={{backgroundColor: '#52c41a', borderColor: '#52c41a'}}
-                        onClick={async () => {
-                            if (learningSet?.id) {
-                                await learningSetService.approveSet(learningSet.id);
-                                navigate(`/learning-sets/${learningSet.id}/flashcards`);
-                            }
-                        }}
-                    >
-                        <CheckOutlined/> Start Studying
                     </button>
                 </div>
             </div>
