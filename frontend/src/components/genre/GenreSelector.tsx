@@ -29,14 +29,15 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
 
     const handleDeleteGenre = async (genreId: number, genreName: string) => {
         try {
-            await axios.delete(`/api/genres/${genreId}`);
+            await axios.delete(`/api/genres/${genreId}`, {withCredentials: true});
             messageApi.success(`Genre "${genreName}" deleted successfully`);
             onGenreDeleted?.();
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
-                const errorMessage = error.response?.data?.error ||
-                    error.response?.data ||
-                    `Failed to delete genre "${genreName}"`;
+                const data = error.response?.data;
+                const errorMessage = (data && typeof data === 'object' && 'message' in data)
+                    ? (data as { message: string }).message
+                    : (typeof data === 'string' ? data : `Failed to delete genre "${genreName}"`);
                 messageApi.error(errorMessage);
             } else {
                 messageApi.error(`Unexpected error while deleting genre "${genreName}"`);
@@ -68,7 +69,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
 
             await axios.put(`/api/genres/${editingGenre?.id}`, {
                 name: updatedName
-            });
+            }, {withCredentials: true});
 
             messageApi.success(`Genre updated successfully`);
             setEditModalVisible(false);
@@ -77,9 +78,10 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
             onGenreUpdated?.();
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
-                const errorMessage = error.response?.data?.error ||
-                    error.response?.data ||
-                    'Failed to update genre';
+                const data = error.response?.data;
+                const errorMessage = (data && typeof data === 'object' && 'message' in data)
+                    ? (data as { message: string }).message
+                    : (typeof data === 'string' ? data : 'Failed to update genre');
                 messageApi.error(errorMessage);
             } else {
                 messageApi.error('Unexpected error while updating genre');

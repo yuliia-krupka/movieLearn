@@ -5,6 +5,7 @@ import {CloseOutlined, CheckOutlined, PlusOutlined, CaretRightOutlined} from '@a
 import {useAuth} from '../auth/useAuth';
 import '../css/UpdateFlashCards.css';
 import {useFlashCards} from '../../hooks/useFlashCards';
+import {learningSetService} from '../../services/learningSetService';
 
 const UpdateFlashCards: React.FC = () => {
     const {id: routeId} = useParams<{ id: string }>();
@@ -31,18 +32,18 @@ const UpdateFlashCards: React.FC = () => {
     } = useFlashCards(routeId, currentUserId);
 
     const handleStartLearning = () => {
-        if (learningSet?.movieId) {
-            navigate('/flash-cards', {state: {movieId: learningSet.movieId}});
+        if (learningSet?.id) {
+            navigate(`/learning-sets/${learningSet.id}/flashcards`);
         } else {
-            navigate('/flash-cards');
+            navigate('/movies');
         }
     };
 
     const handleGoToTest = () => {
-        if (learningSet?.movieId) {
-            navigate('/tests', {state: {movieId: learningSet.movieId}});
+        if (learningSet?.id) {
+            navigate(`/learning-sets/${learningSet.id}/tests`);
         } else {
-            navigate('/tests');
+            navigate('/movies');
         }
     };
 
@@ -141,9 +142,23 @@ const UpdateFlashCards: React.FC = () => {
                 <div className="suggested-words-title">
                     "{learningSet?.name || 'Movie Title'}" - <span>Review Words</span>
                 </div>
-                <button className="add-custom-btn" onClick={handleAddCustomCard}>
-                    <PlusOutlined/> Add Custom Word
-                </button>
+                <div style={{display: 'flex', gap: '10px'}}>
+                    <button className="add-custom-btn" onClick={handleAddCustomCard}>
+                        <PlusOutlined/> Add Custom Word
+                    </button>
+                    <button
+                        className="add-custom-btn"
+                        style={{backgroundColor: '#52c41a', borderColor: '#52c41a'}}
+                        onClick={async () => {
+                            if (learningSet?.id) {
+                                await learningSetService.approveSet(learningSet.id);
+                                navigate(`/learning-sets/${learningSet.id}/flashcards`);
+                            }
+                        }}
+                    >
+                        <CheckOutlined/> Start Studying
+                    </button>
+                </div>
             </div>
 
             <div className="cards-list">

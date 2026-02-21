@@ -13,7 +13,14 @@ export class ErrorHandler {
         if (this.isDuplicateError(error)) {
             return duplicateMessage;
         }
-        return error.response?.data?.message || 'An unexpected error occurred. Please try again.';
+        const data = error.response?.data;
+        if (data && typeof data === 'object' && 'message' in data) {
+            return (data as { message: string }).message || 'An unexpected error occurred.';
+        }
+        if (typeof data === 'string') {
+            return data;
+        }
+        return error.message || 'An unexpected error occurred. Please try again.';
     }
 
     static handleAxiosError(error: unknown, duplicateMessage: string): string {

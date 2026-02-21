@@ -26,20 +26,18 @@ public class Movie {
     private String description;
 
     @Lob
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] image;
+
     @Lob
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] script;
 
     @ManyToMany
-    @JoinTable(
-            name = "movie_genre",
-            joinColumns = @JoinColumn(name = "movie_id"),
-            inverseJoinColumns = @JoinColumn(name = "genre_id")
-    )
+    @JoinTable(name = "movie_genre", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres = new ArrayList<>();
 
     @ManyToMany(mappedBy = "movies")
     private List<User> users = new ArrayList<>();
 
 }
-

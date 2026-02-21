@@ -6,7 +6,7 @@ import '../css/Layout.css';
 import {learningSetService} from '../../services/learningSetService';
 import type {FlashCardData, LearningSetDto, ItemStatusDto} from '../../types/learningSet';
 import {useAuth} from '../auth/useAuth';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 interface FlashCardsModuleProps {
     movieId?: number;
@@ -17,9 +17,10 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
     const location = useLocation();
     const navigate = useNavigate();
     const {currentUserId} = useAuth();
+    const {id} = useParams<{ id: string }>();
     const stateMovieId = location.state?.movieId;
     const movieId = props.movieId || stateMovieId;
-    const learningSetId = props.learningSetId;
+    const learningSetId = props.learningSetId || (id ? Number(id) : undefined);
     const [flashcards, setFlashcards] = useState<FlashCardData[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -38,8 +39,16 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                 setLoading(true);
                 setError(null);
 
-                const targetMovieId = movieId || 1;
-                const learningSetData = await learningSetService.getOrCreateByMovie(targetMovieId);
+                let learningSetData: LearningSetDto;
+
+                if (learningSetId) {
+                    // Use the provided learning set ID
+                    learningSetData = await learningSetService.getById(learningSetId);
+                } else {
+                    // Fallback to movie-based logic
+                    const targetMovieId = movieId || 1;
+                    learningSetData = await learningSetService.getOrCreateByMovie(targetMovieId);
+                }
 
                 setLearningSet(learningSetData);
                 const flashcardData = await learningSetService.getFlashCards(learningSetData.id);
@@ -104,7 +113,11 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
     };
 
     const handleGoToTest = () => {
-        navigate('/tests', {state: {movieId: movieId || learningSet?.movieId}});
+        if (learningSetId) {
+            navigate(`/learning-sets/${learningSetId}/tests`);
+        } else {
+            navigate('/tests', {state: {movieId: movieId || learningSet?.movieId}});
+        }
     };
 
     const handleBackToMovie = () => {
@@ -113,6 +126,14 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
             navigate(`/movies/${mid}`);
         } else {
             navigate('/movies');
+        }
+    };
+
+    const handleGoToRefine = () => {
+        if (learningSetId) {
+            navigate(`/learning-sets/${learningSetId}/update`);
+        } else if (learningSet) {
+            navigate(`/learning-sets/${learningSet.id}/update`);
         }
     };
 
@@ -154,6 +175,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                 onTryAgain={handleTryAgain}
                 itemStatuses={itemStatuses}
                 onGoToTest={handleGoToTest}
+                onGoToRefine={handleGoToRefine}
                 isTestDisabled={!allLearned}
                 onBackToMovie={handleBackToMovie}
             />

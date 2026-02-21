@@ -12,6 +12,7 @@ interface ResultsPageProps {
     onGoToTest?: () => void;
     onBackToMovie?: () => void;
     onBackToFlashcards?: () => void;
+    onGoToRefine?: () => void;
     showStatus?: boolean;
     isTestDisabled?: boolean;
     isTestResult?: boolean;
@@ -44,6 +45,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
                                                      onGoToTest,
                                                      onBackToMovie,
                                                      onBackToFlashcards,
+                                                     onGoToRefine,
                                                      showStatus = true,
                                                      isTestDisabled = false,
                                                      isTestResult = false
@@ -77,14 +79,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
                         )}
 
                         {onBackToFlashcards && (
-                            <button className="results-go-to-test" onClick={onBackToFlashcards}>
+                            <button className="results-back-flashcards" onClick={onBackToFlashcards}>
                                 ← Back to Flashcards
                             </button>
                         )}
                     </div>
                 </div>
 
-                <p className="results-movie-title">"{learningSetName}"</p>
+                <p className="results-movie-title">
+                    "{learningSetName}"
+                    {onGoToRefine && (
+                        <button className="results-title-refine-btn" onClick={onGoToRefine}>
+                            Refine Flashcards
+                        </button>
+                    )}
+                </p>
 
                 <div className="results-list">
                     {flashcards.map((card, index) => {

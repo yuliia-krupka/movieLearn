@@ -15,6 +15,7 @@ export interface LearningSetDto {
     date: string;
     movieId: number;
     learningItems: LearningItemDto[];
+    status: 'GENERATING' | 'REVIEW' | 'READY';
 }
 
 export interface FlashCardData {
@@ -34,10 +35,11 @@ export interface ItemStatusDto {
 
 export interface TestItemData {
     id: number;
-    question: string;
+    text: string;
     answers: string[];
     correctAnswerIndex: number;
     translation: string;
+    question?: string; // For backward compatibility
 }
 
 export interface ApiFlashCard {

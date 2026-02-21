@@ -1,12 +1,11 @@
 import {useState, useEffect} from 'react';
 import {Form, message} from 'antd';
-import axios, {AxiosError} from 'axios';
+import axios from 'axios';
 import {useNavigate, useParams} from "react-router-dom";
 import {useFileUpload} from './useFileUpload';
 import {useGenres} from './useGenres';
 
 import type {Movie, FormValues} from '../../types/movie';
-import type {ApiError} from '../../types/common';
 
 const useUpdateMovie = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -40,12 +39,11 @@ const useUpdateMovie = () => {
             }
 
             try {
-                const response = await axios.get<Movie>(`/api/movies/${id}`);
+                const response = await axios.get<Movie>(`/api/movies/${id}`, {withCredentials: true});
                 if (!isMounted) return;
 
                 setMovie(response.data);
 
-                // Initialize form values ONLY when movie data is successfully fetched
                 form.setFieldsValue({
                     title: response.data.title,
                     description: response.data.description,
@@ -54,7 +52,8 @@ const useUpdateMovie = () => {
 
                 try {
                     const imageResponse = await axios.get(`/api/movies/${id}/image`, {
-                        responseType: 'arraybuffer'
+                        responseType: 'arraybuffer',
+                        withCredentials: true
                     });
                     if (imageResponse.data && imageResponse.data.byteLength > 0 && isMounted) {
                         const blob = new Blob([imageResponse.data], {type: 'image/jpeg'});
@@ -69,7 +68,7 @@ const useUpdateMovie = () => {
                 }
 
                 try {
-                    const scriptResponse = await axios.head(`/api/movies/${id}/script`);
+                    const scriptResponse = await axios.head(`/api/movies/${id}/script`, {withCredentials: true});
                     if (scriptResponse.status === 200 && isMounted) {
                         const contentLength = scriptResponse.headers['content-length'];
                         const size = contentLength ? formatFileSize(parseInt(contentLength)) : 'Unknown size';
@@ -101,7 +100,7 @@ const useUpdateMovie = () => {
         return () => {
             isMounted = false;
         };
-    }, [id, form, navigate]); // Removed imageUpload from dependencies to prevent infinite loops/resets
+    }, [id, form, navigate, imageUpload]);
 
     const handleSubmit = async (values: FormValues) => {
         if (!id) return;
@@ -131,7 +130,8 @@ const useUpdateMovie = () => {
             await axios.put(`/api/movies/${id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
-                }
+                },
+                withCredentials: true
             });
 
             void message.success('Movie updated successfully!');
@@ -142,13 +142,16 @@ const useUpdateMovie = () => {
 
             navigate(`/movies/${id}`);
         } catch (error: unknown) {
-            const axiosError = error as AxiosError<ApiError>;
-            if (axiosError.response) {
-                void message.error(`Error updating movie: ${axiosError.response.data?.message || 'Server error'}`);
-            } else if (axiosError.request) {
+            if (axios.isAxiosError(error)) {
+                const data = error.response?.data;
+                const errorMessage = (data && typeof data === 'object' && 'message' in data)
+                    ? (data as { message: string }).message
+                    : (typeof data === 'string' ? data : 'Server error');
+                void message.error(`Error updating movie: ${errorMessage}`);
+            } else if (error && typeof error === 'object' && 'request' in error) {
                 void message.error('Error connecting to server. Please check your internet connection.');
             } else {
-                void message.error(`Error updating movie: ${axiosError.message}`);
+                void message.error(`Error updating movie: ${(error as Error).message}`);
             }
         } finally {
             setSubmitting(false);

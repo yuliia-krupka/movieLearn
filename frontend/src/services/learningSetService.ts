@@ -7,19 +7,39 @@ import type {
     ApiTestItem
 } from '../types/learningSet';
 
-const API_BASE_URL = 'http://localhost:8080/api';
 
 export const learningSetService = {
     async getOrCreateByMovie(movieId: number): Promise<LearningSetDto> {
-        const response = await fetch(`${API_BASE_URL}/learning-sets/movie/${movieId}`, {
+        const response = await fetch(`/api/learning-sets/movie/${movieId}`, {
             credentials: 'include',
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to get learning set: ${response.statusText}`);
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Failed to get learning set: ${response.statusText}`);
         }
 
         return response.json();
+    },
+
+    async getLatestByUserAndMovie(movieId: number, userId: number, level?: string, interests?: string): Promise<LearningSetDto | null> {
+        let url = `/api/learning-sets/movie/${movieId}/user/${userId}/latest`;
+        const params = new URLSearchParams();
+        if (level) params.append('level', level);
+        if (interests) params.append('interests', interests);
+
+        if (params.toString()) {
+            url += `?${params.toString()}`;
+        }
+        const response = await fetch(url, {
+            credentials: 'include',
+        });
+
+        if (response.status === 404) return null;
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        return data || null;
     },
 
     async recordAnswer(userId: number, learningItemId: number, correct: boolean): Promise<void> {
@@ -28,7 +48,7 @@ export const learningSetService = {
             learningItemId: String(learningItemId),
             correct: String(correct),
         });
-        const response = await fetch(`${API_BASE_URL}/user-learning-status/answer?${params}`, {
+        const response = await fetch(`/api/user-learning-status/answer?${params}`, {
             method: 'POST',
             credentials: 'include',
         });
@@ -39,8 +59,8 @@ export const learningSetService = {
 
     async getItemStatuses(userId: number, learningSetId: number): Promise<ItemStatusDto[]> {
         const response = await fetch(
-            `${API_BASE_URL}/user-learning-status/set/${learningSetId}/user/${userId}`,
-            { credentials: 'include' }
+            `/api/user-learning-status/set/${learningSetId}/user/${userId}`,
+            {credentials: 'include'}
         );
         if (!response.ok) return [];
         const data: ItemStatusDto[] = await response.json();
@@ -58,7 +78,7 @@ export const learningSetService = {
             learningSetId: String(learningSetId),
             score: String(score),
         });
-        const response = await fetch(`${API_BASE_URL}/user-learning-sets/complete-flashcards?${params}`, {
+        const response = await fetch(`/api/user-learning-sets/complete-flashcards?${params}`, {
             method: 'POST',
             credentials: 'include',
         });
@@ -68,7 +88,7 @@ export const learningSetService = {
     },
 
     async getFlashCards(learningSetId: number): Promise<FlashCardData[]> {
-        const response = await fetch(`${API_BASE_URL}/learning-sets/${learningSetId}/flashcards`, {
+        const response = await fetch(`/api/learning-sets/${learningSetId}/flashcards`, {
             credentials: 'include',
         });
 
@@ -87,7 +107,7 @@ export const learningSetService = {
     },
 
     async getTestItems(learningSetId: number): Promise<TestItemData[]> {
-        const response = await fetch(`${API_BASE_URL}/learning-sets/${learningSetId}/tests`, {
+        const response = await fetch(`/api/learning-sets/${learningSetId}/tests`, {
             credentials: 'include',
         });
 
@@ -98,6 +118,7 @@ export const learningSetService = {
         const items: ApiTestItem[] = await response.json();
         return items.map((item) => ({
             id: item.id,
+            text: item.text,
             question: item.text,
             answers: item.answers,
             correctAnswerIndex: item.correctAnswerIndex,
@@ -106,7 +127,7 @@ export const learningSetService = {
     },
 
     async getById(id: number): Promise<LearningSetDto> {
-        const response = await fetch(`${API_BASE_URL}/learning-sets/${id}`, {
+        const response = await fetch(`/api/learning-sets/${id}`, {
             credentials: 'include',
         });
         if (!response.ok) throw new Error('Failed to get learning set');
@@ -114,9 +135,9 @@ export const learningSetService = {
     },
 
     async createItem(item: Partial<ApiFlashCard> & { learningSetId: number, type: string }): Promise<ApiFlashCard> {
-        const response = await fetch(`${API_BASE_URL}/learning-items`, {
+        const response = await fetch(`/api/learning-items`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(item),
             credentials: 'include',
         });
@@ -128,9 +149,9 @@ export const learningSetService = {
         learningSetId: number,
         type: string
     }): Promise<ApiFlashCard> {
-        const response = await fetch(`${API_BASE_URL}/learning-items/${id}`, {
+        const response = await fetch(`/api/learning-items/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(item),
             credentials: 'include',
         });
@@ -139,35 +160,17 @@ export const learningSetService = {
     },
 
     async deleteItem(id: number): Promise<void> {
-        const response = await fetch(`${API_BASE_URL}/learning-items/${id}`, {
+        const response = await fetch(`/api/learning-items/${id}`, {
             method: 'DELETE',
             credentials: 'include',
         });
         if (!response.ok) throw new Error('Failed to delete item');
     },
-
-    async generateCustomItems(request: string, learningSetId: number): Promise<FlashCardData[]> {
-        const params = new URLSearchParams({ request, learningSetId: String(learningSetId) });
-        const response = await fetch(`${API_BASE_URL}/learning-items/generate-custom?${params}`, {
-            method: 'POST',
-            credentials: 'include',
-        });
-        if (!response.ok) throw new Error('Failed to generate items');
-        const items: ApiFlashCard[] = await response.json();
-        return items.map((item) => ({
-            word: item.text,
-            translation: item.translation,
-            exampleSentence: item.exampleSentence,
-            transcription: item.transcription,
-            id: item.id
-        }));
-    },
-
     async regenerate(learningSetId: number, feedback: string, itemIds: number[]): Promise<FlashCardData[]> {
-        const response = await fetch(`${API_BASE_URL}/learning-items/regenerate`, {
+        const response = await fetch(`/api/learning-items/regenerate`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ learningSetId, feedback, itemIds }),
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({learningSetId, feedback, itemIds}),
             credentials: 'include',
         });
         if (!response.ok) throw new Error('Failed to regenerate items');
@@ -179,5 +182,26 @@ export const learningSetService = {
             transcription: item.transcription,
             id: item.id
         }));
+    },
+
+
+    async startLearningForUser(movieId: number, userId: number): Promise<LearningSetDto> {
+        const response = await fetch(`/api/learning/movie/${movieId}/start?userId=${userId}`, {
+            method: 'POST',
+            credentials: 'include',
+        });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Failed to start learning: ${response.statusText}`);
+        }
+        return response.json();
+    },
+
+    async approveSet(learningSetId: number): Promise<void> {
+        const response = await fetch(`/api/learning/set/${learningSetId}/approve`, {
+            method: 'POST',
+            credentials: 'include',
+        });
+        if (!response.ok) throw new Error('Failed to approve set');
     }
 };

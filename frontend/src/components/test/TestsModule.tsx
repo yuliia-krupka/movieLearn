@@ -5,15 +5,17 @@ import MainLayout from '../layout/MainLayout';
 import '../css/Layout.css';
 import '../css/Test.css';
 import {learningSetService} from '../../services/learningSetService';
-import type {TestItemData, LearningSetDto, FlashCardData, ItemStatusDto} from '../../types/learningSet';
+import type {TestItemData, LearningSetDto, ItemStatusDto} from '../../types/learningSet';
 import {useAuth} from '../auth/useAuth';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 const TestsModule: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const {currentUserId} = useAuth();
+    const {currentUserId, user} = useAuth();
+    const {id} = useParams<{ id: string }>();
     const movieId = location.state?.movieId || 1;
+    const learningSetId = id ? Number(id) : undefined;
     const [testItems, setTestItems] = useState<TestItemData[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -26,14 +28,36 @@ const TestsModule: React.FC = () => {
 
     useEffect(() => {
         const loadTestItems = async () => {
+            if (!currentUserId) return;
             try {
                 setLoading(true);
                 setError(null);
 
-                const learningSetData = await learningSetService.getOrCreateByMovie(movieId);
+                let learningSetData: LearningSetDto;
+
+                if (learningSetId) {
+                    learningSetData = await learningSetService.getById(learningSetId);
+                } else {
+                    const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
+                    const userLearningSet = await learningSetService.getLatestByUserAndMovie(
+                        Number(movieId),
+                        currentUserId,
+                        user?.englishLevel,
+                        interestsStr
+                    );
+
+                    // Fallback to legacy behavior if user set not found (shouldn't happen in normal flow)
+                    if (userLearningSet) {
+                        learningSetData = userLearningSet;
+                    } else {
+                        learningSetData = await learningSetService.getOrCreateByMovie(Number(movieId));
+                    }
+                }
+
                 setLearningSet(learningSetData);
 
                 const items = await learningSetService.getTestItems(learningSetData.id);
+                console.log('Retrieved test items:', items.length);
 
                 const shuffledItems = items.map(item => {
                     const indices = item.answers.map((_, i) => i);
@@ -43,11 +67,16 @@ const TestsModule: React.FC = () => {
                     }
                     const shuffledAnswers = indices.map(i => item.answers[i]);
                     const newCorrectIndex = indices.indexOf(item.correctAnswerIndex);
-                    return {...item, answers: shuffledAnswers, correctAnswerIndex: newCorrectIndex};
+                    return {
+                        ...item,
+                        answers: shuffledAnswers,
+                        correctAnswerIndex: newCorrectIndex,
+                        question: item.text // Add question property for TestCard
+                    };
                 });
 
                 setTestItems(shuffledItems);
-            } catch (err) {
+            } catch (err: unknown) {
                 setError(err instanceof Error ? err.message : 'Failed to load test');
             } finally {
                 setLoading(false);
@@ -55,7 +84,7 @@ const TestsModule: React.FC = () => {
         };
 
         void loadTestItems();
-    }, [movieId]);
+    }, [movieId, learningSetId, currentUserId, user?.interests, user?.englishLevel]);
 
     const handleSelectAnswer = (answerIndex: number) => {
         setAnswers(prev => new Map(prev).set(currentIndex, answerIndex));
@@ -90,7 +119,7 @@ const TestsModule: React.FC = () => {
             Promise.all([...answerPromises, completionPromise])
                 .then(() => learningSetService.getItemStatuses(currentUserId, learningSet.id))
                 .then(statuses => setItemStatuses(statuses))
-                .catch(err => console.error('Failed to save results:', err));
+                .catch(() => console.error('Failed to save results'));
         }
     };
 
@@ -109,7 +138,11 @@ const TestsModule: React.FC = () => {
     };
 
     const handleBackToFlashcards = () => {
-        navigate('/flash-cards', {state: {movieId}});
+        if (learningSetId) {
+            navigate(`/learning-sets/${learningSetId}/flashcards`);
+        } else {
+            navigate('/flash-cards', {state: {movieId: movieId}});
+        }
     };
 
     if (loading) {
@@ -137,8 +170,8 @@ const TestsModule: React.FC = () => {
     }
 
     if (showResults) {
-        const flashcardData: FlashCardData[] = testItems.map(item => ({
-            word: item.question,
+        const flashcardData: { word: string; translation: string; id: number }[] = testItems.map(item => ({
+            word: item.question || item.text,
             translation: item.answers[item.correctAnswerIndex],
             id: item.id
         }));
@@ -173,7 +206,7 @@ const TestsModule: React.FC = () => {
         <MainLayout className="flashcard-content">
             {learningSet && (
                 <div className="learning-set-info">
-                    <h2>{learningSet.name} — Test</h2>
+                    <h2>{learningSet.name}</h2>
                 </div>
             )}
 
@@ -182,7 +215,7 @@ const TestsModule: React.FC = () => {
             </div>
 
             <TestCard
-                question={currentItem.question}
+                question={currentItem.question || currentItem.text}
                 answers={currentItem.answers}
                 correctAnswerIndex={currentItem.correctAnswerIndex}
                 selectedAnswer={answers.get(currentIndex) ?? null}

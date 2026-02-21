@@ -1,14 +1,15 @@
 package co.backend.learningItem;
 
+import co.backend.ai.OpenAiService;
 import co.backend.exceptions.BadRequestException;
 import co.backend.exceptions.NotFoundException;
 import co.backend.learningSet.LearningSet;
 import co.backend.learningSet.LearningSetRepository;
+import co.backend.movie.Movie;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.ArrayList;
 
 @Service
 @AllArgsConstructor
@@ -16,6 +17,7 @@ public class LearningItemService {
     private final LearningItemRepository learningItemRepository;
     private final LearningSetRepository learningSetRepository;
     private final LearningItemMapper learningItemMapper;
+    private final OpenAiService openAiService;
 
     public List<LearningItemDto> getByLearningSetId(Long learningSetId) {
         return learningItemRepository.findByLearningSetId(learningSetId)
@@ -59,23 +61,20 @@ public class LearningItemService {
         LearningSet learningSet = learningSetRepository.findById(learningSetId)
                 .orElseThrow(() -> new NotFoundException("Learning set not found: " + learningSetId));
 
-        LearningItem item1 = new LearningItem();
-        item1.setText("Mock Word 1 for " + request);
-        item1.setTranslation("Mock Translation 1");
-        item1.setExampleSentence("This is a mock sentence for word 1.");
-        item1.setTranscription("[mɒk wɜːd wʌn]");
-        item1.setType(LearningItemType.FLASH_CARD);
-        item1.setLearningSet(learningSet);
+        Movie movie = learningSet.getMovie();
 
-        LearningItem item2 = new LearningItem();
-        item2.setText("Mock Word 2 for " + request);
-        item2.setTranslation("Mock Translation 2");
-        item2.setExampleSentence("This is a mock sentence for word 2.");
-        item2.setTranscription("[mɒk wɜːd tuː]");
-        item2.setType(LearningItemType.FLASH_CARD);
-        item2.setLearningSet(learningSet);
+        List<LearningItemDto> generatedDtos = openAiService.generateCustom(
+                request,
+                movie != null ? movie.getTitle() : "Unknown",
+                movie != null ? movie.getDescription() : "");
 
-        List<LearningItem> savedItems = learningItemRepository.saveAll(List.of(item1, item2));
+        List<LearningItem> itemsToSave = generatedDtos.stream().map(dto -> {
+            LearningItem item = learningItemMapper.toEntity(dto);
+            item.setLearningSet(learningSet);
+            return item;
+        }).toList();
+
+        List<LearningItem> savedItems = learningItemRepository.saveAll(itemsToSave);
 
         return savedItems.stream()
                 .map(learningItemMapper::toDto)
@@ -83,27 +82,28 @@ public class LearningItemService {
     }
 
     public List<LearningItemDto> regenerate(Long learningSetId, String feedback, List<Long> itemIds) {
-        // Mock implementation:
-        // 1. Delete the items that are being regenerated
-        if (itemIds != null && !itemIds.isEmpty()) {
-            learningItemRepository.deleteAllById(itemIds);
+        if (itemIds == null || itemIds.isEmpty()) {
+            return List.of();
         }
 
-        // 2. Generate new items based on feedback (Mock)
         LearningSet learningSet = learningSetRepository.findById(learningSetId)
                 .orElseThrow(() -> new NotFoundException("Learning set not found: " + learningSetId));
 
-        List<LearningItem> newItems = new ArrayList<>();
-        for (int i = 0; i < (itemIds != null ? itemIds.size() : 2); i++) {
-            LearningItem item = new LearningItem();
-            item.setText("Regenerated Word " + (i + 1) + " (" + feedback + ")");
-            item.setTranslation("Regenerated Translation " + (i + 1));
-            item.setExampleSentence("New example sentence for word " + (i + 1));
-            item.setTranscription("[rɪˈdʒɛn.ə.reɪ.tɪd wɜːd]");
-            item.setType(LearningItemType.FLASH_CARD);
+        List<LearningItem> items = learningItemRepository.findAllById(itemIds);
+        if (items.isEmpty())
+            return List.of();
+
+        List<LearningItemDto> dtos = items.stream().map(learningItemMapper::toDto).toList();
+
+        List<LearningItemDto> regeneratedDtos = openAiService.regenerateBatch(dtos, feedback);
+
+        learningItemRepository.deleteAll(items);
+
+        List<LearningItem> newItems = regeneratedDtos.stream().map(dto -> {
+            LearningItem item = learningItemMapper.toEntity(dto);
             item.setLearningSet(learningSet);
-            newItems.add(item);
-        }
+            return item;
+        }).toList();
 
         List<LearningItem> savedItems = learningItemRepository.saveAll(newItems);
         return savedItems.stream()

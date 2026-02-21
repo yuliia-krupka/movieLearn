@@ -127,7 +127,15 @@ function App() {
                         }
                     />
                     <Route
-                        path="/flash-cards"
+                        path="/learning-sets/:id/update"
+                        element={
+                            <ProtectedRoute requireAuth={true}>
+                                <UpdateFlashCards/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/learning-sets/:id/flashcards"
                         element={
                             <ProtectedRoute requireAuth={true}>
                                 <FlashCardsModule/>
@@ -135,18 +143,10 @@ function App() {
                         }
                     />
                     <Route
-                        path="/tests"
+                        path="/learning-sets/:id/tests"
                         element={
                             <ProtectedRoute requireAuth={true}>
                                 <TestsModule/>
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/learning-sets/:id/update"
-                        element={
-                            <ProtectedRoute requireAuth={true}>
-                                <UpdateFlashCards/>
                             </ProtectedRoute>
                         }
                     />

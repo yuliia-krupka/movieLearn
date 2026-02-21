@@ -25,12 +25,19 @@ const AdminMoviesList: React.FC = () => {
             await axios.delete(`/api/movies/${id}`, {withCredentials: true});
             message.success('Movie deleted successfully');
             void fetchMovies();
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error deleting movie:', error);
-            const errorMsg = error.response?.data?.message || error.response?.data || 'Failed to delete movie';
-            // If the backend returns a string directly as data (which the screenshot suggests: "Movie has associated...")
-            const displayMsg = typeof error.response?.data === 'string' ? error.response.data : errorMsg;
-            message.error(displayMsg);
+            let errorMsg = 'Failed to delete movie';
+
+            if (axios.isAxiosError(error)) {
+                const responseData = error.response?.data;
+                if (typeof responseData === 'string') {
+                    errorMsg = responseData;
+                } else if (responseData && typeof responseData === 'object' && 'message' in responseData) {
+                    errorMsg = (responseData as { message: string }).message;
+                }
+            }
+            message.error(errorMsg);
         }
     };
 

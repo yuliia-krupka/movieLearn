@@ -110,3 +110,19 @@ ALTER TABLE learning_item DROP COLUMN answers;
 ALTER TABLE learning_item
     ADD COLUMN transcription VARCHAR(255) DEFAULT NULL;
 
+--changeset antigravity:04-add-creator-id-and-status
+ALTER TABLE learning_set
+    ADD COLUMN creator_id INT DEFAULT NULL,
+    ADD COLUMN status VARCHAR(50) DEFAULT 'GENERATING';
+
+--changeset antigravity:05-add-level-and-interests-to-set
+ALTER TABLE learning_set
+    ADD COLUMN english_level VARCHAR(50) DEFAULT NULL,
+    ADD COLUMN interests     TEXT        DEFAULT NULL;
+
+--changeset antigravity:06-add-timestamps-to-learning-item
+ALTER TABLE learning_item
+    ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ADD COLUMN updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON
+UPDATE CURRENT_TIMESTAMP;
+
