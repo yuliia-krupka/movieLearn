@@ -21,5 +21,7 @@ public interface LearningSetRepository extends JpaRepository<LearningSet, Long> 
 
     List<LearningSet> findByMovieIdAndEnglishLevelOrderByDateDesc(Long movieId, EnglishLevel englishLevel);
 
+    void deleteByCreatorId(Long creatorId);
+
     void deleteByMovieIdAndCreatorId(Long movieId, Long creatorId);
 }

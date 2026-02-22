@@ -13,4 +13,6 @@ public interface UserLearningSetRepository extends JpaRepository<UserLearningSet
     Optional<UserLearningSet> findByUserIdAndLearningSetMovieId(Long userId, Long movieId);
 
     List<UserLearningSet> findAllByUserId(Long userId);
+
+    void deleteByUserId(Long userId);
 }

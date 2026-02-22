@@ -10,12 +10,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 @Transactional
+@lombok.extern.slf4j.Slf4j
 public class UserLearningSetService {
 
     private final UserLearningSetRepository userLearningSetRepository;
@@ -35,9 +37,8 @@ public class UserLearningSetService {
                     uls.setUser(userRepository.findById(userId)
                             .orElseThrow(() -> new RuntimeException("User not found")));
                     uls.setLearningSet(learningSetRepository.findById(learningSetId)
-                            .orElseThrow(() -> new RuntimeException("Learning set not found")));
-                    uls.setFlashcardsCompleted(false);
-                    uls.setTestsCompleted(false);
+                            .orElseThrow(() -> new RuntimeException(
+                                    "Learning set not found")));
                     uls.setFlashcardsScore(0);
                     uls.setTestsScore(0);
                     return userLearningSetRepository.save(uls);
@@ -46,7 +47,6 @@ public class UserLearningSetService {
 
     public UserLearningSetDto completeFlashcards(Long userId, Long learningSetId, int score) {
         UserLearningSet uls = getOrCreateEntity(userId, learningSetId);
-        uls.setFlashcardsCompleted(true);
         uls.setFlashcardsScore(score);
         uls.setFlashcardsAttempts(uls.getFlashcardsAttempts() != null ? uls.getFlashcardsAttempts() + 1 : 1);
         return userLearningSetMapper.toDto(userLearningSetRepository.save(uls));
@@ -54,7 +54,6 @@ public class UserLearningSetService {
 
     public UserLearningSetDto completeTests(Long userId, Long learningSetId, int score) {
         UserLearningSet uls = getOrCreateEntity(userId, learningSetId);
-        uls.setTestsCompleted(true);
         uls.setTestsScore(score);
         uls.setTestsAttempts(uls.getTestsAttempts() != null ? uls.getTestsAttempts() + 1 : 1);
         return userLearningSetMapper.toDto(userLearningSetRepository.save(uls));
@@ -71,9 +70,11 @@ public class UserLearningSetService {
                     var set = uls.getLearningSet();
                     var movie = set.getMovie();
 
-                    var statuses = statusRepository.findByUserIdAndLearningItemLearningSetId(userId, set.getId());
+                    var statuses = statusRepository.findByUserIdAndLearningItemLearningSetId(userId,
+                            set.getId());
                     long totalWords = set.getLearningItems().stream()
-                            .filter(item -> item.getType() == co.backend.learningItem.LearningItemType.FLASH_CARD)
+                            .filter(item -> item
+                                    .getType() == co.backend.learningItem.LearningItemType.FLASH_CARD)
                             .count();
                     long learnedWords = statuses.stream()
                             .filter(s -> s.getStatus() == LearningStatus.LEARNED)
@@ -81,51 +82,59 @@ public class UserLearningSetService {
                                     .getType() == co.backend.learningItem.LearningItemType.FLASH_CARD)
                             .count();
 
-                    int correctAnswers = (int) statuses.stream()
-                            .mapToLong(s -> s.getCorrectAnswers() != null ? s.getCorrectAnswers() : 0)
-                            .sum();
-                    int totalAttempts = (int) statuses.stream()
-                            .mapToLong(s -> s.getTotalAttempts() != null ? s.getTotalAttempts() : 0)
-                            .sum();
-                    java.time.LocalDateTime lastAttemptAt = statuses.stream()
+                    int totalSessionAttempts = (uls.getFlashcardsAttempts() != null
+                            ? uls.getFlashcardsAttempts()
+                            : 0)
+                            + (uls.getTestsAttempts() != null ? uls.getTestsAttempts() : 0);
+
+                    LocalDateTime lastAttemptAt = statuses.stream()
                             .map(UserLearningItemStatus::getLastAttemptAt)
                             .filter(java.util.Objects::nonNull)
                             .max(java.util.Comparator.naturalOrder())
                             .orElse(null);
 
                     int flashcardScorePct;
-                    if (uls.isFlashcardsCompleted() && uls.getFlashcardsScore() != null) {
+                    if (uls.getFlashcardsScore() != null && uls.getFlashcardsScore() > 0) {
                         flashcardScorePct = uls.getFlashcardsScore();
-                        System.out.println("[DEBUG STATS] Using session completion score: " + flashcardScorePct + "%");
+                        learnedWords = Math
+                                .round((double) flashcardScorePct * totalWords / 100.0);
+                        log.debug("[DEBUG STATS] Using session completion score: {}%, adjusted learnedWords: {}",
+                                flashcardScorePct, learnedWords);
                     } else {
                         flashcardScorePct = totalWords > 0
-                                ? (int) Math.round(((double) learnedWords / totalWords) * 100)
+                                ? (int) Math.round(((double) learnedWords / totalWords)
+                                * 100)
                                 : 0;
-                        System.out.println("[DEBUG STATS] Using individual progress score: " + flashcardScorePct + "%");
+                        log.debug("[DEBUG STATS] Using individual progress score: {}%",
+                                flashcardScorePct);
                     }
 
                     long totalTests = set.getLearningItems().stream()
-                            .filter(item -> item.getType() == co.backend.learningItem.LearningItemType.TEST)
+                            .filter(item -> item
+                                    .getType() == co.backend.learningItem.LearningItemType.TEST)
                             .count();
                     long correctTests = statuses.stream()
-                            .filter(s -> s.getLearningItem().getType() == co.backend.learningItem.LearningItemType.TEST)
+                            .filter(s -> s.getLearningItem()
+                                    .getType() == co.backend.learningItem.LearningItemType.TEST)
                             .filter(s -> s.getStatus() == LearningStatus.LEARNED)
                             .count();
-                    int testScorePct = totalTests > 0 ? (int) Math.round(((double) correctTests / totalTests) * 100)
+                    int testScorePct = totalTests > 0
+                            ? (int) Math.round(((double) correctTests / totalTests) * 100)
                             : 0;
 
                     if (movie != null) {
-                        System.out.println("[DEBUG STATS] Movie: " + movie.getTitle() +
-                                ", Words: " + learnedWords + "/" + totalWords + " (" + flashcardScorePct + "%)" +
-                                ", Tests: " + correctTests + "/" + totalTests + " (" + testScorePct + "%)");
+                        log.debug("[DEBUG STATS] Movie: {}, Words: {}/{} ({}%), Tests: {}/{} ({}%), Total Sessions: {}",
+                                movie.getTitle(), learnedWords, totalWords,
+                                flashcardScorePct,
+                                correctTests, totalTests, testScorePct,
+                                totalSessionAttempts);
                     }
 
                     return userLearningSetMapper.toProgressDto(
                             uls,
                             totalWords,
                             learnedWords,
-                            correctAnswers,
-                            totalAttempts,
+                            totalSessionAttempts,
                             lastAttemptAt,
                             flashcardScorePct);
                 })

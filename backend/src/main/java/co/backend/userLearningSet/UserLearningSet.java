@@ -27,10 +27,6 @@ public class UserLearningSet {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private LearningSet learningSet;
 
-    private boolean flashcardsCompleted;
-
-    private boolean testsCompleted;
-
     private Integer flashcardsScore;
 
     private Integer testsScore;

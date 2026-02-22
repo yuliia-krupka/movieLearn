@@ -16,10 +16,8 @@
     background-color: #fff;
     border-radius: 8px;
     overflow-y: auto;
-    /* Allow content to scroll if it's too long */
 }
 
-/* Specific class for pages that MUST have fixed layout with scrollable content */
 .fixed-layout {
     height: 100vh;
     overflow: hidden;
@@ -29,7 +27,6 @@
     overflow-y: auto;
     height: calc(100vh - 64px);
     padding: 24px;
-    /* Subtract Header height if it's 64px */
 }
 
 .content-movies {

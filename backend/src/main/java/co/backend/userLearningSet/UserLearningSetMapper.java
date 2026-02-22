@@ -15,14 +15,9 @@ public interface UserLearningSetMapper {
     @Mapping(source = "uls.learningSet.movie.id", target = "movieId")
     @Mapping(source = "uls.learningSet.movie.title", target = "movieTitle")
     @Mapping(source = "uls.learningSet.movie.image", target = "movieImage")
-    @Mapping(source = "uls.flashcardsCompleted", target = "flashcardsCompleted")
-    @Mapping(source = "uls.testsCompleted", target = "testsCompleted")
-    @Mapping(source = "uls.flashcardsAttempts", target = "flashcardsAttempts")
-    @Mapping(source = "uls.testsAttempts", target = "testsAttempts")
-    @Mapping(source = "uls.testsScore", target = "testsScore", defaultValue = "0")
+    @Mapping(source = "uls.learningSet.englishLevel", target = "englishLevel")
     @Mapping(target = "totalWords", ignore = true)
     @Mapping(target = "learnedWords", ignore = true)
-    @Mapping(target = "correctAnswers", ignore = true)
     @Mapping(target = "totalAttempts", ignore = true)
     @Mapping(target = "lastAttemptAt", ignore = true)
     @Mapping(target = "flashcardsScore", ignore = true)
@@ -32,15 +27,13 @@ public interface UserLearningSetMapper {
             UserLearningSet uls,
             long totalWords,
             long learnedWords,
-            int correctAnswers,
-            int totalAttempts,
+            int totalSessionAttempts,
             java.time.LocalDateTime lastAttemptAt,
             int flashcardScorePct) {
         var dto = toProgressDtoBase(uls);
         dto.setTotalWords(totalWords);
         dto.setLearnedWords(learnedWords);
-        dto.setCorrectAnswers(correctAnswers);
-        dto.setTotalAttempts(totalAttempts);
+        dto.setTotalAttempts(totalSessionAttempts);
         dto.setLastAttemptAt(lastAttemptAt);
         dto.setFlashcardsScore(flashcardScorePct);
         if (uls.getTestsScore() != null) {

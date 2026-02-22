@@ -129,3 +129,11 @@ UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE user_learning_set
     ADD COLUMN flashcards_attempts INT DEFAULT 0,
     ADD COLUMN tests_attempts      INT DEFAULT 0;
+
+--changeset antigravity:08-sync-enums
+-- Align database enums with simplified Java definitions
+ALTER TABLE user_learning_item_status
+    MODIFY COLUMN status ENUM ('IN_PROGRESS', 'LEARNED') NOT NULL DEFAULT 'IN_PROGRESS';
+
+ALTER TABLE learning_set
+    MODIFY COLUMN status ENUM ('REVIEW', 'READY') DEFAULT 'REVIEW';

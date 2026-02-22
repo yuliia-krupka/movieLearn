@@ -11,4 +11,6 @@ public interface UserLearningItemStatusRepository extends JpaRepository<UserLear
     List<UserLearningItemStatus> findByUserIdAndLearningItemLearningSetId(Long userId, Long learningSetId);
 
     Optional<UserLearningItemStatus> findByUserIdAndLearningItemId(Long userId, Long learningItemId);
+
+    void deleteByUserId(Long userId);
 }

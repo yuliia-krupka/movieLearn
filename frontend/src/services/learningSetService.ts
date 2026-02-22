@@ -8,6 +8,7 @@ import type {
     MovieProgress
 } from '../types/learningSet';
 
+export type {MovieProgress};
 
 export interface LearningSetService {
     getOrCreateByMovie(movieId: number): Promise<LearningSetDto>;
@@ -239,7 +240,7 @@ export const learningSetService: LearningSetService = {
     },
 
     async startLearningForUser(movieId: number, userId: number): Promise<LearningSetDto> {
-        const response = await fetch(`/api/learning/movie/${movieId}/start?userId=${userId}`, {
+        const response = await fetch(`/api/learning-sets/movie/${movieId}/start?userId=${userId}`, {
             method: 'POST',
             credentials: 'include',
         });
@@ -251,7 +252,7 @@ export const learningSetService: LearningSetService = {
     },
 
     async approveSet(learningSetId: number): Promise<void> {
-        const response = await fetch(`/api/learning/set/${learningSetId}/approve`, {
+        const response = await fetch(`/api/learning-sets/set/${learningSetId}/approve`, {
             method: 'POST',
             credentials: 'include',
         });
@@ -266,8 +267,8 @@ export const learningSetService: LearningSetService = {
 
         const progressData: MovieProgress[] = await response.json();
 
-        const progressWithLevels = await Promise.all(
-            progressData.map(async (progress) => {
+        return Promise.all(
+            progressData.map(async (progress: MovieProgress) => {
                 try {
                     const learningSet = await this.getById(progress.learningSetId);
                     return {
@@ -282,7 +283,5 @@ export const learningSetService: LearningSetService = {
                 }
             })
         );
-
-        return progressWithLevels;
     }
 };

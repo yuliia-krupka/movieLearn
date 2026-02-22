@@ -65,16 +65,11 @@ export interface MovieProgress {
     learningSetId: number;
     movieTitle: string;
     movieImage: string | null;
-    flashcardsCompleted: boolean;
-    testsCompleted: boolean;
     flashcardsScore: number;
     testsScore: number;
     totalWords: number;
     learnedWords: number;
-    correctAnswers: number;
     totalAttempts: number;
     lastAttemptAt: string | null;
-    flashcardsAttempts: number;
-    testsAttempts: number;
     englishLevel: string;
 }

@@ -1,5 +1,6 @@
 package co.backend.userLearningSet.dto;
 
+import co.backend.user.EnglishLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,15 +17,11 @@ public class MovieProgressDto {
     private Long learningSetId;
     private String movieTitle;
     private byte[] movieImage;
-    private boolean flashcardsCompleted;
-    private boolean testsCompleted;
     private Integer flashcardsScore;
     private Integer testsScore;
     private long totalWords;
     private long learnedWords;
-    private Integer correctAnswers;
     private Integer totalAttempts;
     private LocalDateTime lastAttemptAt;
-    private Integer flashcardsAttempts;
-    private Integer testsAttempts;
+    private EnglishLevel englishLevel;
 }

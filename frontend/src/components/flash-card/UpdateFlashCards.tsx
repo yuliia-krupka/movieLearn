@@ -2,8 +2,10 @@ import React from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
 import {CloseOutlined, CheckOutlined, PlusOutlined, CaretRightOutlined} from '@ant-design/icons';
+import {Spin} from 'antd';
 import {useAuth} from '../auth/useAuth';
 import '../css/UpdateFlashCards.css';
+import '../css/MovieDetails.css';
 import {useFlashCards} from '../../hooks/useFlashCards';
 import {learningSetService} from '../../services/learningSetService';
 
@@ -22,6 +24,7 @@ const UpdateFlashCards: React.FC = () => {
         isTestUnlocked,
         isRefineExpanded,
         setIsRefineExpanded,
+        loading,
         handleRegenerate,
         handleSaveCard,
         handleDeleteCard,
@@ -53,8 +56,33 @@ const UpdateFlashCards: React.FC = () => {
         }
     };
 
+    if (loading) {
+        return (
+            <MainLayout className="update-flashcards-container">
+                <div className="loading-spinner-container">
+                    <Spin size="large" tip="Loading vocabulary..."/>
+                </div>
+            </MainLayout>
+        );
+    }
+
     return (
         <MainLayout className="update-flashcards-container">
+            {regenerating && (
+                <div className="generating-overlay">
+                    <div className="generating-content">
+                        <img
+                            src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM21td2NsNGkybmhyZWVzcm52N2g2bXd0d3JoY3J5Zm5jNHZtNXI4cCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/XnjBmkLXUPJQwJW4pp/giphy.gif"
+                            alt="Regenerating content..."
+                            className="generating-gif"
+                        />
+                        <h2 className="generating-title">Regenerating Magic...</h2>
+                        <p className="generating-text">
+                            Personalizing your vocabulary set based on your feedback.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             <div className="study-dashboard-card">
                 <div className="dashboard-title">Start Learning</div>
@@ -93,7 +121,7 @@ const UpdateFlashCards: React.FC = () => {
                     textAlign: 'center',
                     fontStyle: 'italic'
                 }}>
-                    Tip: Clicking 'I know' 3 times marks the word as learned and unlocks test.
+                    Tip: Clicking 'I know' during flashcard review marks the word as learned and unlocks tests.
                 </div>
             </div>
 

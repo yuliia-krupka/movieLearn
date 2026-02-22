@@ -43,8 +43,7 @@ public class UserLearningItemStatusService {
             status.setStatus(LearningStatus.IN_PROGRESS);
         }
 
-        if (status.getCorrectAnswers() >= (status.getLearningItem()
-                .getType() == co.backend.learningItem.LearningItemType.TEST ? 1 : 3)) {
+        if (status.getCorrectAnswers() >= 1) {
             status.setStatus(LearningStatus.LEARNED);
         }
 

@@ -18,7 +18,7 @@ const ProgressDashboard: React.FC = () => {
         if (currentUserId) {
             learningSetService.getUserProgress(currentUserId)
                 .then((data: MovieProgress[]) => setProgress(data))
-                .catch((err: Error) => console.error('Failed to load progress:', err))
+                .catch((err: unknown) => console.error('Failed to load progress:', err))
                 .finally(() => setLoading(false));
         }
     }, [currentUserId]);
@@ -35,9 +35,9 @@ const ProgressDashboard: React.FC = () => {
 
     const totalLearned = progress.reduce((acc: number, curr: MovieProgress) => acc + (curr.learnedWords || 0), 0);
     const totalWords = progress.reduce((acc: number, curr: MovieProgress) => acc + (curr.totalWords || 0), 0);
-    const completedTests = progress.filter(p => p.testsCompleted);
+    const completedTests = progress.filter((p: MovieProgress) => p.testsScore > 0);
     const avgTestScore = completedTests.length > 0
-        ? Math.round(completedTests.reduce((acc, curr) => acc + (curr.testsScore || 0), 0) / completedTests.length)
+        ? Math.round(completedTests.reduce((acc: number, curr: MovieProgress) => acc + (curr.testsScore || 0), 0) / completedTests.length)
         : 0;
 
     return (
@@ -100,9 +100,14 @@ const ProgressDashboard: React.FC = () => {
                                     <div className="movie-card-content">
                                         <div className="movie-title-section">
                                             <h3>{item.movieTitle}</h3>
-                                            <Tag color="blue" className="english-level-tag">
-                                                {item.englishLevel || 'A2'}
-                                            </Tag>
+                                            <div className="title-tags">
+                                                <Tag color="blue" className="english-level-tag">
+                                                    {item.englishLevel || 'A2'}
+                                                </Tag>
+                                                <Tag color="cyan">
+                                                    Total attempts: {item.totalAttempts}
+                                                </Tag>
+                                            </div>
                                         </div>
 
                                         <div className="stat-section">
@@ -119,17 +124,17 @@ const ProgressDashboard: React.FC = () => {
 
                                         <div className="stat-badges">
                                             <div className="stat-badges-row">
-                                                <Tag color={item.flashcardsCompleted ? "default" : "orange"}
+                                                <Tag color={item.flashcardsScore > 0 ? "default" : "orange"}
                                                      style={{
-                                                         color: item.flashcardsCompleted ? "#F49E4C" : undefined,
-                                                         borderColor: item.flashcardsCompleted ? "#F49E4C" : undefined
+                                                         color: item.flashcardsScore > 0 ? "#F49E4C" : undefined,
+                                                         borderColor: item.flashcardsScore > 0 ? "#F49E4C" : undefined
                                                      }}
                                                      icon={<CheckCircleOutlined/>}>
-                                                    Flashcards: {item.flashcardsCompleted ? `${item.flashcardsScore}%` : "Started"}
+                                                    Flashcards: {item.flashcardsScore > 0 ? `${item.flashcardsScore}%` : "Started"}
                                                 </Tag>
-                                                <Tag color={item.testsCompleted ? "blue" : "default"}
+                                                <Tag color={item.testsScore > 0 ? "blue" : "default"}
                                                      icon={<TrophyOutlined/>}>
-                                                    Test: {item.testsScore !== undefined ? `${item.testsScore}%` : "0%"}
+                                                    Test: {item.testsScore > 0 ? `${item.testsScore}%` : "0%"}
                                                 </Tag>
                                             </div>
                                             {item.lastAttemptAt && (

@@ -1,8 +1,11 @@
 package co.backend.user;
 
 import co.backend.exceptions.*;
+import co.backend.learningSet.LearningSetRepository;
 import co.backend.movie.Movie;
 import co.backend.movie.MovieRepository;
+import co.backend.userLearningItemStatus.UserLearningItemStatusRepository;
+import co.backend.userLearningSet.UserLearningSetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
     private final UserMapper userMapper;
+    private final LearningSetRepository learningSetRepository;
+    private final UserLearningSetRepository userLearningSetRepository;
+    private final UserLearningItemStatusRepository userLearningItemStatusRepository;
 
     public List<UserDto> getAllUsers(String email) {
         List<User> users;
@@ -60,6 +66,10 @@ public class UserService {
         if (userToDelete.getRole() == Role.ADMIN) {
             throw new ForbiddenException("Cannot delete other admins");
         }
+
+        userLearningItemStatusRepository.deleteByUserId(id);
+        userLearningSetRepository.deleteByUserId(id);
+        learningSetRepository.deleteByCreatorId(id);
 
         userRepository.deleteById(id);
     }

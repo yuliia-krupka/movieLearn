@@ -5,6 +5,7 @@ import MainLayout from '../layout/MainLayout';
 import {Spin} from 'antd';
 import '../css/Layout.css';
 import '../css/Test.css';
+import '../css/MovieDetails.css';
 import {learningSetService} from '../../services/learningSetService';
 import type {TestItemData, LearningSetDto, ItemStatusDto} from '../../types/learningSet';
 import {useAuth} from '../auth/useAuth';
@@ -54,8 +55,10 @@ const TestsModule: React.FC = () => {
                         learningSetData = userLearningSet;
                         setIsChecking(false);
                     } else {
+                        console.log('Starting test generation...');
                         setIsGenerating(true);
                         learningSetData = await learningSetService.getOrCreateByMovie(Number(movieId));
+                        console.log('Test generation completed');
                         setIsGenerating(false);
                         setIsChecking(false);
                     }
@@ -156,8 +159,14 @@ const TestsModule: React.FC = () => {
     if (loading) {
         return (
             <MainLayout className="flashcard-content">
-                <div className="loading-spinner-container">
-                    <Spin size="large" tip="Preparing tests... This may take a moment if items were recently updated."/>
+                <div className="generating-overlay">
+                    <div className="generating-content">
+                        <Spin size="large"/>
+                        <h2 className="generating-title">Preparing Tests...</h2>
+                        <p className="generating-text">
+                            This may take a moment if items were recently updated.
+                        </p>
+                    </div>
                 </div>
             </MainLayout>
         );
@@ -226,7 +235,7 @@ const TestsModule: React.FC = () => {
                                 />
                                 <h2 className="generating-title">Generating Magic...</h2>
                                 <p className="generating-text">
-                                    Creating personalized flashcards based on the movie script.
+                                    Creating personalized tests based on the movie script.
                                 </p>
                             </>
                         ) : (

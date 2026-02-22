@@ -9,6 +9,7 @@ import {learningSetService} from '../../services/learningSetService';
 import '../css/MovieDetails.css';
 import '../css/movies.css';
 import '../css/Layout.css';
+import type {LearningSetDto} from "../../types/learningSet.ts";
 
 
 interface MovieDetails {
@@ -26,6 +27,8 @@ const MovieDetails: React.FC = () => {
         const [loading, setLoading] = useState(false);
         const [isGenerating, setIsGenerating] = useState(false);
         const [isChecking, setIsChecking] = useState(false);
+        const [learningSet, setLearningSet] = useState<LearningSetDto | null>(null);
+        const [isUserStarted, setIsUserStarted] = useState(false);
         const [errorMsg, setErrorMsg] = useState<string | null>(null);
         const [successMsg, setSuccessMsg] = useState<string | null>(null);
         const [message, contextHolder] = antMessage.useMessage();
@@ -68,12 +71,29 @@ const MovieDetails: React.FC = () => {
             };
 
             fetchMovie().catch(console.error);
-        }, [id, navigate]);
+
+            if (currentUserId) {
+                const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
+                learningSetService.getLatestByUserAndMovie(Number(id), currentUserId, user?.englishLevel, interestsStr)
+                    .then(setLearningSet)
+                    .catch(err => console.error('Error fetching learning set:', err));
+
+                axios.get(`/api/user-learning-sets/movie/${id}/user/${currentUserId}`, {withCredentials: true})
+                    .then(() => setIsUserStarted(true))
+                    .catch(err => {
+                        if (axios.isAxiosError(err) && err.response?.status === 404) {
+                            setIsUserStarted(false);
+                        } else {
+                            console.error('Error checking user progress:', err);
+                        }
+                    });
+            }
+        }, [id, navigate, currentUserId, user]);
 
 
         const handleDelete = async () => {
             try {
-                await axios.delete('/api/movies/${id}', {withCredentials: true});
+                await axios.delete(`/api/movies/${id}`, {withCredentials: true});
                 antMessage.success('Movie deleted successfully');
                 navigate('/movies');
             } catch (error) {
@@ -91,7 +111,7 @@ const MovieDetails: React.FC = () => {
                 setErrorMsg(errorMsg);
             }
         };
-        
+
         const handleStartStudying = async () => {
                 if (!currentUserId) {
                     void message.error('You must be logged in to start studying');
@@ -132,6 +152,8 @@ const MovieDetails: React.FC = () => {
                         learningSet = await learningSetService.startLearningForUser(Number(id), currentUserId);
                         console.log('Generated new learning set:', learningSet.id);
                     }
+
+                    setIsUserStarted(true);
 
                     if (learningSet.status === 'REVIEW') {
                         navigate(`/learning-sets/${learningSet.id}/update`);
@@ -236,13 +258,23 @@ const MovieDetails: React.FC = () => {
                                         >
                                             Back to Movies
                                         </Button>
-                                        <Button
-                                            className="primary-action-btn"
-                                            onClick={handleStartStudying}
-                                        >
-                                            Start Studying
-                                        </Button>
+                                        <div style={{display: 'flex', gap: '12px'}}>
+                                            {isUserStarted && learningSet && learningSet.status === 'READY' && (
+                                                <Button
+                                                    className="secondary-action-btn"
+                                                    onClick={() => navigate(`/learning-sets/${learningSet.id}/update`)}
+                                                >
+                                                    Refine Flashcards
+                                                </Button>
+                                            )}
+                                            <Button
+                                                className="primary-action-btn"
+                                                onClick={handleStartStudying}
+                                            >
+                                                {isUserStarted ? 'Continue Studying' : 'Start Studying'}
+                                            </Button>
                                         </div>
+                                    </div>
                                 </div>
                             )}
                             {isAdmin && (

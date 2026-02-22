@@ -1,12 +1,12 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import FlashCard from './FlashCard';
 import ResultsPage from './ResultsPage';
 import MainLayout from "../layout/MainLayout.tsx";
 import '../css/Layout.css';
-import {learningSetService} from '../../services/learningSetService';
-import type {FlashCardData, LearningSetDto, ItemStatusDto} from '../../types/learningSet';
-import {useAuth} from '../auth/useAuth';
-import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import { learningSetService } from '../../services/learningSetService';
+import type { FlashCardData, LearningSetDto, ItemStatusDto } from '../../types/learningSet';
+import { useAuth } from '../auth/useAuth';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 interface FlashCardsModuleProps {
     movieId?: number;
@@ -16,8 +16,8 @@ interface FlashCardsModuleProps {
 const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const {currentUserId} = useAuth();
-    const {id} = useParams<{ id: string }>();
+    const { currentUserId } = useAuth();
+    const { id } = useParams<{ id: string }>();
     const stateMovieId = location.state?.movieId;
     const movieId = props.movieId || stateMovieId;
     const learningSetId = props.learningSetId || (id ? Number(id) : undefined);
@@ -117,7 +117,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
         if (learningSetId) {
             navigate(`/learning-sets/${learningSetId}/tests`);
         } else {
-            navigate('/tests', {state: {movieId: movieId || learningSet?.movieId}});
+            navigate('/tests', { state: { movieId: movieId || learningSet?.movieId } });
         }
     };
 

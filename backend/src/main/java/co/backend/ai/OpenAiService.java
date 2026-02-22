@@ -1,11 +1,14 @@
 package co.backend.ai;
 
+import co.backend.ai.dto.AiContext;
 import co.backend.ai.dto.ChatRequest;
 import co.backend.ai.dto.ChatResponse;
 import co.backend.ai.dto.GeneratedItem;
 import co.backend.ai.dto.Message;
 import co.backend.learningItem.LearningItemDto;
 import co.backend.learningItem.LearningItemType;
+import co.backend.learningSet.LearningSet;
+import co.backend.movie.Movie;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +45,16 @@ public class OpenAiService {
             Generate content that matches the user's English level and interests.
             Output purely JSON.
             """;
+
+    public AiContext extractAiContext(LearningSet set) {
+        Movie movie = set.getMovie();
+        return new AiContext(
+                movie != null ? movie.getTitle() : "Unknown",
+                movie != null ? movie.getDescription() : "",
+                movie != null ? parseScript(movie.getScript()) : "",
+                set.getEnglishLevel() != null ? set.getEnglishLevel().name() : "Intermediate",
+                set.getInterests() != null ? set.getInterests() : "");
+    }
 
     public List<LearningItemDto> generateFlashcards(String movieTitle, String description, byte[] scriptBytes,
                                                     String interests, String level) {
@@ -119,24 +132,6 @@ public class OpenAiService {
                 
                 Return a JSON array of objects. Do not include markdown formatting like ```json.
                 """, flashcardsJson);
-
-        return callOpenAiList(userPrompt);
-    }
-
-    public List<LearningItemDto> generateCustom(String instruction, String movieTitle, String description) {
-        String userPrompt = String.format("""
-                Generate 2 flashcards based on this request: "%s"
-                Movie: "%s"
-                Description: "%s"
-                
-                For each item, provide:
-                - text: The English word or phrase.
-                - translation: Ukrainian translation.
-                - transcription: IPA transcription.
-                - exampleSentence: A sentence using the word.
-                
-                Return a JSON array of objects.
-                """, instruction, movieTitle, description);
 
         return callOpenAiList(userPrompt);
     }

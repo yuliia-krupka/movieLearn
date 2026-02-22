@@ -77,9 +77,16 @@
 
 .movie-title-section {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
     margin-bottom: 12px;
+}
+
+.title-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .movie-title-section h3 {
@@ -116,7 +123,7 @@
 
 .stat-badges-row {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 8px;
     align-items: center;
 }

@@ -1,11 +1,11 @@
 package co.backend.learningItem;
 
 import co.backend.ai.OpenAiService;
+import co.backend.ai.dto.AiContext;
 import co.backend.exceptions.BadRequestException;
 import co.backend.exceptions.NotFoundException;
 import co.backend.learningSet.LearningSet;
 import co.backend.learningSet.LearningSetRepository;
-import co.backend.movie.Movie;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,13 +20,6 @@ public class LearningItemService {
     private final LearningSetRepository learningSetRepository;
     private final LearningItemMapper learningItemMapper;
     private final OpenAiService openAiService;
-
-    public List<LearningItemDto> getByLearningSetId(Long learningSetId) {
-        return learningItemRepository.findByLearningSetId(learningSetId)
-                .stream()
-                .map(learningItemMapper::toDto)
-                .toList();
-    }
 
     public LearningItemDto update(Long id, LearningItemDto dto) {
         if (id == null) {
@@ -43,12 +36,6 @@ public class LearningItemService {
         return learningItemMapper.toDto(learningItemRepository.save(item));
     }
 
-    public List<LearningItemDto> updateBatch(List<LearningItemDto> items) {
-        return items.stream()
-                .map(dto -> update(dto.getId(), dto))
-                .toList();
-    }
-
     public LearningItemDto create(LearningItemDto dto) {
         LearningSet learningSet = learningSetRepository.findById(dto.getLearningSetId())
                 .orElseThrow(() -> new NotFoundException("Learning set not found: " + dto.getLearningSetId()));
@@ -57,30 +44,6 @@ public class LearningItemService {
         item.setLearningSet(learningSet);
 
         return learningItemMapper.toDto(learningItemRepository.save(item));
-    }
-
-    public List<LearningItemDto> generateCustom(String request, Long learningSetId) {
-        LearningSet learningSet = learningSetRepository.findById(learningSetId)
-                .orElseThrow(() -> new NotFoundException("Learning set not found: " + learningSetId));
-
-        Movie movie = learningSet.getMovie();
-
-        List<LearningItemDto> generatedDtos = openAiService.generateCustom(
-                request,
-                movie != null ? movie.getTitle() : "Unknown",
-                movie != null ? movie.getDescription() : "");
-
-        List<LearningItem> itemsToSave = generatedDtos.stream().map(dto -> {
-            LearningItem item = learningItemMapper.toEntity(dto);
-            item.setLearningSet(learningSet);
-            return item;
-        }).toList();
-
-        List<LearningItem> savedItems = learningItemRepository.saveAll(itemsToSave);
-
-        return savedItems.stream()
-                .map(learningItemMapper::toDto)
-                .toList();
     }
 
     public List<LearningItemDto> regenerate(Long learningSetId, String feedback, List<Long> itemIds) {
@@ -97,16 +60,11 @@ public class LearningItemService {
 
         List<LearningItemDto> dtos = items.stream().map(learningItemMapper::toDto).toList();
 
-        Movie movie = learningSet.getMovie();
-        String movieTitle = movie != null ? movie.getTitle() : "Unknown";
-        String movieDescription = movie != null ? movie.getDescription() : "";
-        String scriptContent = movie != null ? openAiService.parseScript(movie.getScript()) : "";
-        String englishLevel = learningSet.getEnglishLevel() != null ? learningSet.getEnglishLevel().name()
-                : "Intermediate";
-        String interests = learningSet.getInterests() != null ? learningSet.getInterests() : "";
+        AiContext context = openAiService.extractAiContext(learningSet);
 
-        List<LearningItemDto> regeneratedDtos = openAiService.regenerateBatch(dtos, feedback, movieTitle,
-                movieDescription, scriptContent, englishLevel, interests);
+        List<LearningItemDto> regeneratedDtos = openAiService.regenerateBatch(dtos, feedback,
+                context.movieTitle(), context.movieDescription(), context.scriptContent(),
+                context.englishLevel(), context.interests());
         learningSet.getLearningItems().removeAll(items);
 
         List<LearningItem> newItems = regeneratedDtos.stream().map(dto -> {
