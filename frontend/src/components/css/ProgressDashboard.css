@@ -36,6 +36,14 @@
     margin-top: 24px;
 }
 
+.movie-stats-grid:has(.ant-col:only-child) {
+    justify-content: center;
+}
+
+.movie-stats-grid .ant-col:only-child {
+    max-width: 600px;
+}
+
 .movie-stat-card {
     height: 100%;
     border-radius: 12px;

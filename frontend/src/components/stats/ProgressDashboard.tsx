@@ -77,7 +77,8 @@ const ProgressDashboard: React.FC = () => {
                 ) : (
                     <Row gutter={[24, 24]} className="movie-stats-grid">
                         {progress.map((item: MovieProgress) => (
-                            <Col xs={24} md={12} lg={12} xl={8} key={item.learningSetId}>
+                            <Col xs={24} md={progress.length === 1 ? 16 : 12} lg={progress.length === 1 ? 16 : 12}
+                                 xl={progress.length === 1 ? 12 : 8} key={item.learningSetId}>
                                 <Card
                                     hoverable
                                     className="movie-stat-card"

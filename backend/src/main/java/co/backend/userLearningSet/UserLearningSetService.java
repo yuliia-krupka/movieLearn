@@ -93,9 +93,16 @@ public class UserLearningSetService {
                             .max(java.util.Comparator.naturalOrder())
                             .orElse(null);
 
-                    int flashcardScorePct = totalWords > 0
-                            ? (int) Math.round(((double) learnedWords / totalWords) * 100)
-                            : 0;
+                    int flashcardScorePct;
+                    if (uls.isFlashcardsCompleted() && uls.getFlashcardsScore() != null) {
+                        flashcardScorePct = uls.getFlashcardsScore();
+                        System.out.println("[DEBUG STATS] Using session completion score: " + flashcardScorePct + "%");
+                    } else {
+                        flashcardScorePct = totalWords > 0
+                                ? (int) Math.round(((double) learnedWords / totalWords) * 100)
+                                : 0;
+                        System.out.println("[DEBUG STATS] Using individual progress score: " + flashcardScorePct + "%");
+                    }
 
                     long totalTests = set.getLearningItems().stream()
                             .filter(item -> item.getType() == co.backend.learningItem.LearningItemType.TEST)

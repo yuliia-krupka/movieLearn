@@ -140,24 +140,36 @@ public class LearningSetService {
 
     public Optional<LearningSet> findSuitableSetEntity(Long movieId, co.backend.user.EnglishLevel level,
                                                        String interests) {
+        System.out.println("[BACKEND] findSuitableSetEntity called - movieId: " + movieId + ", level: " + level + ", interests: " + interests);
+
         Optional<LearningSet> exactMatch = learningSetRepository
                 .findTopByMovieIdAndEnglishLevelAndInterestsOrderByDateDesc(movieId, level, interests);
 
         if (exactMatch.isPresent()) {
+            System.out.println("[BACKEND] Found exact match: " + exactMatch.get().getId());
             return exactMatch;
         }
 
         List<LearningSet> candidateSets = learningSetRepository
                 .findByMovieIdAndEnglishLevelOrderByDateDesc(movieId, level);
 
+        System.out.println("[BACKEND] Found " + candidateSets.size() + " candidate sets with level " + level);
+
         for (LearningSet candidate : candidateSets) {
-            if (interestsMatch(interests, candidate.getInterests())) {
-                System.out.println("[BACKEND] Found flexible match: user interests='" + interests +
-                        "' vs existing='" + candidate.getInterests() + "'");
-                return Optional.of(candidate);
+            System.out.println("[BACKEND] Checking candidate set " + candidate.getId() + " with level " + candidate.getEnglishLevel());
+            // Double-check that the English level matches exactly
+            if (candidate.getEnglishLevel() != null && candidate.getEnglishLevel().equals(level)) {
+                if (interestsMatch(interests, candidate.getInterests())) {
+                    System.out.println("[BACKEND] Found flexible match: user interests='" + interests +
+                            "' vs existing='" + candidate.getInterests() + "'");
+                    return Optional.of(candidate);
+                }
+            } else {
+                System.out.println("[BACKEND] Level mismatch - expected: " + level + ", actual: " + candidate.getEnglishLevel());
             }
         }
 
+        System.out.println("[BACKEND] No suitable set found");
         return Optional.empty();
     }
 
@@ -165,7 +177,7 @@ public class LearningSetService {
         LearningSet newSet = new LearningSet();
         newSet.setMovie(originalSet.getMovie());
         newSet.setDate(java.time.LocalDateTime.now());
-        newSet.setName(originalSet.getName() + " (Copy)");
+        newSet.setName(originalSet.getName());
         newSet.setCreatorId(newUserId);
         newSet.setStatus(LearningSetStatus.REVIEW);
         newSet.setEnglishLevel(originalSet.getEnglishLevel());

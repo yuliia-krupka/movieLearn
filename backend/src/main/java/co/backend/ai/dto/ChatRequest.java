@@ -13,10 +13,4 @@ public class ChatRequest {
     private String model;
     private List<Message> messages;
     private double temperature;
-
-    public ChatRequest(String model, List<Message> messages) {
-        this.model = model;
-        this.messages = messages;
-        this.temperature = 0.7;
-    }
 }

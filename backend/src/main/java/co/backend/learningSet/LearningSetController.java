@@ -39,37 +39,42 @@ public class LearningSetController {
         System.out.println("[CONTROLLER] getLatestByUserAndMovie called - movieId: " + movieId + ", userId: " + userId + ", level: " + level + ", interests: " + interests);
 
         if (level != null && interests != null) {
-            System.out.println("[CONTROLLER] Looking for suitable shared set...");
+            System.out.println("[CONTROLLER] Looking for suitable shared set with level " + level + "...");
             Optional<LearningSetDto> suitableSet = learningSetService.findSuitableSet(movieId, level, interests);
             if (suitableSet.isPresent()) {
                 System.out.println("[CONTROLLER] Found suitable shared set: " + suitableSet.get().getId());
                 return suitableSet;
             } else {
-                System.out.println("[CONTROLLER] No suitable shared set found");
+                System.out.println("[CONTROLLER] No suitable shared set found with level " + level);
             }
         }
 
         if (level != null) {
-            System.out.println("[CONTROLLER] Looking for user-specific set with level...");
+            System.out.println("[CONTROLLER] Looking for user-specific set with level " + level + "...");
             Optional<LearningSetDto> userSet = learningSetService.getLatestByUserAndMovieWithLevel(userId, movieId, level);
             if (userSet.isPresent()) {
                 System.out.println("[CONTROLLER] Found user-specific set: " + userSet.get().getId());
                 return userSet;
             } else {
-                System.out.println("[CONTROLLER] No user-specific set found with level");
+                System.out.println("[CONTROLLER] No user-specific set found with level " + level);
             }
         }
 
-        System.out.println("[CONTROLLER] Looking for any user set...");
-        Optional<LearningSetDto> anyUserSet = learningSetService.getLatestByUserAndMovie(userId, movieId);
-        if (anyUserSet.isPresent()) {
-            System.out.println("[CONTROLLER] Found any user set: " + anyUserSet.get().getId());
-            return anyUserSet;
+        // Only fall back to any user set if no level is specified
+        if (level == null) {
+            System.out.println("[CONTROLLER] No level specified, looking for any user set...");
+            Optional<LearningSetDto> anyUserSet = learningSetService.getLatestByUserAndMovie(userId, movieId);
+            if (anyUserSet.isPresent()) {
+                System.out.println("[CONTROLLER] Found any user set: " + anyUserSet.get().getId());
+                return anyUserSet;
+            } else {
+                System.out.println("[CONTROLLER] No user set found at all - will need to generate");
+            }
         } else {
-            System.out.println("[CONTROLLER] No user set found at all - will need to generate");
+            System.out.println("[CONTROLLER] Level " + level + " specified but no matching set found - will need to generate new set");
         }
 
-        return learningSetService.getLatestByUserAndMovie(userId, movieId);
+        return Optional.empty();
     }
 
     @GetMapping("/movie/{movieId}")

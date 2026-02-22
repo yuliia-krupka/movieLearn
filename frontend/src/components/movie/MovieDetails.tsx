@@ -6,7 +6,6 @@ import axios from "axios";
 import MainLayout from "../layout/MainLayout.tsx";
 import {useAuth} from '../auth/useAuth';
 import {learningSetService} from '../../services/learningSetService';
-import type {LearningSetDto} from '../../types/learningSet';
 import '../css/MovieDetails.css';
 import '../css/movies.css';
 import '../css/Layout.css';
@@ -24,7 +23,6 @@ const MovieDetails: React.FC = () => {
         const {id} = useParams<{ id: string }>();
         const navigate = useNavigate();
         const [movie, setMovie] = useState<MovieDetails | null>(null);
-        const [learningSet, setLearningSet] = useState<LearningSetDto | null>(null);
         const [loading, setLoading] = useState(false);
         const [isGenerating, setIsGenerating] = useState(false);
         const [isChecking, setIsChecking] = useState(false);
@@ -70,15 +68,7 @@ const MovieDetails: React.FC = () => {
             };
 
             fetchMovie().catch(console.error);
-
-            // Fetch learning set to check if it's ready for refinement
-            if (currentUserId) {
-                const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
-                learningSetService.getLatestByUserAndMovie(Number(id), currentUserId, user?.englishLevel, interestsStr)
-                    .then(setLearningSet)
-                    .catch(err => console.error('Error fetching learning set:', err));
-            }
-        }, [id, navigate, currentUserId, user]);
+        }, [id, navigate]);
 
 
         const handleDelete = async () => {
@@ -101,12 +91,7 @@ const MovieDetails: React.FC = () => {
                 setErrorMsg(errorMsg);
             }
         };
-        const handleRefineFlashcards = () => {
-            if (learningSet) {
-                navigate(`/learning-sets/${learningSet.id}/refine`);
-            }
-        };
-
+        
         const handleStartStudying = async () => {
                 if (!currentUserId) {
                     void message.error('You must be logged in to start studying');
@@ -149,7 +134,7 @@ const MovieDetails: React.FC = () => {
                     }
 
                     if (learningSet.status === 'REVIEW') {
-                        navigate(` /learning - sets/${learningSet.id}/update`);
+                        navigate(`/learning-sets/${learningSet.id}/update`);
                     } else {
                         navigate(`/learning-sets/${learningSet.id}/flashcards`);
                     }
@@ -257,16 +242,7 @@ const MovieDetails: React.FC = () => {
                                         >
                                             Start Studying
                                         </Button>
-                                        {learningSet && learningSet.status === 'READY' && (
-                                            <Button
-                                                className="secondary-action-btn"
-                                                onClick={handleRefineFlashcards}
-                                                style={{marginLeft: '8px'}}
-                                            >
-                                                Refine Flashcards
-                                            </Button>
-                                        )}
-                                    </div>
+                                        </div>
                                 </div>
                             )}
                             {isAdmin && (

@@ -105,13 +105,8 @@ public class LearningItemService {
                 : "Intermediate";
         String interests = learningSet.getInterests() != null ? learningSet.getInterests() : "";
 
-        System.out.println("[BACKEND] Regenerating " + dtos.size() + " items for set " + learningSetId
-                + " with feedback: " + feedback);
         List<LearningItemDto> regeneratedDtos = openAiService.regenerateBatch(dtos, feedback, movieTitle,
                 movieDescription, scriptContent, englishLevel, interests);
-        System.out.println("[BACKEND] AI returned " + regeneratedDtos.size() + " regenerated items");
-
-        // Use the managed collection to ensure orphan removal and sync
         learningSet.getLearningItems().removeAll(items);
 
         List<LearningItem> newItems = regeneratedDtos.stream().map(dto -> {
@@ -125,8 +120,6 @@ public class LearningItemService {
 
         learningSet.getLearningItems().addAll(newItems);
         learningSetRepository.save(learningSet);
-
-        System.out.println("[BACKEND] Successfully added " + newItems.size() + " new items to set " + learningSetId);
 
         return newItems.stream()
                 .map(learningItemMapper::toDto)
