@@ -4,11 +4,49 @@ import type {
     FlashCardData,
     TestItemData,
     ApiFlashCard,
-    ApiTestItem
+    ApiTestItem,
+    MovieProgress
 } from '../types/learningSet';
 
 
-export const learningSetService = {
+export interface LearningSetService {
+    getOrCreateByMovie(movieId: number): Promise<LearningSetDto>;
+
+    getLatestByUserAndMovie(movieId: number, userId: number, level?: string, interests?: string): Promise<LearningSetDto | null>;
+
+    recordAnswer(userId: number, learningItemId: number, correct: boolean): Promise<void>;
+
+    getItemStatuses(userId: number, learningSetId: number): Promise<ItemStatusDto[]>;
+
+    completeFlashcards(userId: number, learningSetId: number, score: number): Promise<void>;
+
+    completeTests(userId: number, learningSetId: number, score: number): Promise<void>;
+
+    getFlashCards(learningSetId: number): Promise<FlashCardData[]>;
+
+    getTestItems(learningSetId: number): Promise<TestItemData[]>;
+
+    getById(id: number): Promise<LearningSetDto>;
+
+    createItem(item: Partial<ApiFlashCard> & { learningSetId: number, type: string }): Promise<ApiFlashCard>;
+
+    updateItem(id: number, item: Partial<ApiFlashCard> & {
+        learningSetId: number,
+        type: string
+    }): Promise<ApiFlashCard>;
+
+    deleteItem(id: number): Promise<void>;
+
+    regenerate(learningSetId: number, feedback: string, itemIds: number[]): Promise<FlashCardData[]>;
+
+    startLearningForUser(movieId: number, userId: number): Promise<LearningSetDto>;
+
+    approveSet(learningSetId: number): Promise<void>;
+
+    getUserProgress(userId: number): Promise<MovieProgress[]>;
+}
+
+export const learningSetService: LearningSetService = {
     async getOrCreateByMovie(movieId: number): Promise<LearningSetDto> {
         const response = await fetch(`/api/learning-sets/movie/${movieId}`, {
             credentials: 'include',
@@ -84,6 +122,21 @@ export const learningSetService = {
         });
         if (!response.ok) {
             console.error('Failed to complete flashcards:', response.statusText);
+        }
+    },
+
+    async completeTests(userId: number, learningSetId: number, score: number): Promise<void> {
+        const params = new URLSearchParams({
+            userId: String(userId),
+            learningSetId: String(learningSetId),
+            score: String(score),
+        });
+        const response = await fetch(`/api/user-learning-sets/complete-tests?${params}`, {
+            method: 'POST',
+            credentials: 'include',
+        });
+        if (!response.ok) {
+            console.error('Failed to complete tests:', response.statusText);
         }
     },
 
@@ -166,6 +219,7 @@ export const learningSetService = {
         });
         if (!response.ok) throw new Error('Failed to delete item');
     },
+
     async regenerate(learningSetId: number, feedback: string, itemIds: number[]): Promise<FlashCardData[]> {
         const response = await fetch(`/api/learning-items/regenerate`, {
             method: 'POST',
@@ -183,7 +237,6 @@ export const learningSetService = {
             id: item.id
         }));
     },
-
 
     async startLearningForUser(movieId: number, userId: number): Promise<LearningSetDto> {
         const response = await fetch(`/api/learning/movie/${movieId}/start?userId=${userId}`, {
@@ -203,5 +256,33 @@ export const learningSetService = {
             credentials: 'include',
         });
         if (!response.ok) throw new Error('Failed to approve set');
+    },
+
+    async getUserProgress(userId: number): Promise<MovieProgress[]> {
+        const response = await fetch(`/api/user-learning-sets/user/${userId}/progress`, {
+            credentials: 'include',
+        });
+        if (!response.ok) throw new Error('Failed to get user progress');
+
+        const progressData: MovieProgress[] = await response.json();
+
+        const progressWithLevels = await Promise.all(
+            progressData.map(async (progress) => {
+                try {
+                    const learningSet = await this.getById(progress.learningSetId);
+                    return {
+                        ...progress,
+                        englishLevel: learningSet.englishLevel || 'A2'
+                    };
+                } catch {
+                    return {
+                        ...progress,
+                        englishLevel: 'A2'
+                    };
+                }
+            })
+        );
+
+        return progressWithLevels;
     }
 };

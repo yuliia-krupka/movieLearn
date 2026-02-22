@@ -14,10 +14,12 @@ public interface LearningSetRepository extends JpaRepository<LearningSet, Long> 
     Optional<LearningSet> findTopByMovieIdAndCreatorIdOrderByDateDesc(Long movieId, Long creatorId);
 
     Optional<LearningSet> findTopByMovieIdAndCreatorIdAndEnglishLevelOrderByDateDesc(Long movieId, Long creatorId,
-            EnglishLevel englishLevel);
+                                                                                     EnglishLevel englishLevel);
 
     Optional<LearningSet> findTopByMovieIdAndEnglishLevelAndInterestsOrderByDateDesc(Long movieId,
-            EnglishLevel englishLevel, String interests);
+                                                                                     EnglishLevel englishLevel, String interests);
 
     List<LearningSet> findByMovieIdAndEnglishLevelOrderByDateDesc(Long movieId, EnglishLevel englishLevel);
+
+    void deleteByMovieIdAndCreatorId(Long movieId, Long creatorId);
 }

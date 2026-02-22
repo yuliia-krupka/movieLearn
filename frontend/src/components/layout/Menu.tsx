@@ -1,5 +1,5 @@
 import type {MenuProps} from "antd";
-import {HomeOutlined, UserOutlined, VideoCameraOutlined,} from "@ant-design/icons";
+import {BarChartOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined,} from "@ant-design/icons";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -40,6 +40,12 @@ export const getMenuItems = (
             icon: <UserOutlined/>,
             label: "Account",
             onClick: () => handleClick("/account"),
+        },
+        {
+            key: "/statistics",
+            icon: <BarChartOutlined/>,
+            label: "Statistics",
+            onClick: () => handleClick("/statistics"),
         },
     ];
 };

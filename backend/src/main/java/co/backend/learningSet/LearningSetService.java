@@ -44,12 +44,12 @@ public class LearningSetService {
 
         if (user.getEnglishLevel() != null && user.getInterests() != null) {
             System.out.println("Looking for suitable shared set...");
-            Optional<LearningSetDto> suitableSet = findSuitableSet(movieId, user.getEnglishLevel(),
+            Optional<LearningSet> suitableSet = findSuitableSetEntity(movieId, user.getEnglishLevel(),
                     user.getInterests());
             if (suitableSet.isPresent()) {
-                System.out.println("[BACKEND] Found suitable shared set, reusing: " + suitableSet.get().getId());
-                userLearningSetService.getOrCreate(userId, suitableSet.get().getId());
-                return suitableSet.get();
+                System.out.println("[BACKEND] Found suitable shared set, cloning for user: " + suitableSet.get().getId());
+                LearningSet clonedSet = cloneSetForUser(suitableSet.get(), userId);
+                return learningSetMapper.toDto(clonedSet);
             } else {
                 System.out.println("No suitable shared set found");
             }
@@ -80,6 +80,10 @@ public class LearningSetService {
         }
 
         System.out.println("[BACKEND] Generating new learning set...");
+
+        // Delete old user's sets for this movie before generating new ones
+        learningSetRepository.deleteByMovieIdAndCreatorId(movieId, userId);
+
         List<LearningItemDto> generatedItems = openAiService.generateFlashcards(
                 movie.getTitle(),
                 movie.getDescription(),
@@ -130,9 +134,14 @@ public class LearningSetService {
 
     public Optional<LearningSetDto> findSuitableSet(Long movieId, co.backend.user.EnglishLevel level,
                                                     String interests) {
-        Optional<LearningSetDto> exactMatch = learningSetRepository
-                .findTopByMovieIdAndEnglishLevelAndInterestsOrderByDateDesc(movieId, level, interests)
+        return findSuitableSetEntity(movieId, level, interests)
                 .map(learningSetMapper::toDto);
+    }
+
+    public Optional<LearningSet> findSuitableSetEntity(Long movieId, co.backend.user.EnglishLevel level,
+                                                       String interests) {
+        Optional<LearningSet> exactMatch = learningSetRepository
+                .findTopByMovieIdAndEnglishLevelAndInterestsOrderByDateDesc(movieId, level, interests);
 
         if (exactMatch.isPresent()) {
             return exactMatch;
@@ -145,11 +154,47 @@ public class LearningSetService {
             if (interestsMatch(interests, candidate.getInterests())) {
                 System.out.println("[BACKEND] Found flexible match: user interests='" + interests +
                         "' vs existing='" + candidate.getInterests() + "'");
-                return Optional.of(learningSetMapper.toDto(candidate));
+                return Optional.of(candidate);
             }
         }
 
         return Optional.empty();
+    }
+
+    private LearningSet cloneSetForUser(LearningSet originalSet, Long newUserId) {
+        LearningSet newSet = new LearningSet();
+        newSet.setMovie(originalSet.getMovie());
+        newSet.setDate(java.time.LocalDateTime.now());
+        newSet.setName(originalSet.getName() + " (Copy)");
+        newSet.setCreatorId(newUserId);
+        newSet.setStatus(LearningSetStatus.REVIEW);
+        newSet.setEnglishLevel(originalSet.getEnglishLevel());
+        newSet.setInterests(originalSet.getInterests());
+
+        LearningSet savedSet = learningSetRepository.save(newSet);
+
+        List<co.backend.learningItem.LearningItem> clonedItems = originalSet.getLearningItems().stream()
+                .map(item -> {
+                    co.backend.learningItem.LearningItem newItem = new co.backend.learningItem.LearningItem();
+                    newItem.setType(item.getType());
+                    newItem.setText(item.getText());
+                    newItem.setTranslation(item.getTranslation());
+                    newItem.setExampleSentence(item.getExampleSentence());
+                    newItem.setTranscription(item.getTranscription());
+                    newItem.setCorrectAnswerIndex(item.getCorrectAnswerIndex());
+                    newItem.setLearningSet(savedSet);
+                    if (item.getAnswers() != null) {
+                        newItem.setAnswers(new java.util.ArrayList<>(item.getAnswers()));
+                    }
+                    return newItem;
+                })
+                .toList();
+
+        savedSet.setLearningItems(new java.util.ArrayList<>(clonedItems));
+        learningSetRepository.save(savedSet);
+
+        userLearningSetService.getOrCreate(newUserId, savedSet.getId());
+        return savedSet;
     }
 
     private boolean interestsMatch(String userInterests, String existingInterests) {
@@ -162,13 +207,13 @@ public class LearningSetService {
         String[] existingInterestsArray = existingInterests.toLowerCase().split("[,\\s]+");
 
         java.util.Set<String> userSet = java.util.Arrays.stream(userInterestsArray)
-                .filter(s -> !s.trim().isEmpty())
                 .map(String::trim)
+                .filter(trim -> !trim.isEmpty())
                 .collect(java.util.stream.Collectors.toSet());
 
         java.util.Set<String> existingSet = java.util.Arrays.stream(existingInterestsArray)
-                .filter(s -> !s.trim().isEmpty())
                 .map(String::trim)
+                .filter(trim -> !trim.isEmpty())
                 .collect(java.util.stream.Collectors.toSet());
 
         return userSet.equals(existingSet);

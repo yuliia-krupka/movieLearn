@@ -86,7 +86,8 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
         setShowResults(true);
 
         if (currentUserId && learningSet) {
-            const score = Array.from(results.values()).filter(Boolean).length;
+            const correctCount = Array.from(results.values()).filter(Boolean).length;
+            const score = Math.round((correctCount / flashcards.length) * 100);
 
             learningSetService.completeFlashcards(currentUserId, learningSet.id, score)
                 .catch(err => console.error('Failed to complete flashcards:', err));

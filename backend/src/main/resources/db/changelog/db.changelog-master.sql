@@ -125,4 +125,7 @@ ALTER TABLE learning_item
     ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ADD COLUMN updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON
 UPDATE CURRENT_TIMESTAMP;
-
+--changeset antigravity:07-add-attempts-to-user-learning-set
+ALTER TABLE user_learning_set
+    ADD COLUMN flashcards_attempts INT DEFAULT 0,
+    ADD COLUMN tests_attempts      INT DEFAULT 0;

@@ -26,6 +26,8 @@ const TestsModule: React.FC = () => {
     const [answers, setAnswers] = useState<Map<number, number | null>>(new Map());
     const [showResults, setShowResults] = useState(false);
     const [itemStatuses, setItemStatuses] = useState<ItemStatusDto[]>([]);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [isChecking, setIsChecking] = useState(false);
 
     useEffect(() => {
         const loadTestItems = async () => {
@@ -39,6 +41,7 @@ const TestsModule: React.FC = () => {
                 if (learningSetId) {
                     learningSetData = await learningSetService.getById(learningSetId);
                 } else {
+                    setIsChecking(true);
                     const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
                     const userLearningSet = await learningSetService.getLatestByUserAndMovie(
                         Number(movieId),
@@ -47,11 +50,14 @@ const TestsModule: React.FC = () => {
                         interestsStr
                     );
 
-                    // Fallback to legacy behavior if user set not found (shouldn't happen in normal flow)
                     if (userLearningSet) {
                         learningSetData = userLearningSet;
+                        setIsChecking(false);
                     } else {
+                        setIsGenerating(true);
                         learningSetData = await learningSetService.getOrCreateByMovie(Number(movieId));
+                        setIsGenerating(false);
+                        setIsChecking(false);
                     }
                 }
 
@@ -110,12 +116,13 @@ const TestsModule: React.FC = () => {
                 return Promise.resolve();
             });
 
-            const score = Array.from(answers.entries()).filter(([index, selectedAnswer]) => {
+            const correctCount = Array.from(answers.entries()).filter(([index, selectedAnswer]) => {
                 const item = testItems[index];
                 return item && selectedAnswer === item.correctAnswerIndex;
             }).length;
+            const score = Math.round((correctCount / testItems.length) * 100);
 
-            const completionPromise = learningSetService.completeFlashcards(currentUserId, learningSet.id, score);
+            const completionPromise = learningSetService.completeTests(currentUserId, learningSet.id, score);
 
             Promise.all([...answerPromises, completionPromise])
                 .then(() => learningSetService.getItemStatuses(currentUserId, learningSet.id))
@@ -150,7 +157,7 @@ const TestsModule: React.FC = () => {
         return (
             <MainLayout className="flashcard-content">
                 <div className="loading-spinner-container">
-                    <Spin size="large"/>
+                    <Spin size="large" tip="Preparing tests... This may take a moment if items were recently updated."/>
                 </div>
             </MainLayout>
         );
@@ -207,6 +214,34 @@ const TestsModule: React.FC = () => {
 
     return (
         <MainLayout className="flashcard-content">
+            {(isGenerating || isChecking) && (
+                <div className="generating-overlay">
+                    <div className="generating-content">
+                        {isGenerating ? (
+                            <>
+                                <img
+                                    src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM21td2NsNGkybmhyZWVzcm52N2g2bXd0d3JoY3J5Zm5jNHZtNXI4cCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/XnjBmkLXUPJQwJW4pp/giphy.gif"
+                                    alt="Generating new content..."
+                                    className="generating-gif"
+                                />
+                                <h2 className="generating-title">Generating Magic...</h2>
+                                <p className="generating-text">
+                                    Creating personalized flashcards based on the movie script.
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <Spin size="large"/>
+                                <h2 className="generating-title">Checking...</h2>
+                                <p className="generating-text">
+                                    Looking for existing learning sets...
+                                </p>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {learningSet && (
                 <div className="learning-set-info">
                     <h2>{learningSet.name}</h2>

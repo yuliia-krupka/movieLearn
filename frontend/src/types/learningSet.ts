@@ -16,6 +16,7 @@ export interface LearningSetDto {
     movieId: number;
     learningItems: LearningItemDto[];
     status: 'GENERATING' | 'REVIEW' | 'READY';
+    englishLevel: string;
 }
 
 export interface FlashCardData {
@@ -57,4 +58,23 @@ export interface ApiTestItem {
     answers: string[];
     correctAnswerIndex: number;
     translation: string;
+}
+
+export interface MovieProgress {
+    movieId: number;
+    learningSetId: number;
+    movieTitle: string;
+    movieImage: string | null;
+    flashcardsCompleted: boolean;
+    testsCompleted: boolean;
+    flashcardsScore: number;
+    testsScore: number;
+    totalWords: number;
+    learnedWords: number;
+    correctAnswers: number;
+    totalAttempts: number;
+    lastAttemptAt: string | null;
+    flashcardsAttempts: number;
+    testsAttempts: number;
+    englishLevel: string;
 }

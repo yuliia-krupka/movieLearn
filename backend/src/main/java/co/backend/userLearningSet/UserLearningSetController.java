@@ -1,8 +1,11 @@
 package co.backend.userLearningSet;
 
+import co.backend.userLearningSet.dto.MovieProgressDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user-learning-sets")
@@ -10,32 +13,28 @@ import org.springframework.web.bind.annotation.*;
 public class UserLearningSetController {
 
     private final UserLearningSetService userLearningSetService;
-    private final UserLearningSetMapper userLearningSetMapper;
 
     @PostMapping("/start")
-    public ResponseEntity<UserLearningSetDto> start(
+    public UserLearningSetDto start(
             @RequestParam Long userId,
             @RequestParam Long learningSetId) {
-        return ResponseEntity
-                .ok(userLearningSetMapper.toDto(userLearningSetService.getOrCreate(userId, learningSetId)));
+        return userLearningSetService.getOrCreate(userId, learningSetId);
     }
 
     @PostMapping("/complete-flashcards")
-    public ResponseEntity<UserLearningSetDto> completeFlashcards(
+    public UserLearningSetDto completeFlashcards(
             @RequestParam Long userId,
             @RequestParam Long learningSetId,
             @RequestParam int score) {
-        return ResponseEntity.ok(
-                userLearningSetMapper.toDto(userLearningSetService.completeFlashcards(userId, learningSetId, score)));
+        return userLearningSetService.completeFlashcards(userId, learningSetId, score);
     }
 
     @PostMapping("/complete-tests")
-    public ResponseEntity<UserLearningSetDto> completeTests(
+    public UserLearningSetDto completeTests(
             @RequestParam Long userId,
             @RequestParam Long learningSetId,
             @RequestParam int score) {
-        return ResponseEntity
-                .ok(userLearningSetMapper.toDto(userLearningSetService.completeTests(userId, learningSetId, score)));
+        return userLearningSetService.completeTests(userId, learningSetId, score);
     }
 
     @GetMapping("/movie/{movieId}/user/{userId}")
@@ -43,7 +42,12 @@ public class UserLearningSetController {
             @PathVariable Long movieId,
             @PathVariable Long userId) {
         return userLearningSetService.getByUserAndMovie(userId, movieId)
-                .map(uls -> ResponseEntity.ok(userLearningSetMapper.toDto(uls)))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/user/{userId}/progress")
+    public List<MovieProgressDto> getProgress(@PathVariable Long userId) {
+        return userLearningSetService.getUserProgressSummary(userId);
     }
 }

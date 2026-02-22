@@ -241,10 +241,6 @@ public class OpenAiService {
         }
     }
 
-    private LearningItemDto callOpenAiSingle(String userPrompt, LearningItemDto fallback) {
-        return callOpenAiSingle(userPrompt, fallback, 0.7);
-    }
-
     private LearningItemDto callOpenAiSingle(String userPrompt, LearningItemDto fallback, double temperature) {
         try {
             return callSingleWithModel(userPrompt, modelName, fallback, temperature);

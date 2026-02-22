@@ -5,6 +5,8 @@ import co.backend.learningSet.LearningSet;
 import co.backend.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,11 +29,13 @@ public class UserLearningItemStatus {
 
     @ManyToOne
     @JoinColumn(name = "learning_item_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnoreProperties({"learningSet"})
     private LearningItem learningItem;
 
     @ManyToOne
     @JoinColumn(name = "learning_set_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnoreProperties({"learningItems"})
     private LearningSet learningSet;
 

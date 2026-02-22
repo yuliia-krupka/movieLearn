@@ -18,6 +18,7 @@ import AdminDashboard from "./components/admin/AdminDashboard.tsx";
 import AccessDenied from "./components/err/AccessDenied.tsx";
 import UpdateFlashCards from "./components/flash-card/UpdateFlashCards.tsx";
 import AdminMoviesList from "./components/movie/AdminMoviesList.tsx";
+import ProgressDashboard from "./components/stats/ProgressDashboard.tsx";
 
 function App() {
     return (
@@ -147,6 +148,14 @@ function App() {
                         element={
                             <ProtectedRoute requireAuth={true}>
                                 <TestsModule/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/statistics"
+                        element={
+                            <ProtectedRoute requireAuth={true}>
+                                <ProgressDashboard/>
                             </ProtectedRoute>
                         }
                     />

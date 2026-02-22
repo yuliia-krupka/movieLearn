@@ -6,6 +6,7 @@ import co.backend.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,9 +43,12 @@ public class UserLearningItemStatusService {
             status.setStatus(LearningStatus.IN_PROGRESS);
         }
 
-        if (status.getCorrectAnswers() >= 3) {
+        if (status.getCorrectAnswers() >= (status.getLearningItem()
+                .getType() == co.backend.learningItem.LearningItemType.TEST ? 1 : 3)) {
             status.setStatus(LearningStatus.LEARNED);
         }
+
+        status.setLastAttemptAt(LocalDateTime.now());
 
         return statusMapper.toDto(statusRepository.save(status));
     }
