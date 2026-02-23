@@ -91,7 +91,7 @@ const ProgressDashboard: React.FC = () => {
                                             />
                                         ) : (
                                             <div className="movie-placeholder-img">
-                                                <BookOutlined style={{fontSize: 48, color: '#ccc'}}/>
+                                                <BookOutlined className="movie-placeholder-icon"/>
                                             </div>
                                         )
                                     }
@@ -124,11 +124,8 @@ const ProgressDashboard: React.FC = () => {
 
                                         <div className="stat-badges">
                                             <div className="stat-badges-row">
-                                                <Tag color={item.flashcardsScore > 0 ? "default" : "orange"}
-                                                     style={{
-                                                         color: item.flashcardsScore > 0 ? "#F49E4C" : undefined,
-                                                         borderColor: item.flashcardsScore > 0 ? "#F49E4C" : undefined
-                                                     }}
+                                                <Tag className={item.flashcardsScore > 0 ? "flashcards-tag-active" : ""}
+                                                     color={item.flashcardsScore > 0 ? undefined : "orange"}
                                                      icon={<CheckCircleOutlined/>}>
                                                     Flashcards: {item.flashcardsScore > 0 ? `${item.flashcardsScore}%` : "Started"}
                                                 </Tag>

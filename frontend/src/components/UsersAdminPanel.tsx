@@ -28,7 +28,7 @@ const roleColors: Record<string, string> = {
 };
 
 const UserList: React.FC = () => {
-    const [message, contextHolder] = antMessage.useMessage();
+    const [message] = antMessage.useMessage();
     const {user: currentUser} = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -67,7 +67,7 @@ const UserList: React.FC = () => {
     };
 
     return (
-        <MainLayout messageContext={contextHolder} className="content-movies" contentStyle={{padding: '24px'}}>
+        <MainLayout className="content-movies" contentStyle={{padding: '24px'}}>
             <div className="userList-container">
                 <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16}}>
                     <h2 className="userList-title" style={{marginBottom: 0}}>User Management</h2>

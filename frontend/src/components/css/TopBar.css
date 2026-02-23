@@ -29,6 +29,14 @@
     cursor: pointer;
 }
 
+.admin-dashboard-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #595959;
+    font-weight: 500;
+}
+
 .admin-dashboard-btn:hover {
     background-color: rgba(0, 0, 0, 0.025) !important;
     color: #1890ff !important;
@@ -36,6 +44,14 @@
 
 .admin-dashboard-btn:hover .anticon {
     color: #1890ff !important;
+}
+
+.admin-dashboard-icon {
+    font-size: 18px;
+}
+
+.topbar-search {
+    max-width: 240px;
 }
 
 .ant-input-search-button {

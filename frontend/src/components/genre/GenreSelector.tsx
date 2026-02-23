@@ -1,12 +1,11 @@
 import React, {useState} from 'react';
-import {Form, Select, Button, Popconfirm, Input, Modal} from 'antd';
-import {PlusOutlined, DeleteOutlined, EditOutlined} from '@ant-design/icons';
+import {Form, Select, Button, Input, Modal} from 'antd';
+import {PlusOutlined} from '@ant-design/icons';
 import {type Genre} from '../../types/genre';
+import GenreOptionItem from './GenreOptionItem';
 import axios from 'axios';
 import type useMessage from "antd/es/message/useMessage";
 import '../css/GenreSelector.css';
-
-const {Option} = Select;
 
 interface GenreSelectorProps {
     genres: Genre[];
@@ -14,6 +13,7 @@ interface GenreSelectorProps {
     onGenreDeleted?: () => void;
     onGenreUpdated?: () => void;
     messageApi: ReturnType<typeof useMessage>[0];
+    excludeMovieId?: number;
 }
 
 const GenreSelector: React.FC<GenreSelectorProps> = ({
@@ -21,7 +21,8 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                                                          onAddGenre,
                                                          onGenreDeleted,
                                                          onGenreUpdated,
-                                                         messageApi
+                                                         messageApi,
+                                                         excludeMovieId
                                                      }) => {
     const [editingGenre, setEditingGenre] = useState<Genre | null>(null);
     const [editModalVisible, setEditModalVisible] = useState(false);
@@ -29,7 +30,10 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
 
     const handleDeleteGenre = async (genreId: number, genreName: string) => {
         try {
-            await axios.delete(`/api/genres/${genreId}`, {withCredentials: true});
+            const url = excludeMovieId
+                ? `/api/genres/${genreId}?excludeMovieId=${excludeMovieId}`
+                : `/api/genres/${genreId}`;
+            await axios.delete(url, {withCredentials: true});
             messageApi.success(`Genre "${genreName}" deleted successfully`);
             onGenreDeleted?.();
         } catch (error: unknown) {
@@ -119,47 +123,16 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                     placeholder="Select genres"
                     style={{width: '100%'}}
                     maxTagCount="responsive"
+                    optionLabelProp="label"
                 >
                     {genres.map((genre) => (
-                        <Option key={genre.id} value={genre.name}>
-                            <div className="genre-option-container">
-                                <span>{genre.name}</span>
-                                <div className="genre-actions">
-                                    <Button
-                                        type="text"
-                                        size="small"
-                                        icon={<EditOutlined/>}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEditGenre(genre);
-                                        }}
-                                        className="genre-edit-btn"
-                                    />
-                                    <Popconfirm
-                                        title="Delete Genre"
-                                        description={`Are you sure you want to delete "${genre.name}" ? `}
-                                        onConfirm={(e) => {
-                                            e?.stopPropagation();
-                                            void handleDeleteGenre(genre.id, genre.name);
-                                        }}
-                                        onCancel={(e) => e?.stopPropagation()}
-                                        okText="Yes"
-                                        cancelText="No"
-                                        placement="left"
-                                    >
-                                        <Button
-                                            type="text"
-                                            size="small"
-                                            icon={<DeleteOutlined/>}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                            }}
-                                            className="genre-delete-btn"
-                                        />
-                                    </Popconfirm>
-                                </div>
-                            </div>
-                        </Option>
+                        <Select.Option key={genre.id} value={genre.name} label={genre.name}>
+                            <GenreOptionItem
+                                genre={genre}
+                                onEdit={handleEditGenre}
+                                onDelete={handleDeleteGenre}
+                            />
+                        </Select.Option>
                     ))}
                 </Select>
             </Form.Item>

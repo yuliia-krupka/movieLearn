@@ -36,8 +36,7 @@ const Sidebar: React.FC = () => {
                     type="text"
                     icon={<MenuOutlined/>}
                     onClick={() => setDrawerVisible(true)}
-                    className="sidebar-menu-button"
-                    style={{display: drawerVisible ? "none" : "block"}}
+                    className={`sidebar-menu-button ${drawerVisible ? 'hidden' : ''}`}
                 />
                 <SidebarDrawer
                     open={drawerVisible}

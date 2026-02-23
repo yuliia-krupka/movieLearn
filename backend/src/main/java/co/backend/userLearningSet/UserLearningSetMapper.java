@@ -23,24 +23,4 @@ public interface UserLearningSetMapper {
     @Mapping(target = "flashcardsScore", ignore = true)
     MovieProgressDto toProgressDtoBase(UserLearningSet uls);
 
-    default MovieProgressDto toProgressDto(
-            UserLearningSet uls,
-            long totalWords,
-            long learnedWords,
-            int totalSessionAttempts,
-            java.time.LocalDateTime lastAttemptAt,
-            int flashcardScorePct) {
-        var dto = toProgressDtoBase(uls);
-        dto.setTotalWords(totalWords);
-        dto.setLearnedWords(learnedWords);
-        dto.setTotalAttempts(totalSessionAttempts);
-        dto.setLastAttemptAt(lastAttemptAt);
-        dto.setFlashcardsScore(flashcardScorePct);
-        if (uls.getTestsScore() != null) {
-            dto.setTestsScore(uls.getTestsScore());
-        } else {
-            dto.setTestsScore(0);
-        }
-        return dto;
-    }
 }

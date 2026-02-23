@@ -6,6 +6,7 @@ import {
     Typography,
     Card,
     Space,
+    Spin,
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
@@ -107,11 +108,9 @@ const CreateMovieForm: React.FC = () => {
     };
 
     const renderLoadingState = () => (
-        <MainLayout messageContext={contextHolder}>
-            <div className="loading-container">
-                <span>Loading genres...</span>
-            </div>
-        </MainLayout>
+        <div className="loading-container" style={{textAlign: 'center', padding: '50px'}}>
+            <Spin size="large" tip="Loading genres..."/>
+        </div>
     );
 
     const renderFormContent = () => (
@@ -142,13 +141,14 @@ const CreateMovieForm: React.FC = () => {
                     rules={[
                         {required: true, message: 'Please enter movie description'},
                         {min: 2, message: 'Description must be at least 2 characters'},
+                        {max: 600, message: 'Description must be at most 600 characters'},
                         {
                             pattern: /^[A-Za-z0-9\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]*$/,
                             message: 'Only English letters, numbers, and symbols are allowed'
                         }
                     ]}
                 >
-                    <TextArea rows={4} placeholder="Enter movie description"/>
+                    <TextArea rows={4} placeholder="Enter movie description" showCount maxLength={600}/>
                 </Form.Item>
 
                 <GenreSelector
@@ -181,7 +181,7 @@ const CreateMovieForm: React.FC = () => {
                     uploadButtonText="Upload Script File"
                 />
 
-                <Form.Item style={{textAlign: 'center', marginTop: 24}}>
+                <Form.Item className="form-actions-center">
                     <Space size="middle">
                         <Button
                             className="yellow-btn"
@@ -206,14 +206,11 @@ const CreateMovieForm: React.FC = () => {
         </Card>
     );
 
-    if (loading) {
-        return renderLoadingState();
-    }
-
     return (
-        <MainLayout fullHeight messageContext={contextHolder}>
-            <Title level={2} style={{textAlign: 'center'}}>Add New Movie</Title>
-            {renderFormContent()}
+        <MainLayout fullHeight>
+            {contextHolder}
+            <Title level={2} className="page-title-center">Add New Movie</Title>
+            {loading ? renderLoadingState() : renderFormContent()}
             <AddGenreModal
                 visible={isGenreModalVisible}
                 loading={addingGenre}

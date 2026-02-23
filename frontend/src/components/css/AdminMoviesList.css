@@ -141,3 +141,54 @@
     margin: 0;
     text-align: center;
 }
+
+.admin-movies-layout .ant-layout-content {
+    padding: 0 24px;
+    height: calc(100vh - 90px);
+    overflow: hidden;
+}
+
+.admin-movies-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-movies-header {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-shrink: 0;
+    margin-top: 24px;
+}
+
+.admin-movies-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.admin-movies-loading {
+    text-align: center;
+    padding: 50px;
+    flex: 1;
+}
+
+.admin-movies-list-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 16px;
+}
+
+.admin-movie-col {
+    display: flex;
+    justify-content: center;
+}
+
+.admin-movies-pagination-container {
+    flex-shrink: 0;
+    padding: 16px 0;
+    border-top: 1px solid #f0f0f0;
+    background-color: #fff;
+}

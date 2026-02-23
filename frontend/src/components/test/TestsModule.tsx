@@ -10,6 +10,7 @@ import {learningSetService} from '../../services/learningSetService';
 import type {TestItemData, LearningSetDto, ItemStatusDto} from '../../types/learningSet';
 import {useAuth} from '../auth/useAuth';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import {shuffleAnswers} from '../../utils/testUtils';
 
 const TestsModule: React.FC = () => {
     const location = useLocation();
@@ -67,8 +68,6 @@ const TestsModule: React.FC = () => {
 
                 setLearningSet(learningSetData);
 
-                // For test generation, we don't know if getTestItems will just fetch or generate
-                // If it takes more than 500ms, it's likely generating
                 const generateTimeout = setTimeout(() => setIsGeneratingTests(true), 500);
 
                 const items = await learningSetService.getTestItems(learningSetData.id);
@@ -78,13 +77,7 @@ const TestsModule: React.FC = () => {
                 console.log('Retrieved test items:', items.length);
 
                 const shuffledItems = items.map(item => {
-                    const indices = item.answers.map((_, i) => i);
-                    for (let i = indices.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [indices[i], indices[j]] = [indices[j], indices[i]];
-                    }
-                    const shuffledAnswers = indices.map(i => item.answers[i]);
-                    const newCorrectIndex = indices.indexOf(item.correctAnswerIndex);
+                    const {shuffledAnswers, newCorrectIndex} = shuffleAnswers(item.answers, item.correctAnswerIndex);
                     return {
                         ...item,
                         answers: shuffledAnswers,
@@ -118,24 +111,26 @@ const TestsModule: React.FC = () => {
         setShowResults(true);
 
         if (currentUserId && learningSet) {
-            const answerPromises = Array.from(answers.entries()).map(([index, selectedAnswer]) => {
+            const bulkAnswers: { learningItemId: number, correct: boolean }[] = [];
+
+            Array.from(answers.entries()).forEach(([index, selectedAnswer]) => {
                 const item = testItems[index];
                 if (item && selectedAnswer !== null) {
                     const correct = selectedAnswer === item.correctAnswerIndex;
-                    return learningSetService.recordAnswer(currentUserId, item.id, correct);
+                    bulkAnswers.push({learningItemId: item.id, correct});
                 }
-                return Promise.resolve();
             });
 
-            const correctCount = Array.from(answers.entries()).filter(([index, selectedAnswer]) => {
-                const item = testItems[index];
-                return item && selectedAnswer === item.correctAnswerIndex;
-            }).length;
+            const answersPromise = bulkAnswers.length > 0
+                ? learningSetService.recordAnswersBulk(currentUserId, bulkAnswers)
+                : Promise.resolve();
+
+            const correctCount = bulkAnswers.filter(a => a.correct).length;
             const score = Math.round((correctCount / testItems.length) * 100);
 
             const completionPromise = learningSetService.completeTests(currentUserId, learningSet.id, score);
 
-            Promise.all([...answerPromises, completionPromise])
+            Promise.all([answersPromise, completionPromise])
                 .then(() => learningSetService.getItemStatuses(currentUserId, learningSet.id))
                 .then(statuses => setItemStatuses(statuses))
                 .catch(() => console.error('Failed to save results'));

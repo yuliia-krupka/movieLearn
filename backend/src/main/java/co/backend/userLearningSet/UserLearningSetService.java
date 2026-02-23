@@ -25,6 +25,7 @@ public class UserLearningSetService {
     private final LearningSetRepository learningSetRepository;
     private final UserLearningItemStatusRepository statusRepository;
     private final UserLearningSetMapper userLearningSetMapper;
+    private final MovieProgressMapper movieProgressMapper;
 
     public UserLearningSetDto getOrCreate(Long userId, Long learningSetId) {
         return userLearningSetMapper.toDto(getOrCreateEntity(userId, learningSetId));
@@ -91,10 +92,9 @@ public class UserLearningSetService {
                                     .getType() == co.backend.learningItem.LearningItemType.FLASH_CARD)
                             .count();
 
-                    int totalSessionAttempts = (uls.getFlashcardsAttempts() != null
+                    int totalSessionAttempts = uls.getFlashcardsAttempts() != null
                             ? uls.getFlashcardsAttempts()
-                            : 0)
-                            + (uls.getTestsAttempts() != null ? uls.getTestsAttempts() : 0);
+                            : 0;
 
                     LocalDateTime lastAttemptAt = statuses.stream()
                             .map(UserLearningItemStatus::getLastAttemptAt)
@@ -139,7 +139,7 @@ public class UserLearningSetService {
                                 totalSessionAttempts);
                     }
 
-                    return userLearningSetMapper.toProgressDto(
+                    return movieProgressMapper.toProgressDto(
                             uls,
                             totalWords,
                             learnedWords,

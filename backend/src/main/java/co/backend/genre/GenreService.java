@@ -54,21 +54,30 @@ public class GenreService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteGenre(Long id) {
+    public void deleteGenre(Long id, Long excludeMovieId) {
         if (id == null) {
             throw new BadRequestException("Id must be provided");
         }
-        if (!genreRepository.existsById(id)) {
-            throw new NotFoundException("Genre with id " + id + " not found");
-        }
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found"));
 
         List<Movie> moviesGenreUsedIn = movieRepository.findAllByGenres_Id(id);
 
         if (moviesGenreUsedIn != null && !moviesGenreUsedIn.isEmpty()) {
-            throw new BadRequestException("Cannot delete genre. It is currently used by one or more movies.");
+            boolean usedByOthers = moviesGenreUsedIn.stream()
+                    .anyMatch(m -> excludeMovieId == null || !m.getId().equals(excludeMovieId));
+
+            if (usedByOthers) {
+                throw new BadRequestException("Cannot delete genre. It is currently used by other movies.");
+            }
+
+            for (Movie movie : moviesGenreUsedIn) {
+                movie.getGenres().remove(genre);
+                movieRepository.save(movie);
+            }
         }
 
-        genreRepository.deleteById(id);
+        genreRepository.delete(genre);
     }
 
     public GenreDto getGenreById(Long id) {

@@ -29,7 +29,7 @@
     transition: all 0.3s;
 }
 
-.ant-form-item-label > label {
+.ant-form-item-label>label {
     font-weight: 500;
     color: #333;
 }
@@ -41,3 +41,37 @@
     border-radius: 6px;
 }
 
+.form-actions-center {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.page-title-center {
+    text-align: center;
+}
+
+.page-title-container {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.page-title-marginless {
+    margin: 0;
+}
+
+.section-divider {
+    margin: 32px 0;
+}
+
+.file-section-margin {
+    margin-bottom: 24px;
+}
+
+.success-text {
+    color: #52c41a;
+}
+
+.form-actions-margin-center {
+    margin-top: 40px;
+    text-align: center;
+}

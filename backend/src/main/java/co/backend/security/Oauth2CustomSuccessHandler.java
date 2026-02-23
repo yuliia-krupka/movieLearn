@@ -1,5 +1,6 @@
 package co.backend.security;
 
+import co.backend.user.Role;
 import co.backend.user.UserDto;
 import co.backend.user.UserMapper;
 import co.backend.user.UserService;
@@ -33,7 +34,9 @@ public class Oauth2CustomSuccessHandler implements AuthenticationSuccessHandler 
 
         UserDto currentUserDto = userMapper.toDto(userService.getCurrentUserByEmail(userDto.getEmail()));
 
-        if (currentUserDto.getEnglishLevel() != null && currentUserDto.getInterests() != null
+        if (Role.ADMIN.equals(currentUserDto.getRole())) {
+            response.sendRedirect(frontendUrl + "/admin");
+        } else if (currentUserDto.getEnglishLevel() != null && currentUserDto.getInterests() != null
                 && !currentUserDto.getInterests().isEmpty()) {
             response.sendRedirect(frontendUrl + "/home");
         } else if (currentUserDto.getEnglishLevel() != null) {

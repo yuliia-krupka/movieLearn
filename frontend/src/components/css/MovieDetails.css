@@ -303,3 +303,12 @@
     min-height: 400px;
     width: 100%;
 }
+
+.movie-details-back-btn {
+    margin-right: 16px;
+}
+
+.movie-details-action-group {
+    display: flex;
+    gap: 12px;
+}

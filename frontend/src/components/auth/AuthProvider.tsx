@@ -10,27 +10,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const [user, setUser] = useState<User & { id?: number } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const checkAuthStatus = async () => {
-            setIsLoading(true);
-            try {
-                const response = await fetch('/api/users/account', {
-                    credentials: 'include',
-                });
-                if (response.ok) {
-                    const userData = await response.json();
-                    setUser(userData);
-                } else {
-                    setUser(null);
-                }
-            } catch (error) {
-                console.error('Auth check failed:', error);
+    const checkAuthStatus = async () => {
+        setIsLoading(true);
+        try {
+            const response = await fetch('/api/users/account', {
+                credentials: 'include',
+            });
+            if (response.ok) {
+                const userData = await response.json();
+                setUser(userData);
+            } else {
                 setUser(null);
-            } finally {
-                setIsLoading(false);
             }
-        };
+        } catch (error) {
+            console.error('Auth check failed:', error);
+            setUser(null);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
+    useEffect(() => {
         void checkAuthStatus();
     }, []);
 
@@ -57,7 +57,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         isAuthenticated: !!user,
         currentUserId: user?.id,
         login,
-        logout
+        logout,
+        checkAuthStatus
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

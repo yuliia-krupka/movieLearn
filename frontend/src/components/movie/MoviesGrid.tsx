@@ -99,10 +99,10 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
     const isLoading = loading || (showGenreFilter && genresLoading);
 
     return (
-        <div style={{width: '100%', padding: '0 20px', display: 'flex', flexDirection: 'column', height: '100%'}}>
+        <div className="movies-grid-container">
             {contextHolder}
-            <div style={{flexShrink: 0}}>
-                <Row justify="space-between" align="middle" style={{marginBottom: '16px'}}>
+            <div className="movies-grid-header">
+                <Row justify="space-between" align="middle" className="movies-grid-header-row">
                     <Col>
                         <Title level={5} className="subtitle">
                             {searchQuery ? `Search results for: "${searchQuery}"` : title}
@@ -114,7 +114,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                                 <Select
                                     mode="multiple"
                                     placeholder="Filter by genre"
-                                    style={{width: 200}}
+                                    className="movies-grid-genre-select"
                                     onChange={setSelectedGenres}
                                     value={selectedGenres}
                                     allowClear
@@ -131,11 +131,11 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
             </div>
 
             {isLoading ? (
-                <div style={{display: 'flex', justifyContent: 'center', padding: '50px 0', flex: 1}}>
+                <div className="movies-grid-loading">
                     <Spin size="large"/>
                 </div>
             ) : filteredMovies.length === 0 ? (
-                <div style={{display: 'flex', justifyContent: 'center', padding: '50px 0', flex: 1}}>
+                <div className="movies-grid-empty">
                     <Empty description={
                         searchQuery
                             ? `No movies found for "${searchQuery}"`
@@ -146,7 +146,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                 </div>
             ) : (
                 <>
-                    <div style={{flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingBottom: '16px'}}>
+                    <div className="movies-grid-content">
                         <Row gutter={[12, 12]}>
                             {currentMovies.map(movie => (
                                 <Col
@@ -156,7 +156,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                                     md={colSpan}
                                     lg={colSpan}
                                     xl={colSpan}
-                                    style={{display: 'flex', justifyContent: 'center'}}
+                                    className="movies-grid-col"
                                 >
                                     <MovieCard movie={movie}/>
                                 </Col>
@@ -164,12 +164,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                         </Row>
                     </div>
 
-                    <div style={{
-                        flexShrink: 0,
-                        padding: '16px 0',
-                        borderTop: '1px solid #f0f0f0',
-                        backgroundColor: '#fff'
-                    }}>
+                    <div className="movies-grid-pagination-container">
                         <Pagination
                             current={currentPage}
                             onChange={setCurrentPage}
@@ -178,7 +173,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                             showSizeChanger={false}
                             showQuickJumper={false}
                             responsive={true}
-                            style={{textAlign: 'center', margin: 0}}
+                            className="movies-grid-pagination"
                         />
                     </div>
                 </>

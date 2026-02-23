@@ -99,7 +99,8 @@
 }
 
 @keyframes subtleShake {
-    0%, 100% {
+    0%,
+    100% {
         transform: translateX(0);
     }
     25% {
@@ -179,10 +180,13 @@
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 0 0 0 rgba(244, 158, 76, 0.4);
         transform: scale(1);
     }
+
     50% {
         box-shadow: 0 0 20px 10px rgba(244, 158, 76, 0.2);
         transform: scale(1.05);
@@ -266,4 +270,15 @@
     color: white !important;
     box-shadow: none !important;
     animation: none !important;
+}
+
+.account-loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.account-space {
+    width: 100%;
 }

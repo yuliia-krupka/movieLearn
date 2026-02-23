@@ -93,11 +93,19 @@ public class MovieService {
 
     private void setMovieFiles(Movie movie, MultipartFile image, MultipartFile script) {
         try {
-            if (image != null && !image.isEmpty()) {
-                movie.setImage(image.getBytes());
+            if (image != null) {
+                if (!image.isEmpty()) {
+                    movie.setImage(image.getBytes());
+                } else {
+                    movie.setImage(null);
+                }
             }
-            if (script != null && !script.isEmpty()) {
-                movie.setScript(script.getBytes());
+            if (script != null) {
+                if (!script.isEmpty()) {
+                    movie.setScript(script.getBytes());
+                } else {
+                    movie.setScript(null);
+                }
             }
         } catch (IOException e) {
             throw new FileUploadException("Failed to upload files", e);

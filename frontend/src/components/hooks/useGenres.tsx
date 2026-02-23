@@ -2,12 +2,11 @@ import {useState, useEffect, useCallback} from 'react';
 import axios from 'axios';
 import {type Genre} from '../../types/genre';
 import {type NewGenreData} from '../../types/movie';
-import useMessage from 'antd/es/message/useMessage';
+import {message} from 'antd';
 
 export const useGenres = () => {
     const [genres, setGenres] = useState<Genre[]>([]);
     const [loading, setLoading] = useState(false);
-    const [customMessage] = useMessage();
 
     const fetchGenres = useCallback(async (): Promise<void> => {
         try {
@@ -16,11 +15,11 @@ export const useGenres = () => {
             setGenres(response.data);
         } catch (err) {
             console.error('Failed to fetch genres:', err);
-            customMessage.error('Error loading genres');
+            void message.error('Error loading genres');
         } finally {
             setLoading(false);
         }
-    }, [customMessage]);
+    }, []);
 
     const addGenre = async (genreData: NewGenreData): Promise<boolean> => {
         try {
@@ -35,7 +34,7 @@ export const useGenres = () => {
             };
 
             setGenres(prev => [...prev, newGenre]);
-            customMessage.success('Genre added successfully!');
+            void message.success('Genre added successfully!');
             return true;
         } catch (err: unknown) {
             console.error('Failed to add genre:', err);

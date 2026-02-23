@@ -35,8 +35,8 @@ public class GenreController {
     @DeleteMapping("/{id}")
     @PreAuthorize(value = "hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteGenre(@PathVariable Long id) {
-        genreService.deleteGenre(id);
+    public void deleteGenre(@PathVariable Long id, @RequestParam(required = false) Long excludeMovieId) {
+        genreService.deleteGenre(id, excludeMovieId);
     }
 
     @GetMapping("/{id}")

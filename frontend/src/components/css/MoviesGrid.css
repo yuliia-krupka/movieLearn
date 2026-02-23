@@ -10,3 +10,55 @@
     color: #666;
     font-size: 16px;
 }
+
+.movies-grid-container {
+    width: 100%;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.movies-grid-header {
+    flex-shrink: 0;
+}
+
+.movies-grid-header-row {
+    margin-bottom: 16px;
+}
+
+.movies-grid-genre-select {
+    width: 200px;
+}
+
+.movies-grid-loading,
+.movies-grid-empty {
+    display: flex;
+    justify-content: center;
+    padding: 50px 0;
+    flex: 1;
+}
+
+.movies-grid-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 16px;
+}
+
+.movies-grid-col {
+    display: flex;
+    justify-content: center;
+}
+
+.movies-grid-pagination-container {
+    flex-shrink: 0;
+    padding: 16px 0;
+    border-top: 1px solid #f0f0f0;
+    background-color: #fff;
+}
+
+.movies-grid-pagination {
+    text-align: center;
+    margin: 0;
+}

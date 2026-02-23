@@ -58,7 +58,7 @@ const MovieDetails: React.FC = () => {
             const fetchMovie = async () => {
                 setLoading(true);
                 try {
-                    const response = await axios.get(` /api/movies/${id}`, {
+                    const response = await axios.get(`/api/movies/${id}`, {
                         withCredentials: true,
                     });
                     setMovie(response.data);
@@ -72,7 +72,7 @@ const MovieDetails: React.FC = () => {
 
             fetchMovie().catch(console.error);
 
-            if (currentUserId) {
+            if (currentUserId && !isAdmin) {
                 const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
                 learningSetService.getLatestByUserAndMovie(Number(id), currentUserId, user?.englishLevel, interestsStr)
                     .then(setLearningSet)
@@ -186,7 +186,8 @@ const MovieDetails: React.FC = () => {
             : undefined;
 
         return (
-            <MainLayout messageContext={contextHolder}>
+            <MainLayout>
+                {contextHolder}
                 {(isGenerating || isChecking) && (
                     <div className="generating-overlay">
                         <div className="generating-content">
@@ -251,14 +252,13 @@ const MovieDetails: React.FC = () => {
                                     <div className="movie-actions">
                                         <Button
                                             type="link"
-                                            className="back-link-btn"
+                                            className="back-link-btn movie-details-back-btn"
                                             icon={<ArrowLeftOutlined/>}
                                             onClick={() => navigate('/movies')}
-                                            style={{marginRight: '16px'}}
                                         >
                                             Back to Movies
                                         </Button>
-                                        <div style={{display: 'flex', gap: '12px'}}>
+                                        <div className="movie-details-action-group">
                                             {isUserStarted && learningSet && learningSet.status === 'READY' && (
                                                 <Button
                                                     className="secondary-action-btn"

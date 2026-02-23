@@ -2,6 +2,7 @@ import {Button, Typography} from 'antd';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import useMessage from 'antd/es/message/useMessage';
+import {useAuth} from "./auth/useAuth.tsx";
 import {type FC} from 'react';
 import "./css/EnglishLevel.css";
 import Logo from "./Logo.tsx";
@@ -12,6 +13,7 @@ const {Text} = Typography;
 
 const EnglishLevel: FC = () => {
     const navigate = useNavigate();
+    const {checkAuthStatus} = useAuth();
     const [customMessage, contextHolder] = useMessage();
 
 
@@ -22,6 +24,7 @@ const EnglishLevel: FC = () => {
                 {},
                 {withCredentials: true}
             );
+            await checkAuthStatus();
             navigate('/interests');
         } catch (error) {
             console.error('Failed to set level:', error);

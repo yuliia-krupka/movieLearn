@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Form,
     Input,
@@ -12,7 +12,7 @@ import {
     Col,
     Divider
 } from 'antd';
-import { SaveFilled, CloseOutlined } from '@ant-design/icons';
+import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 import useMessage from 'antd/es/message/useMessage';
 
 import '../css/Layout.css';
@@ -25,8 +25,8 @@ import FileUploader from './FileUploader.tsx';
 import MainLayout from "../layout/MainLayout.tsx";
 import GenreSelector from "../genre/GenreSelector.tsx";
 
-const { Title, Text } = Typography;
-const { TextArea } = Input;
+const {Title, Text} = Typography;
+const {TextArea} = Input;
 
 const UpdateMovieForm: React.FC = () => {
     const {
@@ -67,6 +67,10 @@ const UpdateMovieForm: React.FC = () => {
         try {
             const success = await addGenre(genreData);
             if (success) {
+                const currentGenres = form.getFieldValue('genres') || [];
+                form.setFieldsValue({
+                    genres: [...currentGenres, genreData.name]
+                });
                 messageApi.success('Genre added successfully');
                 setAddGenreModalVisible(false);
             }
@@ -89,7 +93,7 @@ const UpdateMovieForm: React.FC = () => {
                 const validSelectedGenres = currentSelectedGenres.filter(name => availableGenreNames.has(name));
 
                 if (validSelectedGenres.length !== currentSelectedGenres.length) {
-                    form.setFieldsValue({ genres: validSelectedGenres });
+                    form.setFieldsValue({genres: validSelectedGenres});
                 }
             }
         }
@@ -97,9 +101,10 @@ const UpdateMovieForm: React.FC = () => {
 
 
     return (
-        <MainLayout fullHeight messageContext={contextHolder}>
-            <div style={{ marginBottom: '24px', textAlign: 'center' }}>
-                <Title level={2} style={{ margin: 0 }}>Update Movie</Title>
+        <MainLayout fullHeight>
+            {contextHolder}
+            <div className="page-title-container">
+                <Title level={2} className="page-title-marginless">Update Movie</Title>
             </div>
 
             <div className="update-movie-container">
@@ -117,7 +122,7 @@ const UpdateMovieForm: React.FC = () => {
                     >
                         {loading ? (
                             <div className="loading-spinner">
-                                <Spin size="large" tip="Loading movie details..." />
+                                <Spin size="large" tip="Loading movie details..."/>
                             </div>
                         ) : (
                             <>
@@ -128,12 +133,12 @@ const UpdateMovieForm: React.FC = () => {
                                             name="title"
                                             label={<span className="form-label">Movie Title</span>}
                                             rules={[
-                                                { required: true, message: 'Please enter movie title' },
-                                                { min: 2, message: 'Name must be at least 2 characters' },
-                                                { max: 50, message: 'Name must be at most 50 characters' },
+                                                {required: true, message: 'Please enter movie title'},
+                                                {min: 2, message: 'Name must be at least 2 characters'},
+                                                {max: 50, message: 'Name must be at most 50 characters'},
                                             ]}
                                         >
-                                            <Input placeholder="Enter movie title" />
+                                            <Input placeholder="Enter movie title"/>
                                         </Form.Item>
                                     </Col>
                                     <Col span={12}>
@@ -143,49 +148,50 @@ const UpdateMovieForm: React.FC = () => {
                                             onGenreDeleted={handleGenreDeleted}
                                             onGenreUpdated={() => void fetchGenres()}
                                             messageApi={messageApi}
+                                            excludeMovieId={id ? parseInt(id) : undefined}
                                         />
                                     </Col>
                                 </Row>
 
-                                {/* Row 2: Description (Full Width) */}
                                 <Row>
                                     <Col span={24}>
                                         <Form.Item
                                             name="description"
                                             label={<span className="form-label">Description</span>}
                                             rules={[
-                                                { required: true, message: 'Please enter movie description' },
-                                                { min: 2, message: 'Description must be at least 2 characters' },
-                                                { max: 500, message: 'Description must be at most 500 characters' },
+                                                {required: true, message: 'Please enter movie description'},
+                                                {min: 2, message: 'Description must be at least 2 characters'},
+                                                {max: 600, message: 'Description must be at most 600 characters'},
                                             ]}
                                         >
                                             <TextArea rows={4} placeholder="Brief summary of the movie plot..."
-                                                showCount maxLength={500} />
+                                                      showCount maxLength={600}/>
                                         </Form.Item>
                                     </Col>
                                 </Row>
 
-                                <Divider orientation="center" plain style={{ margin: '32px 0' }}>Media & Files</Divider>
+                                <Divider orientation="center" plain className="section-divider">Media & Files</Divider>
 
-                                {/* Row 3: Script (Smaller/Thinner) */}
                                 <Row>
                                     <Col span={24}>
-                                        <div className="file-section" style={{ marginBottom: '24px' }}>
-                                            <FileUploader
-                                                label="Movie Script"
-                                                file={scriptUpload.file}
-                                                error={scriptUpload.error}
-                                                accept=".pdf,.doc,.docx,.txt"
-                                                onFileChange={handleScriptUpload}
-                                                onFileRemove={scriptUpload.handleFileRemove}
-                                                uploadButtonText="Select Document"
-                                                showPreview={false}
-                                            />
+                                        <div className="file-section file-section-margin">
+                                            {!currentScriptInfo && (
+                                                <FileUploader
+                                                    label="Movie Script"
+                                                    file={scriptUpload.file}
+                                                    error={scriptUpload.error}
+                                                    accept=".pdf,.doc,.docx,.txt"
+                                                    onFileChange={handleScriptUpload}
+                                                    onFileRemove={scriptUpload.handleFileRemove}
+                                                    uploadButtonText="Select Document"
+                                                    showPreview={false}
+                                                />
+                                            )}
 
                                             {currentScriptInfo && (
                                                 <div className="current-file-badge">
                                                     <div className="badge-header">
-                                                        <Text strong style={{ color: '#52c41a' }}>Current Script
+                                                        <Text strong className="success-text">Current Script
                                                             Active</Text>
                                                         <Button
                                                             size="small"
@@ -220,26 +226,27 @@ const UpdateMovieForm: React.FC = () => {
                                     </Col>
                                 </Row>
 
-                                {/* Row 4: Poster (Bigger) */}
                                 <Row>
                                     <Col span={24}>
                                         <div className="file-section">
-                                            <FileUploader
-                                                label="Movie Poster"
-                                                file={imageUpload.file}
-                                                previewUrl={imageUpload.previewUrl}
-                                                error={imageUpload.error}
-                                                accept="image/*"
-                                                onFileChange={handleImageUpload}
-                                                onFileRemove={imageUpload.handleFileRemove}
-                                                uploadButtonText="Select Image"
-                                                showPreview={true}
-                                            />
+                                            {!currentImageUrl && (
+                                                <FileUploader
+                                                    label="Movie Poster"
+                                                    file={imageUpload.file}
+                                                    previewUrl={imageUpload.previewUrl}
+                                                    error={imageUpload.error}
+                                                    accept="image/*"
+                                                    onFileChange={handleImageUpload}
+                                                    onFileRemove={imageUpload.handleFileRemove}
+                                                    uploadButtonText="Select Image"
+                                                    showPreview={true}
+                                                />
+                                            )}
 
                                             {currentImageUrl && !imageUpload.file && (
                                                 <div className="current-file-badge">
                                                     <div className="badge-header">
-                                                        <Text strong style={{ color: '#52c41a' }}>Current Poster
+                                                        <Text strong className="success-text">Current Poster
                                                             Active</Text>
                                                         <Button
                                                             size="small"
@@ -247,7 +254,7 @@ const UpdateMovieForm: React.FC = () => {
                                                             type="text"
                                                             onClick={() => {
                                                                 setCurrentImageUrl(null);
-                                                                imageUpload.previewUrl = null;
+                                                                imageUpload.setPreviewUrl(null);
                                                             }}
                                                         >
                                                             Remove
@@ -264,11 +271,11 @@ const UpdateMovieForm: React.FC = () => {
                                     </Col>
                                 </Row>
 
-                                <Form.Item style={{ marginTop: '40px', textAlign: 'center' }}>
+                                <Form.Item className="form-actions-margin-center">
                                     <Space size="large">
                                         <Button
                                             onClick={handleCancel}
-                                            icon={<CloseOutlined />}
+                                            icon={<CloseOutlined/>}
                                             size="large"
                                             className="cancel-btn"
                                         >
@@ -278,7 +285,7 @@ const UpdateMovieForm: React.FC = () => {
                                             className="yellow-btn save-btn"
                                             htmlType="submit"
                                             loading={submitting}
-                                            icon={<SaveFilled />}
+                                            icon={<SaveFilled/>}
                                             size="large"
                                         >
                                             Save Changes

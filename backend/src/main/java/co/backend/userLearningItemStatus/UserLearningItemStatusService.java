@@ -3,11 +3,14 @@ package co.backend.userLearningItemStatus;
 import co.backend.exceptions.NotFoundException;
 import co.backend.learningItem.LearningItemRepository;
 import co.backend.user.UserRepository;
+import co.backend.userLearningItemStatus.dto.AnswerDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -17,6 +20,14 @@ public class UserLearningItemStatusService {
     private final UserRepository userRepository;
     private final LearningItemRepository learningItemRepository;
     private final UserLearningItemStatusMapper statusMapper;
+
+    @Transactional
+    public List<UserLearningItemStatusDto> recordAnswersBulk(Long userId,
+                                                             List<AnswerDto> answers) {
+        return answers.stream()
+                .map(answer -> recordAnswer(userId, answer.getLearningItemId(), answer.isCorrect()))
+                .toList();
+    }
 
     public UserLearningItemStatusDto recordAnswer(Long userId, Long learningItemId, boolean correct) {
         UserLearningItemStatus status = statusRepository

@@ -17,6 +17,8 @@ export interface LearningSetService {
 
     recordAnswer(userId: number, learningItemId: number, correct: boolean): Promise<void>;
 
+    recordAnswersBulk(userId: number, answers: { learningItemId: number, correct: boolean }[]): Promise<void>;
+
     getItemStatuses(userId: number, learningSetId: number): Promise<ItemStatusDto[]>;
 
     completeFlashcards(userId: number, learningSetId: number, score: number): Promise<void>;
@@ -93,6 +95,18 @@ export const learningSetService: LearningSetService = {
         });
         if (!response.ok) {
             console.error('Failed to record answer:', response.statusText);
+        }
+    },
+
+    async recordAnswersBulk(userId: number, answers: { learningItemId: number, correct: boolean }[]): Promise<void> {
+        const response = await fetch(`/api/user-learning-status/answers/bulk?userId=${userId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(answers),
+            credentials: 'include',
+        });
+        if (!response.ok) {
+            console.error('Failed to record answers bulk:', response.statusText);
         }
     },
 
@@ -267,21 +281,9 @@ export const learningSetService: LearningSetService = {
 
         const progressData: MovieProgress[] = await response.json();
 
-        return Promise.all(
-            progressData.map(async (progress: MovieProgress) => {
-                try {
-                    const learningSet = await this.getById(progress.learningSetId);
-                    return {
-                        ...progress,
-                        englishLevel: learningSet.englishLevel || 'A2'
-                    };
-                } catch {
-                    return {
-                        ...progress,
-                        englishLevel: 'A2'
-                    };
-                }
-            })
-        );
+        return progressData.map((progress: MovieProgress) => ({
+            ...progress,
+            englishLevel: progress.englishLevel || 'A2'
+        }));
     }
 };

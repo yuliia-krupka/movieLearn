@@ -31,7 +31,7 @@ const Account = () => {
     if (userLoading) {
         return (
             <MainLayout>
-                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%'}}>
+                <div className="account-loading-container">
                     <Spin size="large"/>
                 </div>
             </MainLayout>
@@ -61,7 +61,7 @@ const Account = () => {
                 </div>
 
                 <Card className="profile-card">
-                    <Space direction="vertical" size="large" style={{width: "100%"}}>
+                    <Space direction="vertical" size="large" className="account-space">
                         <ProfileDetail label="Email:" value={user?.email || "Not available"}/>
                         <ProfileDetail label="English level:" value={user?.englishLevel || "Not set"}/>
                         <ProfileDetail label="Movies started:" value={moviesStarted}/>

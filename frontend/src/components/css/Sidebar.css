@@ -75,3 +75,7 @@
 .sidebar-title-learn {
     color: #F49E4C;
 }
+
+.hidden {
+    display: none !important;
+}

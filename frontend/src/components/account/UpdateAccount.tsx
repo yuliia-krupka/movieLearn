@@ -23,7 +23,7 @@ const UpdateAccount = () => {
     const navigate = useNavigate();
     const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
     const [selectedLevel, setSelectedLevel] = useState<string>("");
-    const [customMessage, contextHolder] = useMessage();
+    const [customMessage] = useMessage();
     const {user, loading, error, fetchUserProfile, updateUserProfile} = useUserProfile();
 
     useEffect(() => {
@@ -71,7 +71,7 @@ const UpdateAccount = () => {
 
     if (loading && !user) {
         return (
-            <MainLayout messageContext={contextHolder}>
+            <MainLayout>
                 <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
                     <Spin size="large"/>
                 </div>
@@ -81,14 +81,14 @@ const UpdateAccount = () => {
 
     if (error && !user) {
         return (
-            <MainLayout messageContext={contextHolder}>
+            <MainLayout>
                 <Alert message="Error" description={error} type="error" showIcon style={{margin: 24}}/>
             </MainLayout>
         );
     }
 
     return (
-        <MainLayout messageContext={contextHolder}>
+        <MainLayout>
             <div className="profile-container">
                 <Title level={3} style={{margin: 24, textAlign: 'center'}}>
                     Update Profile

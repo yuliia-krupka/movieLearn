@@ -3,6 +3,7 @@ import {Typography} from 'antd';
 import {useNavigate} from 'react-router-dom';
 import useMessage from 'antd/es/message/useMessage';
 import axios from 'axios';
+import {useAuth} from "./auth/useAuth.tsx";
 import './css/interests.css';
 import Logo from "./Logo.tsx";
 
@@ -13,6 +14,7 @@ import LogoDesign from "./LogoDesign.tsx";
 
 const Interests: React.FC = () => {
     const navigate = useNavigate();
+    const {checkAuthStatus} = useAuth();
     const [customMessage, contextHolder] = useMessage();
     const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
@@ -36,6 +38,7 @@ const Interests: React.FC = () => {
                 {withCredentials: true}
             );
 
+            await checkAuthStatus();
             navigate('/home');
         } catch (error) {
             console.error('Failed to set interests:', error);

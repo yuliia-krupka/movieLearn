@@ -36,7 +36,7 @@ const TopBar: React.FC = () => {
                     placeholder="Search movies..."
                     onSearch={onSearch}
                     enterButton
-                    style={{maxWidth: 240}}
+                    className="topbar-search"
                     allowClear
                 />
 
@@ -44,16 +44,9 @@ const TopBar: React.FC = () => {
                     <Tooltip title="Admin Dashboard">
                         <Button
                             type="text"
-                            icon={<DashboardOutlined style={{fontSize: '18px'}}/>}
+                            icon={<DashboardOutlined className="admin-dashboard-icon"/>}
                             onClick={() => navigate('/admin')}
                             className="admin-dashboard-btn"
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                color: '#595959',
-                                fontWeight: 500
-                            }}
                         >
                             Admin
                         </Button>

@@ -152,3 +152,14 @@
     font-style: italic;
     color: #8c8c8c;
 }
+
+.movie-placeholder-icon {
+    font-size: 48px;
+    color: #ccc;
+}
+
+.flashcards-tag-active {
+    color: #F49E4C !important;
+    border-color: #F49E4C !important;
+    background: #fff !important;
+}

@@ -100,7 +100,7 @@ const useUpdateMovie = () => {
         return () => {
             isMounted = false;
         };
-    }, [id, form, navigate, imageUpload]);
+    }, [id, form, navigate]);
 
     const handleSubmit = async (values: FormValues) => {
         if (!id) return;
@@ -121,10 +121,14 @@ const useUpdateMovie = () => {
 
             if (imageUpload.file) {
                 formData.append('image', imageUpload.file);
+            } else if (currentImageUrl === null) {
+                formData.append('image', new Blob([], {type: 'application/octet-stream'}));
             }
 
             if (scriptUpload.file) {
                 formData.append('script', scriptUpload.file);
+            } else if (currentScriptInfo === null) {
+                formData.append('script', new Blob([], {type: 'application/octet-stream'}));
             }
 
             await axios.put(`/api/movies/${id}`, formData, {
@@ -189,6 +193,10 @@ const useUpdateMovie = () => {
             void message.error('Image must be smaller than 2MB!');
             return false;
         }
+        if (currentImageUrl) {
+            URL.revokeObjectURL(currentImageUrl);
+            setCurrentImageUrl(null);
+        }
         return imageUpload.handleFileChange(file, true);
     };
 
@@ -207,6 +215,7 @@ const useUpdateMovie = () => {
             void message.error('Script must be smaller than 5MB!');
             return false;
         }
+        setCurrentScriptInfo(null);
         return scriptUpload.handleFileChange(file, false);
     };
 

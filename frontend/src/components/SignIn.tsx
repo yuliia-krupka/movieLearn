@@ -8,15 +8,23 @@ import "./css/SignIn.css";
 import LogoDesign from "./LogoDesign.tsx";
 
 function SignIn() {
-    const {isAuthenticated, login} = useAuth();
+    const {isAuthenticated, login, isAdmin, user} = useAuth();
     const navigate = useNavigate();
     const infoSectionRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            navigate('/home');
+        if (isAuthenticated && user) {
+            if (isAdmin) {
+                navigate('/admin');
+            } else if (!user.englishLevel) {
+                navigate('/level');
+            } else if (!user.interests || user.interests.length === 0) {
+                navigate('/interests');
+            } else {
+                navigate('/home');
+            }
         }
-    }, [isAuthenticated, navigate]);
+    }, [isAuthenticated, isAdmin, navigate, user]);
 
     const scrollToInfo = () => {
         const target = infoSectionRef.current;

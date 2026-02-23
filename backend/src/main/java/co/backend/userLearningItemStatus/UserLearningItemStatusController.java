@@ -20,6 +20,13 @@ public class UserLearningItemStatusController {
         return statusService.recordAnswer(userId, learningItemId, correct);
     }
 
+    @PostMapping("/answers/bulk")
+    public List<UserLearningItemStatusDto> recordAnswersBulk(
+            @RequestParam Long userId,
+            @RequestBody List<co.backend.userLearningItemStatus.dto.AnswerDto> answers) {
+        return statusService.recordAnswersBulk(userId, answers);
+    }
+
     @GetMapping("/set/{learningSetId}/user/{userId}")
     public List<UserLearningItemStatusDto> getStatusesBySet(
             @PathVariable Long learningSetId,

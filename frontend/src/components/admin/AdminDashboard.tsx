@@ -35,7 +35,7 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <MainLayout contentStyle={{padding: '32px', alignItems: 'flex-start', backgroundColor: '#fff'}}>
-            <div className="dashboard-header" style={{textAlign: 'left', width: '100%'}}>
+            <div className="dashboard-header">
                 <Title level={2} className="dashboard-title">
                     <DashboardOutlined/> Dashboard
                 </Title>
@@ -44,11 +44,11 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             {loading ? (
-                <div style={{textAlign: 'center', padding: '50px', width: '100%'}}>
+                <div className="dashboard-loading-container">
                     <Spin size="large"/>
                 </div>
             ) : (
-                <Row gutter={[24, 24]} style={{width: '100%'}}>
+                <Row gutter={[24, 24]} className="dashboard-full-width">
                     <Col xs={24} sm={24} md={12} lg={8}>
                         <Card
                             className="stat-card"
