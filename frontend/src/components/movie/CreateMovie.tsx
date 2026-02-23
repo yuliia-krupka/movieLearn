@@ -4,9 +4,10 @@ import {
     Input,
     Button,
     Typography,
-    Card,
     Space,
     Spin,
+    Row,
+    Col, Card,
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
@@ -80,13 +81,13 @@ const CreateMovieForm: React.FC = () => {
         return formData;
     };
 
-    const submitMovieData = async (formData: FormData): Promise<void> => {
+    const submitMovieData = async (formData: FormData) => {
         const response = await axios.post('/api/movies', formData, {
             headers: {'Content-Type': 'multipart/form-data'},
             withCredentials: true,
         });
         customMessage.success('Movie created successfully!');
-        navigate(`/movies/${response.data.id}`);
+        return response.data;
     };
 
     const handleSubmit = async (values: MovieFormData): Promise<void> => {
@@ -94,7 +95,8 @@ const CreateMovieForm: React.FC = () => {
         setSubmitting(true);
         try {
             const formData = createFormData(values);
-            await submitMovieData(formData);
+            const createdMovie = await submitMovieData(formData);
+            navigate(`/movies/${createdMovie.id}`);
         } catch (error) {
             const message = ErrorHandler.handleAxiosError(error, 'A movie with this title already exists.');
             customMessage.error(message);
@@ -114,7 +116,10 @@ const CreateMovieForm: React.FC = () => {
     );
 
     const renderFormContent = () => (
-        <Card className="create-movie-card">
+        <Card className="create-movie-card-wide">
+            <div className="create-form-header">
+                <Title level={2} className="create-form-title">Add New Movie</Title>
+            </div>
             <Form
                 form={form}
                 layout="vertical"
@@ -126,13 +131,14 @@ const CreateMovieForm: React.FC = () => {
                     rules={[
                         {required: true, message: 'Please enter movie title'},
                         {min: 2, message: 'Title must be at least 2 characters'},
+                        {max: 100, message: 'Title must be at most 100 characters'},
                         {
                             pattern: /^[A-Za-z0-9\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]*$/,
                             message: 'Only English letters, numbers, and symbols are allowed'
                         }
                     ]}
                 >
-                    <Input placeholder="Enter movie title"/>
+                    <Input placeholder="Enter movie title" showCount maxLength={100}/>
                 </Form.Item>
 
                 <Form.Item
@@ -148,7 +154,7 @@ const CreateMovieForm: React.FC = () => {
                         }
                     ]}
                 >
-                    <TextArea rows={4} placeholder="Enter movie description" showCount maxLength={600}/>
+                    <TextArea rows={3} placeholder="Enter movie description" showCount maxLength={600}/>
                 </Form.Item>
 
                 <GenreSelector
@@ -159,46 +165,54 @@ const CreateMovieForm: React.FC = () => {
                     messageApi={customMessage}
                 />
 
-                <FileUploader
-                    label="Poster"
-                    file={imageUpload.file}
-                    previewUrl={imageUpload.previewUrl}
-                    error={imageUpload.error}
-                    accept="image/*"
-                    onFileChange={(file) => imageUpload.handleFileChange(file, true)}
-                    onFileRemove={imageUpload.handleFileRemove}
-                    uploadButtonText="Upload Poster Image"
-                    showPreview={true}
-                />
+                <Row gutter={24}>
+                    <Col span={12}>
+                        <FileUploader
+                            label="Poster"
+                            file={imageUpload.file}
+                            error={imageUpload.error}
+                            accept="image/*"
+                            onFileChange={(file) => imageUpload.handleFileChange(file, true)}
+                            onFileRemove={imageUpload.handleFileRemove}
+                            uploadButtonText="Upload Poster"
+                            description="JPG, PNG • max 10 MB"
+                            iconType="image"
+                        />
+                    </Col>
 
-                <FileUploader
-                    label="Script"
-                    file={scriptUpload.file}
-                    error={scriptUpload.error}
-                    accept=".pdf,.txt,.doc,.docx"
-                    onFileChange={scriptUpload.handleFileChange}
-                    onFileRemove={scriptUpload.handleFileRemove}
-                    uploadButtonText="Upload Script File"
-                />
+                    <Col span={12}>
+                        <FileUploader
+                            label="Script"
+                            file={scriptUpload.file}
+                            error={scriptUpload.error}
+                            accept=".pdf,.txt,.doc,.docx"
+                            onFileChange={scriptUpload.handleFileChange}
+                            onFileRemove={scriptUpload.handleFileRemove}
+                            uploadButtonText="Upload Script File"
+                            description="PDF, TXT, DOCX • max 20 MB"
+                            iconType="document"
+                        />
+                    </Col>
+                </Row>
 
-                <Form.Item className="form-actions-center">
+                <Form.Item className="form-actions-right">
                     <Space size="middle">
                         <Button
-                            className="yellow-btn"
+                            className="cancel-btn-light"
+                            onClick={handleCancel}
+                            icon={<CloseOutlined/>}
+                            size="large"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            className="yellow-btn-rect"
                             htmlType="submit"
                             loading={submitting}
                             icon={<SaveFilled/>}
                             size="large"
                         >
                             {submitting ? 'Creating...' : 'Create Movie'}
-                        </Button>
-                        <Button
-                            className="blue-btn"
-                            onClick={handleCancel}
-                            icon={<CloseOutlined/>}
-                            size="large"
-                        >
-                            Cancel
                         </Button>
                     </Space>
                 </Form.Item>
@@ -209,7 +223,6 @@ const CreateMovieForm: React.FC = () => {
     return (
         <MainLayout fullHeight>
             {contextHolder}
-            <Title level={2} className="page-title-center">Add New Movie</Title>
             {loading ? renderLoadingState() : renderFormContent()}
             <AddGenreModal
                 visible={isGenreModalVisible}

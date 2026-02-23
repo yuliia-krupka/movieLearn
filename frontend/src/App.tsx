@@ -30,7 +30,7 @@ function App() {
                     <Route
                         path="/level"
                         element={
-                            <ProtectedRoute requireAuth={true}>
+                            <ProtectedRoute requireAuth={true} requireUser={true}>
                                 <EnglishLevel/>
                             </ProtectedRoute>
                         }
@@ -38,7 +38,7 @@ function App() {
                     <Route
                         path="/interests"
                         element={
-                            <ProtectedRoute requireAuth={true}>
+                            <ProtectedRoute requireAuth={true} requireUser={true}>
                                 <Interests/>
                             </ProtectedRoute>
                         }
@@ -73,7 +73,7 @@ function App() {
                     <Route
                         path="/home"
                         element={
-                            <ProtectedRoute requireAuth={true} requireOnboarding={true}>
+                            <ProtectedRoute requireAuth={true} requireUser={true} requireOnboarding={true}>
                                 <Home/>
                             </ProtectedRoute>
                         }
@@ -130,7 +130,7 @@ function App() {
                     <Route
                         path="/learning-sets/:id/update"
                         element={
-                            <ProtectedRoute requireAuth={true}>
+                            <ProtectedRoute requireAuth={true} requireUser={true}>
                                 <UpdateFlashCards/>
                             </ProtectedRoute>
                         }
@@ -138,7 +138,7 @@ function App() {
                     <Route
                         path="/learning-sets/:id/flashcards"
                         element={
-                            <ProtectedRoute requireAuth={true} requireOnboarding={true}>
+                            <ProtectedRoute requireAuth={true} requireUser={true} requireOnboarding={true}>
                                 <FlashCardsModule/>
                             </ProtectedRoute>
                         }
@@ -146,7 +146,7 @@ function App() {
                     <Route
                         path="/learning-sets/:id/tests"
                         element={
-                            <ProtectedRoute requireAuth={true} requireOnboarding={true}>
+                            <ProtectedRoute requireAuth={true} requireUser={true} requireOnboarding={true}>
                                 <TestsModule/>
                             </ProtectedRoute>
                         }
@@ -154,7 +154,7 @@ function App() {
                     <Route
                         path="/statistics"
                         element={
-                            <ProtectedRoute requireAuth={true} requireOnboarding={true}>
+                            <ProtectedRoute requireAuth={true} requireUser={true} requireOnboarding={true}>
                                 <ProgressDashboard/>
                             </ProtectedRoute>
                         }

@@ -178,7 +178,7 @@ const useUpdateMovie = () => {
         scriptUpload.handleFileRemove();
         setCurrentImageUrl(null);
         setCurrentScriptInfo(null);
-        navigate('/admin/movies');
+        navigate(`/movies/${id}`);
     };
 
     const handleImageUpload = (file: File) => {

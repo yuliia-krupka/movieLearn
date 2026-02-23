@@ -9,26 +9,28 @@ import {
     Spin,
 
     Row,
-    Col,
-    Divider
+    Col
 } from 'antd';
-import {SaveFilled, CloseOutlined} from '@ant-design/icons';
+import {SaveFilled, CloseOutlined, FileOutlined, DeleteOutlined} from '@ant-design/icons';
 import useMessage from 'antd/es/message/useMessage';
 
 import '../css/Layout.css';
 import '../css/movies.css';
+import '../css/CreateMovie.css';
 import '../css/UpdateMovie.css';
 
 import useUpdateMovie from '../hooks/useUpdateMovie.tsx';
 import AddGenreModal from '../genre/AddGenreModal.tsx';
 import FileUploader from './FileUploader.tsx';
+import FormStepper from './FormStepper.tsx';
 import MainLayout from "../layout/MainLayout.tsx";
 import GenreSelector from "../genre/GenreSelector.tsx";
 
-const {Title, Text} = Typography;
+const {Title} = Typography;
 const {TextArea} = Input;
 
 const UpdateMovieForm: React.FC = () => {
+    const [currentStep, setCurrentStep] = useState<number>(0);
     const {
         loading,
         submitting,
@@ -103,12 +105,15 @@ const UpdateMovieForm: React.FC = () => {
     return (
         <MainLayout fullHeight>
             {contextHolder}
-            <div className="page-title-container">
-                <Title level={2} className="page-title-marginless">Update Movie</Title>
-            </div>
-
             <div className="update-movie-container">
-                <Card className="update-movie-card">
+                <Card className="create-movie-card-wide">
+                    <div className="create-form-header">
+                        <Title level={2} className="create-form-title">Update Movie</Title>
+                        <div className="header-dots">
+                            <div className={`header-dot ${currentStep === 0 ? 'orange' : ''}`}></div>
+                            <div className={`header-dot ${currentStep === 1 ? 'orange' : ''}`}></div>
+                        </div>
+                    </div>
                     <Form
                         form={form}
                         layout="vertical"
@@ -118,7 +123,6 @@ const UpdateMovieForm: React.FC = () => {
                             description: movie?.description || '',
                             genres: movie?.genres || []
                         }}
-                        size="large"
                     >
                         {loading ? (
                             <div className="loading-spinner">
@@ -126,172 +130,204 @@ const UpdateMovieForm: React.FC = () => {
                             </div>
                         ) : (
                             <>
-                                {/* Row 1: Title and Genre */}
-                                <Row gutter={24}>
-                                    <Col span={12}>
-                                        <Form.Item
-                                            name="title"
-                                            label={<span className="form-label">Movie Title</span>}
-                                            rules={[
-                                                {required: true, message: 'Please enter movie title'},
-                                                {min: 2, message: 'Name must be at least 2 characters'},
-                                                {max: 50, message: 'Name must be at most 50 characters'},
-                                            ]}
-                                        >
-                                            <Input placeholder="Enter movie title"/>
-                                        </Form.Item>
-                                    </Col>
-                                    <Col span={12}>
-                                        <GenreSelector
-                                            genres={genres}
-                                            onAddGenre={handleAddGenre}
-                                            onGenreDeleted={handleGenreDeleted}
-                                            onGenreUpdated={() => void fetchGenres()}
-                                            messageApi={messageApi}
-                                            excludeMovieId={id ? parseInt(id) : undefined}
-                                        />
-                                    </Col>
-                                </Row>
+                                <FormStepper
+                                    currentStep={currentStep}
+                                    onStepClick={setCurrentStep}
+                                    steps={['Movie Info', 'Media & Files']}
+                                />
 
-                                <Row>
-                                    <Col span={24}>
-                                        <Form.Item
-                                            name="description"
-                                            label={<span className="form-label">Description</span>}
-                                            rules={[
-                                                {required: true, message: 'Please enter movie description'},
-                                                {min: 2, message: 'Description must be at least 2 characters'},
-                                                {max: 600, message: 'Description must be at most 600 characters'},
-                                            ]}
-                                        >
-                                            <TextArea rows={4} placeholder="Brief summary of the movie plot..."
-                                                      showCount maxLength={600}/>
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
+                                <div className="step-content" style={{display: currentStep === 0 ? 'block' : 'none'}}>
+                                    <Form.Item
+                                        name="title"
+                                        label="Title"
+                                        rules={[
+                                            {required: true, message: 'Please enter movie title'},
+                                            {min: 2, message: 'Name must be at least 2 characters'},
+                                            {max: 100, message: 'Name must be at most 100 characters'},
+                                        ]}
+                                    >
+                                        <Input placeholder="Enter movie title" showCount maxLength={100}/>
+                                    </Form.Item>
 
-                                <Divider orientation="center" plain className="section-divider">Media & Files</Divider>
+                                    <Form.Item
+                                        name="description"
+                                        label="Description"
+                                        rules={[
+                                            {required: true, message: 'Please enter movie description'},
+                                            {min: 2, message: 'Description must be at least 2 characters'},
+                                            {max: 600, message: 'Description must be at most 600 characters'},
+                                        ]}
+                                    >
+                                        <TextArea rows={3} placeholder="Brief summary of the movie plot..."
+                                                  showCount maxLength={600}/>
+                                    </Form.Item>
 
-                                <Row>
-                                    <Col span={24}>
-                                        <div className="file-section file-section-margin">
-                                            {!currentScriptInfo && (
+                                    <GenreSelector
+                                        genres={genres}
+                                        onAddGenre={handleAddGenre}
+                                        onGenreDeleted={handleGenreDeleted}
+                                        onGenreUpdated={() => void fetchGenres()}
+                                        messageApi={messageApi}
+                                        excludeMovieId={id ? parseInt(id) : undefined}
+                                    />
+
+                                    <Form.Item className="form-actions-right">
+                                        <Space size="middle">
+                                            <Button
+                                                className="cancel-btn-light"
+                                                onClick={handleCancel}
+                                                icon={<CloseOutlined/>}
+                                                size="large"
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                className="yellow-btn-rect"
+                                                onClick={() => setCurrentStep(1)}
+                                                size="large"
+                                            >
+                                                Next: Media &gt;
+                                            </Button>
+                                        </Space>
+                                    </Form.Item>
+                                </div>
+
+                                <div className="step-content" style={{display: currentStep === 1 ? 'block' : 'none'}}>
+                                    <Row gutter={24}>
+                                        <Col span={12}>
+                                            {!currentImageUrl ? (
                                                 <FileUploader
-                                                    label="Movie Script"
-                                                    file={scriptUpload.file}
-                                                    error={scriptUpload.error}
-                                                    accept=".pdf,.doc,.docx,.txt"
-                                                    onFileChange={handleScriptUpload}
-                                                    onFileRemove={scriptUpload.handleFileRemove}
-                                                    uploadButtonText="Select Document"
-                                                    showPreview={false}
-                                                />
-                                            )}
-
-                                            {currentScriptInfo && (
-                                                <div className="current-file-badge">
-                                                    <div className="badge-header">
-                                                        <Text strong className="success-text">Current Script
-                                                            Active</Text>
-                                                        <Button
-                                                            size="small"
-                                                            danger
-                                                            type="text"
-                                                            onClick={() => {
-                                                                setCurrentScriptInfo(null);
-                                                                scriptUpload.handleFileRemove();
-                                                            }}
-                                                        >
-                                                            Remove
-                                                        </Button>
-                                                    </div>
-                                                    <Button
-                                                        type="dashed"
-                                                        block
-                                                        onClick={() => {
-                                                            const link = document.createElement('a');
-                                                            link.href = `/api/movies/${id}/script`;
-                                                            link.download = `script_${id}.pdf`;
-                                                            link.target = '_blank';
-                                                            document.body.appendChild(link);
-                                                            link.click();
-                                                            document.body.removeChild(link);
-                                                        }}
-                                                    >
-                                                        Download Script
-                                                    </Button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </Col>
-                                </Row>
-
-                                <Row>
-                                    <Col span={24}>
-                                        <div className="file-section">
-                                            {!currentImageUrl && (
-                                                <FileUploader
-                                                    label="Movie Poster"
+                                                    label="Poster"
                                                     file={imageUpload.file}
-                                                    previewUrl={imageUpload.previewUrl}
                                                     error={imageUpload.error}
                                                     accept="image/*"
                                                     onFileChange={handleImageUpload}
                                                     onFileRemove={imageUpload.handleFileRemove}
-                                                    uploadButtonText="Select Image"
-                                                    showPreview={true}
+                                                    uploadButtonText="Upload Poster"
+                                                    description="JPG, PNG • max 10 MB"
+                                                    iconType="image"
                                                 />
-                                            )}
-
-                                            {currentImageUrl && !imageUpload.file && (
-                                                <div className="current-file-badge">
-                                                    <div className="badge-header">
-                                                        <Text strong className="success-text">Current Poster
-                                                            Active</Text>
+                                            ) : (
+                                                <Form.Item label="Poster" required>
+                                                    <div className="selected-file-container">
+                                                        <div className="selected-file-icon-wrapper image"
+                                                             style={{padding: 2}}>
+                                                            <img src={currentImageUrl} alt="Current poster" style={{
+                                                                width: '100%',
+                                                                height: '100%',
+                                                                objectFit: 'cover',
+                                                                borderRadius: 4
+                                                            }}/>
+                                                        </div>
+                                                        <div className="selected-file-info">
+                                                            <p className="selected-file-name"
+                                                               style={{margin: 0}}>Current Poster</p>
+                                                            <p className="selected-file-size"
+                                                               style={{margin: '4px 0 0 0'}}>Active</p>
+                                                        </div>
                                                         <Button
-                                                            size="small"
-                                                            danger
                                                             type="text"
+                                                            className="remove-file-icon-btn"
+                                                            icon={<DeleteOutlined className="remove-icon-inner"/>}
                                                             onClick={() => {
                                                                 setCurrentImageUrl(null);
                                                                 imageUpload.setPreviewUrl(null);
                                                             }}
-                                                        >
-                                                            Remove
-                                                        </Button>
+                                                        />
                                                     </div>
-                                                    <img
-                                                        src={currentImageUrl}
-                                                        alt="Current movie poster"
-                                                        className="badge-image"
-                                                    />
-                                                </div>
+                                                </Form.Item>
                                             )}
-                                        </div>
-                                    </Col>
-                                </Row>
+                                        </Col>
 
-                                <Form.Item className="form-actions-margin-center">
-                                    <Space size="large">
-                                        <Button
-                                            onClick={handleCancel}
-                                            icon={<CloseOutlined/>}
-                                            size="large"
-                                            className="cancel-btn"
-                                        >
-                                            Cancel
-                                        </Button>
-                                        <Button
-                                            className="yellow-btn save-btn"
-                                            htmlType="submit"
-                                            loading={submitting}
-                                            icon={<SaveFilled/>}
-                                            size="large"
-                                        >
-                                            Save Changes
-                                        </Button>
-                                    </Space>
-                                </Form.Item>
+                                        <Col span={12}>
+                                            {!currentScriptInfo ? (
+                                                <FileUploader
+                                                    label="Script"
+                                                    file={scriptUpload.file}
+                                                    error={scriptUpload.error}
+                                                    accept=".pdf,.txt,.doc,.docx"
+                                                    onFileChange={handleScriptUpload}
+                                                    onFileRemove={scriptUpload.handleFileRemove}
+                                                    uploadButtonText="Upload Script File"
+                                                    description="PDF, TXT, DOCX • max 20 MB"
+                                                    iconType="document"
+                                                />
+                                            ) : (
+                                                <Form.Item label="Script" required>
+                                                    <div className="selected-file-container">
+                                                        <div className="selected-file-icon-wrapper document">
+                                                            <FileOutlined className="selected-icon-inner"/>
+                                                        </div>
+                                                        <div className="selected-file-info">
+                                                            <p className="selected-file-name"
+                                                               style={{margin: 0}}>Current Script</p>
+                                                            <div style={{
+                                                                display: 'flex',
+                                                                gap: 8,
+                                                                marginTop: 4,
+                                                                alignItems: 'center'
+                                                            }}>
+                                                                <span className="selected-file-size"
+                                                                      style={{margin: 0}}>Active</span>
+                                                                <Button
+                                                                    type="link"
+                                                                    size="small"
+                                                                    style={{
+                                                                        padding: 0,
+                                                                        fontSize: 13,
+                                                                        height: 'auto',
+                                                                        lineHeight: 1
+                                                                    }}
+                                                                    onClick={() => {
+                                                                        const link = document.createElement('a');
+                                                                        link.href = `/api/movies/${id}/script`;
+                                                                        link.download = `script_${id}.pdf`;
+                                                                        link.target = '_blank';
+                                                                        document.body.appendChild(link);
+                                                                        link.click();
+                                                                        document.body.removeChild(link);
+                                                                    }}
+                                                                >
+                                                                    Download
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                        <Button
+                                                            type="text"
+                                                            className="remove-file-icon-btn"
+                                                            icon={<DeleteOutlined className="remove-icon-inner"/>}
+                                                            onClick={() => {
+                                                                setCurrentScriptInfo(null);
+                                                                scriptUpload.handleFileRemove();
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </Form.Item>
+                                            )}
+                                        </Col>
+                                    </Row>
+
+                                    <Form.Item className="form-actions-right">
+                                        <Space size="middle">
+                                            <Button
+                                                className="cancel-btn-light"
+                                                onClick={() => setCurrentStep(0)}
+                                                size="large"
+                                            >
+                                                &lt; Back
+                                            </Button>
+                                            <Button
+                                                className="yellow-btn-rect"
+                                                htmlType="submit"
+                                                loading={submitting}
+                                                icon={<SaveFilled/>}
+                                                size="large"
+                                            >
+                                                Save Changes
+                                            </Button>
+                                        </Space>
+                                    </Form.Item>
+                                </div>
                             </>
                         )}
                     </Form>

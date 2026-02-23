@@ -1,7 +1,6 @@
 import React from "react";
-import {Layout, Avatar, Typography, Input, message as antMessage, Button, Tooltip} from "antd";
+import {Layout, Avatar, Typography, Input, message as antMessage} from "antd";
 import {useNavigate} from "react-router-dom";
-import {DashboardOutlined} from "@ant-design/icons";
 import "../css/TopBar.css";
 import {useAuth} from "../auth/useAuth";
 
@@ -21,7 +20,7 @@ const TopBar: React.FC = () => {
         }
 
         try {
-            navigate(`/movies?search=${encodeURIComponent(value)}`);
+            navigate(` /movies?search=${encodeURIComponent(value)}`);
         } catch (error) {
             message.error("Error during searching");
             console.error("Error during searching:", error);
@@ -39,19 +38,6 @@ const TopBar: React.FC = () => {
                     className="topbar-search"
                     allowClear
                 />
-
-                {user?.role === 'ADMIN' && (
-                    <Tooltip title="Admin Dashboard">
-                        <Button
-                            type="text"
-                            icon={<DashboardOutlined className="admin-dashboard-icon"/>}
-                            onClick={() => navigate('/admin')}
-                            className="admin-dashboard-btn"
-                        >
-                            Admin
-                        </Button>
-                    </Tooltip>
-                )}
 
                 <div className="topbar-user">
                     <Avatar

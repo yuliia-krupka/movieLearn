@@ -1,6 +1,6 @@
 import React from 'react';
-import {Form, Upload, Button, Image} from 'antd';
-import {UploadOutlined, DeleteOutlined} from '@ant-design/icons';
+import {Form, Upload, Button} from 'antd';
+import {DeleteOutlined, FileOutlined, PictureOutlined} from '@ant-design/icons';
 
 interface FileUploaderProps {
     label: string;
@@ -12,18 +12,20 @@ interface FileUploaderProps {
     onFileRemove: () => void;
     uploadButtonText: string;
     showPreview?: boolean;
+    description?: string;
+    iconType?: 'image' | 'document';
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({
                                                        label,
                                                        file,
-                                                       previewUrl,
                                                        error,
                                                        accept,
                                                        onFileChange,
                                                        onFileRemove,
                                                        uploadButtonText,
-                                                       showPreview = false,
+                                                       description,
+                                                       iconType = 'document',
                                                    }) => {
     return (
         <Form.Item label={label} required>
@@ -35,36 +37,35 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                         maxCount={1}
                         accept={accept}
                     >
-                        <Button icon={<UploadOutlined/>}>
-                            {uploadButtonText}
-                        </Button>
+                        <div className="custom-upload-dropzone">
+                            <div className={`upload-icon-wrapper ${iconType}`}>
+                                {iconType === 'image' ? <PictureOutlined className="upload-icon-inner"/> :
+                                    <FileOutlined className="upload-icon-inner"/>}
+                            </div>
+                            <div className="upload-text-wrapper">
+                                <span className="upload-title">{uploadButtonText}</span>
+                                {description && <span className="upload-description">{description}</span>}
+                            </div>
+                        </div>
                     </Upload>
                 ) : (
-                    <div className={showPreview ? "image-preview-container" : "file-info-container"}>
-                        {showPreview && previewUrl && (
-                            <div className="image-preview">
-                                <Image
-                                    src={previewUrl}
-                                    alt="Preview"
-                                    className="preview-image"
-                                    fallback="/api/placeholder/120/160"
-                                />
-                            </div>
-                        )}
-                        <div className={showPreview ? "image-info" : "file-info"}>
-                            <p className="file-name">{file.name}</p>
-                            <p className="file-size">
+                    <div className="selected-file-container">
+                        <div className={`selected-file-icon-wrapper ${iconType}`}>
+                            {iconType === 'image' ? <PictureOutlined className="selected-icon-inner"/> :
+                                <FileOutlined className="selected-icon-inner"/>}
+                        </div>
+                        <div className="selected-file-info">
+                            <p className="selected-file-name">{file.name}</p>
+                            <p className="selected-file-size">
                                 {(file.size / 1024 / 1024).toFixed(2)} MB
                             </p>
-                            <Button
-                                danger
-                                size="small"
-                                icon={<DeleteOutlined/>}
-                                onClick={onFileRemove}
-                            >
-                                Remove
-                            </Button>
                         </div>
+                        <Button
+                            type="text"
+                            className="remove-file-icon-btn"
+                            icon={<DeleteOutlined className="remove-icon-inner"/>}
+                            onClick={onFileRemove}
+                        />
                     </div>
                 )}
             </div>

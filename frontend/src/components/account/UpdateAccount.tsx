@@ -6,6 +6,7 @@ import {useUserProfile} from "../hooks/useUserProfile.ts";
 import '../css/Account.css';
 import '../css/Layout.css'
 import useMessage from "antd/es/message/useMessage";
+import {useAuth} from "../auth/useAuth.tsx";
 
 const {Title} = Typography;
 import {interestsList, englishLevels} from "../../constants/common.ts";
@@ -19,6 +20,7 @@ type UserData = {
 };
 
 const UpdateAccount = () => {
+    const {isAdmin} = useAuth();
     const [form] = Form.useForm<UserData>();
     const navigate = useNavigate();
     const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
@@ -127,36 +129,40 @@ const UpdateAccount = () => {
                         </Form.Item>
 
 
-                        <Form.Item label="English Level">
-                            <div className="levels-container">
-                                {englishLevels.map(level => (
-                                    <button
-                                        key={level}
-                                        type="button"
-                                        className={`level-bullet ${selectedLevel === level ? "selected" : ""}`}
-                                        onClick={() => onLevelSelect(level)}
-                                        aria-pressed={selectedLevel === level}
-                                    >
-                                        {level}
-                                    </button>
-                                ))}
-                            </div>
-                        </Form.Item>
+                        {!isAdmin && (
+                            <>
+                                <Form.Item label="English Level">
+                                    <div className="levels-container">
+                                        {englishLevels.map(level => (
+                                            <button
+                                                key={level}
+                                                type="button"
+                                                className={`level-bullet ${selectedLevel === level ? "selected" : ""}`}
+                                                onClick={() => onLevelSelect(level)}
+                                                aria-pressed={selectedLevel === level}
+                                            >
+                                                {level}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </Form.Item>
 
-                        <Form.Item label="Interests">
-                            <div className="interests-container">
-                                {interestsList.map(interest => (
-                                    <button
-                                        key={interest}
-                                        type="button"
-                                        className={`interest-badge ${selectedInterests.includes(interest) ? "selected" : ""}`}
-                                        onClick={() => toggleInterest(interest)}
-                                    >
-                                        {interest}
-                                    </button>
-                                ))}
-                            </div>
-                        </Form.Item>
+                                <Form.Item label="Interests">
+                                    <div className="interests-container">
+                                        {interestsList.map(interest => (
+                                            <button
+                                                key={interest}
+                                                type="button"
+                                                className={`interest-badge ${selectedInterests.includes(interest) ? "selected" : ""}`}
+                                                onClick={() => toggleInterest(interest)}
+                                            >
+                                                {interest}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </Form.Item>
+                            </>
+                        )}
 
                         <Form.Item>
                             <Button

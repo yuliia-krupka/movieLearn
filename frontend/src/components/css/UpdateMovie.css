@@ -1,12 +1,12 @@
 .update-movie-container {
-    padding: 24px 0;
+    padding: 16px 0;
 }
 
 .update-movie-card {
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-    padding: 24px;
+    padding: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     border-radius: 12px;
 }
@@ -91,14 +91,14 @@
 
 .file-section {
     background: #fafafa;
-    padding: 16px;
+    padding: 12px;
     border-radius: 8px;
     border: 1px dashed #d9d9d9;
 }
 
 .current-file-badge {
-    margin-top: 12px;
-    padding: 12px;
+    margin-top: 8px;
+    padding: 8px;
     background: #fff;
     border: 1px solid #f0f0f0;
     border-radius: 6px;

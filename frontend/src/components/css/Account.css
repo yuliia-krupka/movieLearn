@@ -90,22 +90,27 @@
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(0.95);
     }
+
     100% {
         transform: scale(1.05);
     }
 }
 
 @keyframes subtleShake {
+
     0%,
     100% {
         transform: translateX(0);
     }
+
     25% {
         transform: translateX(-2px);
     }
+
     75% {
         transform: translateX(2px);
     }
@@ -116,10 +121,12 @@
         border-width: 2px;
         border-style: solid;
     }
+
     50% {
         border-width: 3px;
         border-style: dashed;
     }
+
     100% {
         border-width: 2px;
         border-style: solid;
@@ -281,4 +288,28 @@
 
 .account-space {
     width: 100%;
+}
+
+.admin-badge {
+    display: inline-block;
+    background-color: #5A73DB;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+.admin-info-text {
+    color: #6c757d;
+    font-size: 14px;
+    text-align: center;
+    background-color: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 16px;
+    border: 1px dashed #ced4da;
 }

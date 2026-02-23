@@ -3,10 +3,17 @@ import {message} from 'antd';
 import {useEffect, type ReactNode} from 'react';
 import {useAuth} from "./useAuth.tsx";
 
-export const ProtectedRoute = ({children, requireAuth = true, requireAdmin = false, requireOnboarding = false}: {
+export const ProtectedRoute = ({
+                                   children,
+                                   requireAuth = true,
+                                   requireAdmin = false,
+                                   requireUser = false,
+                                   requireOnboarding = false
+                               }: {
     children: ReactNode,
     requireAuth?: boolean,
     requireAdmin?: boolean,
+    requireUser?: boolean,
     requireOnboarding?: boolean
 }) => {
     const {isAuthenticated, isAdmin, isLoading, user} = useAuth();
@@ -19,6 +26,8 @@ export const ProtectedRoute = ({children, requireAuth = true, requireAdmin = fal
                 navigate('/', {replace: true});
             } else if (requireAdmin && !isAdmin) {
                 navigate('/access-denied', {replace: true});
+            } else if (requireUser && isAdmin) {
+                navigate('/admin', {replace: true});
             } else if (requireOnboarding && isAuthenticated && user && !isAdmin) {
                 if (!user.englishLevel) {
                     navigate('/level', {replace: true});
@@ -27,7 +36,7 @@ export const ProtectedRoute = ({children, requireAuth = true, requireAdmin = fal
                 }
             }
         }
-    }, [isAuthenticated, isAdmin, isLoading, requireAuth, requireAdmin, requireOnboarding, user, navigate]);
+    }, [isAuthenticated, isAdmin, isLoading, requireAuth, requireAdmin, requireUser, requireOnboarding, user, navigate]);
 
     if (isLoading) {
         return <div>Loading...</div>;
