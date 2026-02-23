@@ -59,6 +59,15 @@ public class UserLearningSetService {
         return userLearningSetMapper.toDto(userLearningSetRepository.save(uls));
     }
 
+    public void resetScoresIfIncomplete(Long userId, Long learningSetId) {
+        userLearningSetRepository.findByUserIdAndLearningSetId(userId, learningSetId)
+                .ifPresent(uls -> {
+                    uls.setFlashcardsScore(0);
+                    uls.setTestsScore(0);
+                    userLearningSetRepository.save(uls);
+                });
+    }
+
     public Optional<UserLearningSetDto> getByUserAndMovie(Long userId, Long movieId) {
         return userLearningSetRepository.findByUserIdAndLearningSetMovieId(userId, movieId)
                 .map(userLearningSetMapper::toDto);

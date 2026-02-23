@@ -29,6 +29,7 @@ const TestsModule: React.FC = () => {
     const [itemStatuses, setItemStatuses] = useState<ItemStatusDto[]>([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [isChecking, setIsChecking] = useState(false);
+    const [isGeneratingTests, setIsGeneratingTests] = useState(false);
 
     useEffect(() => {
         const loadTestItems = async () => {
@@ -66,7 +67,14 @@ const TestsModule: React.FC = () => {
 
                 setLearningSet(learningSetData);
 
+                // For test generation, we don't know if getTestItems will just fetch or generate
+                // If it takes more than 500ms, it's likely generating
+                const generateTimeout = setTimeout(() => setIsGeneratingTests(true), 500);
+
                 const items = await learningSetService.getTestItems(learningSetData.id);
+                clearTimeout(generateTimeout);
+                setIsGeneratingTests(false);
+
                 console.log('Retrieved test items:', items.length);
 
                 const shuffledItems = items.map(item => {
@@ -161,11 +169,27 @@ const TestsModule: React.FC = () => {
             <MainLayout className="flashcard-content">
                 <div className="generating-overlay">
                     <div className="generating-content">
-                        <Spin size="large"/>
-                        <h2 className="generating-title">Preparing Tests...</h2>
-                        <p className="generating-text">
-                            This may take a moment if items were recently updated.
-                        </p>
+                        {isGenerating || isGeneratingTests ? (
+                            <>
+                                <img
+                                    src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM21td2NsNGkybmhyZWVzcm52N2g2bXd0d3JoY3J5Zm5jNHZtNXI4cCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/XnjBmkLXUPJQwJW4pp/giphy.gif"
+                                    alt="Generating new content..."
+                                    className="generating-gif"
+                                />
+                                <h2 className="generating-title">Preparing Tests...</h2>
+                                <p className="generating-text">
+                                    This may take a moment if items were recently updated.
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <Spin size="large"/>
+                                <h2 className="generating-title">Loading Tests...</h2>
+                                <p className="generating-text">
+                                    Fetching your questions.
+                                </p>
+                            </>
+                        )}
                     </div>
                 </div>
             </MainLayout>
@@ -223,7 +247,7 @@ const TestsModule: React.FC = () => {
 
     return (
         <MainLayout className="flashcard-content">
-            {(isGenerating || isChecking) && (
+            {(isGenerating || isChecking) && !loading && (
                 <div className="generating-overlay">
                     <div className="generating-content">
                         {isGenerating ? (

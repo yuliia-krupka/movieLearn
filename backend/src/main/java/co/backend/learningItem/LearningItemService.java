@@ -6,6 +6,8 @@ import co.backend.exceptions.BadRequestException;
 import co.backend.exceptions.NotFoundException;
 import co.backend.learningSet.LearningSet;
 import co.backend.learningSet.LearningSetRepository;
+import co.backend.userLearningItemStatus.UserLearningItemStatusService;
+import co.backend.userLearningSet.UserLearningSetService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ public class LearningItemService {
     private final LearningSetRepository learningSetRepository;
     private final LearningItemMapper learningItemMapper;
     private final OpenAiService openAiService;
+    private final UserLearningItemStatusService userLearningItemStatusService;
+    private final UserLearningSetService userLearningSetService;
 
     public LearningItemDto update(Long id, LearningItemDto dto) {
         if (id == null) {
@@ -76,8 +80,17 @@ public class LearningItemService {
             return item;
         }).toList();
 
+        newItems = learningItemRepository.saveAll(newItems);
+
         learningSet.getLearningItems().addAll(newItems);
-        learningSetRepository.save(learningSet);
+        LearningSet savedSet = learningSetRepository.save(learningSet);
+
+        if (savedSet.getCreatorId() != null) {
+            for (LearningItem newItem : newItems) {
+                userLearningItemStatusService.createStatusIfStarted(savedSet.getCreatorId(), newItem);
+            }
+            userLearningSetService.resetScoresIfIncomplete(savedSet.getCreatorId(), savedSet.getId());
+        }
 
         return newItems.stream()
                 .map(learningItemMapper::toDto)

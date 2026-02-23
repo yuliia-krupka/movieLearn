@@ -52,6 +52,35 @@ public class UserLearningItemStatusService {
         return statusMapper.toDto(statusRepository.save(status));
     }
 
+    public boolean hasProgress(Long userId, Long learningSetId) {
+        return statusRepository.findByUserIdAndLearningItemLearningSetId(userId, learningSetId)
+                .stream()
+                .anyMatch(status -> status.getTotalAttempts() > 0 || status.getStatus() == LearningStatus.LEARNED);
+    }
+
+    public void createStatusIfStarted(Long userId, co.backend.learningItem.LearningItem newItem) {
+        if (hasProgress(userId, newItem.getLearningSet().getId())) {
+            UserLearningItemStatus newStatus = new UserLearningItemStatus();
+            newStatus.setUser(userRepository.findById(userId)
+                    .orElseThrow(() -> new NotFoundException("User not found")));
+            newStatus.setLearningItem(newItem);
+            newStatus.setLearningSet(newItem.getLearningSet());
+            newStatus.setCorrectAnswers(0);
+            newStatus.setTotalAttempts(0);
+            newStatus.setStatus(LearningStatus.IN_PROGRESS);
+            statusRepository.save(newStatus);
+        }
+    }
+
+    public void resetProgress(Long userId, Long learningItemId) {
+        statusRepository.findByUserIdAndLearningItemId(userId, learningItemId).ifPresent(status -> {
+            status.setCorrectAnswers(0);
+            status.setTotalAttempts(0);
+            status.setStatus(LearningStatus.IN_PROGRESS);
+            statusRepository.save(status);
+        });
+    }
+
     public List<UserLearningItemStatusDto> getStatusesByLearningSet(Long userId, Long learningSetId) {
         return statusRepository.findByUserIdAndLearningItemLearningSetId(userId, learningSetId)
                 .stream()

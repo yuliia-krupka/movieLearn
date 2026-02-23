@@ -68,6 +68,8 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
                 return [...remaining, ...formattedNewCards];
             });
 
+            setIsTestUnlocked(false);
+
             setSelectedCardIds([]);
             message.success('Regenerated selected words');
             setFeedback('');

@@ -1,5 +1,6 @@
 package co.backend.learningSet;
 
+import co.backend.ai.OpenAiService;
 import co.backend.ai.dto.AiContext;
 import co.backend.exceptions.BadRequestException;
 import co.backend.exceptions.NotFoundException;
@@ -8,6 +9,10 @@ import co.backend.learningItem.LearningItemDto;
 import co.backend.learningItem.LearningItemMapper;
 import co.backend.learningItem.LearningItemRepository;
 import co.backend.learningItem.LearningItemType;
+import co.backend.movie.MovieRepository;
+import co.backend.user.UserRepository;
+import co.backend.userLearningItemStatus.UserLearningItemStatusService;
+import co.backend.userLearningSet.UserLearningSetService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,10 +34,11 @@ public class LearningSetService {
     private final LearningItemMapper learningItemMapper;
     private final LearningItemRepository learningItemRepository;
     private final TestDataProvider testDataProvider;
-    private final co.backend.ai.OpenAiService openAiService;
-    private final co.backend.movie.MovieRepository movieRepository;
-    private final co.backend.user.UserRepository userRepository;
-    private final co.backend.userLearningSet.UserLearningSetService userLearningSetService;
+    private final OpenAiService openAiService;
+    private final MovieRepository movieRepository;
+    private final UserRepository userRepository;
+    private final UserLearningSetService userLearningSetService;
+    private final UserLearningItemStatusService userLearningItemStatusService;
 
     public LearningSetDto generateForUser(Long movieId, Long userId) {
         log.info("[BACKEND] generateForUser called - movieId: {}, userId: {}", movieId, userId);
@@ -264,8 +270,42 @@ public class LearningSetService {
 
     public void updateItems(Long id, List<LearningItemDto> items) {
         LearningSet set = findSetById(id);
+        Long userId = set.getCreatorId();
+
+        java.util.Map<Long, LearningItem> existingItems = set.getLearningItems().stream()
+                .filter(item -> item.getId() != null)
+                .collect(java.util.stream.Collectors.toMap(LearningItem::getId, item -> item));
+
+        java.util.List<LearningItem> updatedItems = new java.util.ArrayList<>();
+        java.util.List<LearningItem> newlyCreatedItems = new java.util.ArrayList<>();
+
+        for (LearningItemDto dto : items) {
+            if (dto.getId() != null && existingItems.containsKey(dto.getId())) {
+                LearningItem existingItem = existingItems.get(dto.getId());
+                existingItem.setText(dto.getText());
+                existingItem.setTranslation(dto.getTranslation());
+                existingItem.setTranscription(dto.getTranscription());
+                existingItem.setExampleSentence(dto.getExampleSentence());
+                updatedItems.add(existingItem);
+                existingItems.remove(dto.getId());
+            } else {
+                LearningItem newItem = learningItemMapper.toEntity(dto);
+                newItem.setLearningSet(set);
+                updatedItems.add(newItem);
+                newlyCreatedItems.add(newItem);
+            }
+        }
+
         set.getLearningItems().clear();
-        addItemsToSet(set, items);
+        set.getLearningItems().addAll(updatedItems);
+        learningSetRepository.save(set);
+
+        if (userId != null && !newlyCreatedItems.isEmpty()) {
+            for (LearningItem newItem : newlyCreatedItems) {
+                userLearningItemStatusService.createStatusIfStarted(userId, newItem);
+            }
+            userLearningSetService.resetScoresIfIncomplete(userId, id);
+        }
     }
 
     public LearningItemDto regenerateItem(Long setId, Long itemId, String instructions) {
@@ -289,6 +329,11 @@ public class LearningSetService {
         item.setExampleSentence(updatedDto.getExampleSentence());
 
         learningSetRepository.save(set);
+
+        if (set.getCreatorId() != null) {
+            userLearningItemStatusService.resetProgress(set.getCreatorId(), item.getId());
+            userLearningSetService.resetScoresIfIncomplete(set.getCreatorId(), set.getId());
+        }
 
         return learningItemMapper.toDto(item);
     }
