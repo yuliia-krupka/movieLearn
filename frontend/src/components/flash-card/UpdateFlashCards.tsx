@@ -60,7 +60,9 @@ const UpdateFlashCards: React.FC = () => {
         return (
             <MainLayout className="update-flashcards-container">
                 <div className="loading-spinner-container">
-                    <Spin size="large" tip="Loading vocabulary..."/>
+                    <Spin size="large" tip="Loading vocabulary...">
+                        <div style={{padding: 50}}/>
+                    </Spin>
                 </div>
             </MainLayout>
         );

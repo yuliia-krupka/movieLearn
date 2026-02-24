@@ -7,7 +7,7 @@ import {
     Space,
     Spin,
     Row,
-    Col, Card,
+    Col, Card, Modal,
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
@@ -32,6 +32,8 @@ const CreateMovieForm: React.FC = () => {
     const [submitting, setSubmitting] = useState(false);
     const [isGenreModalVisible, setIsGenreModalVisible] = useState(false);
     const [addingGenre, setAddingGenre] = useState(false);
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
 
     const [customMessage, contextHolder] = useMessage();
     const navigate = useNavigate();
@@ -109,9 +111,18 @@ const CreateMovieForm: React.FC = () => {
         navigate('/admin');
     };
 
+    const handlePreview = () => {
+        if (imageUpload.previewUrl) {
+            setPreviewImage(imageUpload.previewUrl);
+            setPreviewOpen(true);
+        }
+    };
+
     const renderLoadingState = () => (
         <div className="loading-container" style={{textAlign: 'center', padding: '50px'}}>
-            <Spin size="large" tip="Loading genres..."/>
+            <Spin size="large" tip="Loading genres...">
+                <div style={{padding: 50}}/>
+            </Spin>
         </div>
     );
 
@@ -165,22 +176,24 @@ const CreateMovieForm: React.FC = () => {
                     messageApi={customMessage}
                 />
 
-                <Row gutter={24}>
-                    <Col span={12}>
+                <Row gutter={[24, 16]}>
+                    <Col xs={24} md={12}>
                         <FileUploader
                             label="Poster"
                             file={imageUpload.file}
+                            previewUrl={imageUpload.previewUrl}
                             error={imageUpload.error}
                             accept="image/*"
                             onFileChange={(file) => imageUpload.handleFileChange(file, true)}
                             onFileRemove={imageUpload.handleFileRemove}
+                            onPreview={handlePreview}
                             uploadButtonText="Upload Poster"
                             description="JPG, PNG • max 10 MB"
                             iconType="image"
                         />
                     </Col>
 
-                    <Col span={12}>
+                    <Col xs={24} md={12}>
                         <FileUploader
                             label="Script"
                             file={scriptUpload.file}
@@ -230,6 +243,15 @@ const CreateMovieForm: React.FC = () => {
                 onCancel={() => setIsGenreModalVisible(false)}
                 onSubmit={handleAddNewGenre}
             />
+            <Modal
+                open={previewOpen}
+                title="Poster Preview"
+                footer={null}
+                onCancel={() => setPreviewOpen(false)}
+                width={800}
+            >
+                <img alt="Poster Preview" style={{width: '100%'}} src={previewImage}/>
+            </Modal>
         </MainLayout>
     );
 };

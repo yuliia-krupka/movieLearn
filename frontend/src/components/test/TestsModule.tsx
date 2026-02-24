@@ -163,7 +163,7 @@ const TestsModule: React.FC = () => {
 
     if (loading) {
         return (
-            <MainLayout className="flashcard-content">
+            <MainLayout className="flashcard-content" fullHeight>
                 <div className="generating-overlay">
                     <div className="generating-content">
                         {isGenerating || isGeneratingTests ? (
@@ -256,7 +256,7 @@ const TestsModule: React.FC = () => {
     const progress = ((currentIndex + (answers.has(currentIndex) ? 1 : 0)) / testItems.length) * 100;
 
     return (
-        <MainLayout className="flashcard-content">
+        <MainLayout className="flashcard-content" fullHeight>
             {(isGenerating || isChecking) && !loading && (
                 <div className="generating-overlay">
                     <div className="generating-content">

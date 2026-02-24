@@ -68,3 +68,9 @@
 .ant-input-affix-wrapper:hover {
     border-color: #F5A623 !important;
 }
+
+@media (max-width: 576px) {
+    .topbar-username {
+        display: none;
+    }
+}

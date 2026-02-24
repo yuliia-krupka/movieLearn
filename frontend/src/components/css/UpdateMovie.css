@@ -128,3 +128,24 @@
     font-weight: 600;
     padding: 0 32px;
 }
+
+@media (max-width: 576px) {
+    .update-movie-container {
+        padding: 12px;
+    }
+
+    .form-actions-right {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .form-actions-right .ant-space {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .form-actions-right button {
+        width: 100%;
+        margin: 0 !important;
+    }
+}

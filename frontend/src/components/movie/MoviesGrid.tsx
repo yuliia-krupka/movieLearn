@@ -151,11 +151,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                             {currentMovies.map(movie => (
                                 <Col
                                     key={movie.id}
-                                    xs={24}
-                                    sm={colSpan}
-                                    md={colSpan}
-                                    lg={colSpan}
-                                    xl={colSpan}
+                                    span={colSpan}
                                     className="movies-grid-col"
                                 >
                                     <MovieCard movie={movie}/>

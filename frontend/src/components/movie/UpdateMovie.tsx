@@ -9,7 +9,7 @@ import {
     Spin,
 
     Row,
-    Col
+    Col, Modal
 } from 'antd';
 import {SaveFilled, CloseOutlined, FileOutlined, DeleteOutlined} from '@ant-design/icons';
 import useMessage from 'antd/es/message/useMessage';
@@ -59,6 +59,8 @@ const UpdateMovieForm: React.FC = () => {
     const [messageApi, contextHolder] = useMessage();
     const [addGenreModalVisible, setAddGenreModalVisible] = useState<boolean>(false);
     const [addingGenre, setAddingGenre] = useState<boolean>(false);
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
 
     const handleAddGenre = () => {
         setAddGenreModalVisible(true);
@@ -101,6 +103,14 @@ const UpdateMovieForm: React.FC = () => {
         }
     }, [genres, genresLoading, form]);
 
+    const handlePreview = (image?: string | null) => {
+        const previewUrl = image || imageUpload.previewUrl;
+        if (previewUrl) {
+            setPreviewImage(previewUrl);
+            setPreviewOpen(true);
+        }
+    };
+
 
     return (
         <MainLayout fullHeight>
@@ -126,7 +136,9 @@ const UpdateMovieForm: React.FC = () => {
                     >
                         {loading ? (
                             <div className="loading-spinner">
-                                <Spin size="large" tip="Loading movie details..."/>
+                                <Spin size="large" tip="Loading movie details...">
+                                    <div style={{padding: 50}}/>
+                                </Spin>
                             </div>
                         ) : (
                             <>
@@ -193,16 +205,18 @@ const UpdateMovieForm: React.FC = () => {
                                 </div>
 
                                 <div className="step-content" style={{display: currentStep === 1 ? 'block' : 'none'}}>
-                                    <Row gutter={24}>
-                                        <Col span={12}>
+                                    <Row gutter={[24, 16]}>
+                                        <Col xs={24} md={12}>
                                             {!currentImageUrl ? (
                                                 <FileUploader
                                                     label="Poster"
                                                     file={imageUpload.file}
+                                                    previewUrl={imageUpload.previewUrl}
                                                     error={imageUpload.error}
                                                     accept="image/*"
                                                     onFileChange={handleImageUpload}
                                                     onFileRemove={imageUpload.handleFileRemove}
+                                                    onPreview={() => handlePreview()}
                                                     uploadButtonText="Upload Poster"
                                                     description="JPG, PNG • max 10 MB"
                                                     iconType="image"
@@ -210,8 +224,10 @@ const UpdateMovieForm: React.FC = () => {
                                             ) : (
                                                 <Form.Item label="Poster" required>
                                                     <div className="selected-file-container">
-                                                        <div className="selected-file-icon-wrapper image"
-                                                             style={{padding: 2}}>
+                                                        <div
+                                                            className="selected-file-icon-wrapper image clickable-preview"
+                                                            onClick={() => handlePreview(currentImageUrl)}
+                                                            style={{padding: 2, cursor: 'pointer'}}>
                                                             <img src={currentImageUrl} alt="Current poster" style={{
                                                                 width: '100%',
                                                                 height: '100%',
@@ -239,7 +255,7 @@ const UpdateMovieForm: React.FC = () => {
                                             )}
                                         </Col>
 
-                                        <Col span={12}>
+                                        <Col xs={24} md={12}>
                                             {!currentScriptInfo ? (
                                                 <FileUploader
                                                     label="Script"
@@ -334,13 +350,22 @@ const UpdateMovieForm: React.FC = () => {
                 </Card>
             </div>
 
+            <Modal
+                open={previewOpen}
+                title="Poster Preview"
+                footer={null}
+                onCancel={() => setPreviewOpen(false)}
+                width={800}
+            >
+                <img alt="Poster Preview" style={{width: '100%'}} src={previewImage}/>
+            </Modal>
+
             <AddGenreModal
                 visible={addGenreModalVisible}
                 loading={addingGenre}
                 onCancel={() => setAddGenreModalVisible(false)}
                 onSubmit={handleAddGenreSubmit}
             />
-
         </MainLayout>
     );
 };

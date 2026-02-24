@@ -67,7 +67,8 @@
     background-color: #fafafa;
     cursor: pointer;
     transition: all 0.3s;
-    height: 80px;
+    min-height: 80px;
+    height: auto;
 }
 
 .custom-upload-dropzone:hover {
@@ -83,6 +84,7 @@
     align-items: center;
     justify-content: center;
     font-size: 24px;
+    flex-shrink: 0;
 }
 
 .upload-icon-wrapper.image {
@@ -111,6 +113,7 @@
     color: #8c8c8c;
     font-size: 13px;
     margin-top: 4px;
+    word-break: break-word;
 }
 
 /* Selected File Styles */
@@ -122,7 +125,9 @@
     align-items: center;
     gap: 16px;
     background-color: #fff;
-    height: 80px;
+    background-color: #fff;
+    min-height: 80px;
+    height: auto;
 }
 
 .selected-file-icon-wrapper {
@@ -133,6 +138,7 @@
     align-items: center;
     justify-content: center;
     font-size: 24px;
+    flex-shrink: 0;
 }
 
 .selected-file-icon-wrapper.image {
@@ -162,6 +168,7 @@
     line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-all;
 }
 
 .selected-file-size {
@@ -312,59 +319,31 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 576px) {
     .create-movie-container {
-        padding: 16px;
+        padding: 12px;
     }
 
-    .create-movie-card {
+    .create-movie-card-wide {
+        padding: 16px 12px;
         margin: 0;
+        border-radius: 0;
     }
 
-    .image-preview-container {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .image-info {
-        width: 100%;
-        align-items: center;
-    }
-
-    .file-info-container {
+    .form-actions-right {
         flex-direction: column;
         gap: 12px;
-        align-items: stretch;
+        padding-top: 24px;
     }
 
-    .file-info {
-        text-align: center;
+    .form-actions-right .ant-space {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px !important;
     }
 
-    .placeholder-content {
-        width: 150px;
-        height: 100px;
-    }
-
-    .placeholder-icon {
-        width: 20px;
-        height: 20px;
-        top: 15px;
-        right: 20px;
-    }
-
-    .mountain-1 {
-        border-left-width: 25px;
-        border-right-width: 25px;
-        border-bottom-width: 40px;
-        left: 20px;
-    }
-
-    .mountain-2 {
-        border-left-width: 35px;
-        border-right-width: 35px;
-        border-bottom-width: 60px;
-        right: 15px;
+    .form-actions-right button {
+        width: 100%;
+        margin: 0 !important;
     }
 }

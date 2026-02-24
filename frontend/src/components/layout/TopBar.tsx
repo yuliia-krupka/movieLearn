@@ -20,7 +20,7 @@ const TopBar: React.FC = () => {
         }
 
         try {
-            navigate(` /movies?search=${encodeURIComponent(value)}`);
+            navigate(`/movies?search=${encodeURIComponent(value)}`);
         } catch (error) {
             message.error("Error during searching");
             console.error("Error during searching:", error);

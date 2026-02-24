@@ -10,6 +10,7 @@ interface FileUploaderProps {
     accept?: string;
     onFileChange: (file: File) => boolean;
     onFileRemove: () => void;
+    onPreview?: () => void;
     uploadButtonText: string;
     showPreview?: boolean;
     description?: string;
@@ -19,10 +20,12 @@ interface FileUploaderProps {
 const FileUploader: React.FC<FileUploaderProps> = ({
                                                        label,
                                                        file,
+                                                       previewUrl,
                                                        error,
                                                        accept,
                                                        onFileChange,
                                                        onFileRemove,
+                                                       onPreview,
                                                        uploadButtonText,
                                                        description,
                                                        iconType = 'document',
@@ -50,9 +53,22 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                     </Upload>
                 ) : (
                     <div className="selected-file-container">
-                        <div className={`selected-file-icon-wrapper ${iconType}`}>
-                            {iconType === 'image' ? <PictureOutlined className="selected-icon-inner"/> :
-                                <FileOutlined className="selected-icon-inner"/>}
+                        <div
+                            className={`selected-file-icon-wrapper ${iconType} ${onPreview ? 'clickable-preview' : ''}`}
+                            onClick={iconType === 'image' ? onPreview : undefined}
+                            style={iconType === 'image' ? {cursor: 'pointer'} : {}}
+                        >
+                            {iconType === 'image' && (previewUrl || file) ? (
+                                <img
+                                    src={previewUrl || URL.createObjectURL(file)}
+                                    alt="Preview"
+                                    className="selected-icon-inner"
+                                    style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4}}
+                                />
+                            ) : (
+                                iconType === 'image' ? <PictureOutlined className="selected-icon-inner"/> :
+                                    <FileOutlined className="selected-icon-inner"/>
+                            )}
                         </div>
                         <div className="selected-file-info">
                             <p className="selected-file-name">{file.name}</p>

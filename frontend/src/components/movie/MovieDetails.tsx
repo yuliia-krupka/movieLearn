@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Button, Row, Col, Spin, message as antMessage} from 'antd';
-import {ArrowLeftOutlined} from '@ant-design/icons';
+import {ArrowLeftOutlined, EditOutlined, DeleteOutlined} from '@ant-design/icons';
 import axios from "axios";
 import MainLayout from "../layout/MainLayout.tsx";
 import {useAuth} from '../auth/useAuth';
@@ -280,10 +280,13 @@ const MovieDetails: React.FC = () => {
                                 <div className="admin-actions-container">
                                     <div className="movie-actions">
                                         <Button className="yellow-btn"
+                                                icon={<EditOutlined/>}
                                                 onClick={() => navigate(`/admin/movies/${id}/update`)}>
                                             Edit
                                         </Button>
-                                        <Button className="yellow-btn" onClick={handleDelete}>
+                                        <Button className="yellow-btn"
+                                                icon={<DeleteOutlined/>}
+                                                onClick={handleDelete}>
                                             Delete
                                         </Button>
                                     </div>

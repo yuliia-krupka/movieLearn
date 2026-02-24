@@ -144,7 +144,9 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
         return (
             <MainLayout className="flashcard-content">
                 <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh'}}>
-                    <Spin size="large" tip="Loading flashcards..."/>
+                    <Spin size="large" tip="Loading flashcards...">
+                        <div style={{padding: 50}}/>
+                    </Spin>
                 </div>
             </MainLayout>
         );
@@ -201,7 +203,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
     }
 
     return (
-        <MainLayout className="flashcard-content">
+        <MainLayout className="flashcard-content" fullHeight>
             {learningSet && (
                 <div className="learning-set-info">
                     <h2>{learningSet.name}</h2>

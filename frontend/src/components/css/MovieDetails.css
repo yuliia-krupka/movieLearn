@@ -11,6 +11,7 @@
     overflow: hidden;
     margin-bottom: 30px;
     position: relative;
+    flex-shrink: 0;
 }
 
 .movie-poster-fullwidth {
@@ -159,7 +160,7 @@
     }
 
     .movie-title-overlay {
-        bottom: 10px;
+        bottom: 0;
         padding: 30px 15px 15px;
     }
 
@@ -178,6 +179,16 @@
     }
 
     .movie-actions .yellow-btn {
+        width: 100%;
+    }
+
+    .movie-details-action-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .movie-details-action-group .primary-action-btn,
+    .movie-details-action-group .secondary-action-btn {
         width: 100%;
     }
 }

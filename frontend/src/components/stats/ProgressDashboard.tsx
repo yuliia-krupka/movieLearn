@@ -27,7 +27,9 @@ const ProgressDashboard: React.FC = () => {
         return (
             <MainLayout>
                 <div className="stats-loading">
-                    <Spin size="large" tip="Loading your movie statistics..."/>
+                    <Spin size="large" tip="Loading your movie statistics...">
+                        <div style={{padding: 50}}/>
+                    </Spin>
                 </div>
             </MainLayout>
         );

@@ -137,6 +137,8 @@
 
 .levels-container {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 15px;
     align-items: center;
     margin-top: 8px;
@@ -157,6 +159,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    flex-shrink: 0;
 }
 
 .level-bullet:hover {
@@ -176,6 +179,7 @@
 .interests-container {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 10px;
     margin-top: 8px;
 }
