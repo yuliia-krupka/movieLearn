@@ -13,6 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
+import java.util.Comparator;
+
+import co.backend.learningItem.LearningItemType;
+import co.backend.learningSet.LearningSet;
 
 @Service
 @AllArgsConstructor
@@ -27,8 +32,8 @@ public class UserLearningSetService {
     private final UserLearningSetMapper userLearningSetMapper;
     private final MovieProgressMapper movieProgressMapper;
 
-    public UserLearningSetDto getOrCreate(Long userId, Long learningSetId) {
-        return userLearningSetMapper.toDto(getOrCreateEntity(userId, learningSetId));
+    public void getOrCreate(Long userId, Long learningSetId) {
+        userLearningSetMapper.toDto(getOrCreateEntity(userId, learningSetId));
     }
 
     private UserLearningSet getOrCreateEntity(Long userId, Long learningSetId) {
@@ -76,77 +81,75 @@ public class UserLearningSetService {
 
     public List<MovieProgressDto> getUserProgressSummary(Long userId) {
         return userLearningSetRepository.findAllByUserId(userId).stream()
-                .map(uls -> {
-                    var set = uls.getLearningSet();
-                    var movie = set.getMovie();
-
-                    var statuses = statusRepository.findByUserIdAndLearningItemLearningSetId(userId,
-                            set.getId());
-                    long totalWords = set.getLearningItems().stream()
-                            .filter(item -> item
-                                    .getType() == co.backend.learningItem.LearningItemType.FLASH_CARD)
-                            .count();
-                    long learnedWords = statuses.stream()
-                            .filter(s -> s.getStatus() == LearningStatus.LEARNED)
-                            .filter(s -> s.getLearningItem()
-                                    .getType() == co.backend.learningItem.LearningItemType.FLASH_CARD)
-                            .count();
-
-                    int totalSessionAttempts = uls.getFlashcardsAttempts() != null
-                            ? uls.getFlashcardsAttempts()
-                            : 0;
-
-                    LocalDateTime lastAttemptAt = statuses.stream()
-                            .map(UserLearningItemStatus::getLastAttemptAt)
-                            .filter(java.util.Objects::nonNull)
-                            .max(java.util.Comparator.naturalOrder())
-                            .orElse(null);
-
-                    int flashcardScorePct;
-                    if (uls.getFlashcardsScore() != null && uls.getFlashcardsScore() > 0) {
-                        flashcardScorePct = uls.getFlashcardsScore();
-                        learnedWords = Math
-                                .round((double) flashcardScorePct * totalWords / 100.0);
-                        log.debug("[DEBUG STATS] Using session completion score: {}%, adjusted learnedWords: {}",
-                                flashcardScorePct, learnedWords);
-                    } else {
-                        flashcardScorePct = totalWords > 0
-                                ? (int) Math.round(((double) learnedWords / totalWords)
-                                * 100)
-                                : 0;
-                        log.debug("[DEBUG STATS] Using individual progress score: {}%",
-                                flashcardScorePct);
-                    }
-
-                    long totalTests = set.getLearningItems().stream()
-                            .filter(item -> item
-                                    .getType() == co.backend.learningItem.LearningItemType.TEST)
-                            .count();
-                    long correctTests = statuses.stream()
-                            .filter(s -> s.getLearningItem()
-                                    .getType() == co.backend.learningItem.LearningItemType.TEST)
-                            .filter(s -> s.getStatus() == LearningStatus.LEARNED)
-                            .count();
-                    int testScorePct = totalTests > 0
-                            ? (int) Math.round(((double) correctTests / totalTests) * 100)
-                            : 0;
-
-                    if (movie != null) {
-                        log.debug("[DEBUG STATS] Movie: {}, Words: {}/{} ({}%), Tests: {}/{} ({}%), Total Sessions: {}",
-                                movie.getTitle(), learnedWords, totalWords,
-                                flashcardScorePct,
-                                correctTests, totalTests, testScorePct,
-                                totalSessionAttempts);
-                    }
-
-                    return movieProgressMapper.toProgressDto(
-                            uls,
-                            totalWords,
-                            learnedWords,
-                            totalSessionAttempts,
-                            lastAttemptAt,
-                            flashcardScorePct);
-                })
+                .map(uls -> createProgressDto(userId, uls))
                 .toList();
+    }
+
+    private MovieProgressDto createProgressDto(Long userId, UserLearningSet uls) {
+        var set = uls.getLearningSet();
+        var movie = set.getMovie();
+
+        var statuses = statusRepository.findByUserIdAndLearningItemLearningSetId(userId, set.getId());
+
+        long totalWords = countItemsByType(set, LearningItemType.FLASH_CARD);
+        long learnedWords = countLearnedItemsByType(statuses,
+                LearningItemType.FLASH_CARD);
+
+        int totalSessionAttempts = uls.getFlashcardsAttempts() != null ? uls.getFlashcardsAttempts() : 0;
+
+        LocalDateTime lastAttemptAt = getLastAttemptTime(statuses);
+
+        int flashcardScorePct = calculateFlashcardScorePct(uls, totalWords, learnedWords);
+
+        if (uls.getFlashcardsScore() != null && uls.getFlashcardsScore() > 0) {
+            learnedWords = Math.round((double) flashcardScorePct * totalWords / 100.0);
+        }
+
+        long totalTests = countItemsByType(set, LearningItemType.TEST);
+        long correctTests = countLearnedItemsByType(statuses, LearningItemType.TEST);
+        int testScorePct = calculateScorePct(correctTests, totalTests);
+
+        if (movie != null) {
+            log.debug("[DEBUG STATS] Movie: {}, Words: {}/{} ({}%), Tests: {}/{} ({}%), Total Sessions: {}",
+                    movie.getTitle(), learnedWords, totalWords, flashcardScorePct,
+                    correctTests, totalTests, testScorePct, totalSessionAttempts);
+        }
+
+        return movieProgressMapper.toProgressDto(uls, totalWords, learnedWords,
+                totalSessionAttempts, lastAttemptAt, flashcardScorePct);
+    }
+
+    private long countItemsByType(LearningSet set,
+                                  LearningItemType type) {
+        return set.getLearningItems().stream()
+                .filter(item -> item.getType() == type)
+                .count();
+    }
+
+    private long countLearnedItemsByType(List<UserLearningItemStatus> statuses,
+                                         LearningItemType type) {
+        return statuses.stream()
+                .filter(s -> s.getStatus() == LearningStatus.LEARNED)
+                .filter(s -> s.getLearningItem().getType() == type)
+                .count();
+    }
+
+    private LocalDateTime getLastAttemptTime(List<UserLearningItemStatus> statuses) {
+        return statuses.stream()
+                .map(UserLearningItemStatus::getLastAttemptAt)
+                .filter(Objects::nonNull)
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+    }
+
+    private int calculateFlashcardScorePct(UserLearningSet uls, long totalWords, long learnedWords) {
+        if (uls.getFlashcardsScore() != null && uls.getFlashcardsScore() > 0) {
+            return uls.getFlashcardsScore();
+        }
+        return calculateScorePct(learnedWords, totalWords);
+    }
+
+    private int calculateScorePct(long correctOrLearned, long total) {
+        return total > 0 ? (int) Math.round(((double) correctOrLearned / total) * 100) : 0;
     }
 }

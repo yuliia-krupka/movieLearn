@@ -1,6 +1,7 @@
 package co.backend.learningSet;
 
 import co.backend.learningItem.LearningItemDto;
+import co.backend.user.EnglishLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -16,19 +17,9 @@ public class LearningSetController {
 
     private final LearningSetService learningSetService;
 
-    @PostMapping("/generate/{movieId}")
-    public LearningSetDto generate(@PathVariable Long movieId) {
-        return learningSetService.generateForMovie(movieId);
-    }
-
     @GetMapping("/{id}")
     public LearningSetDto getById(@PathVariable Long id) {
         return learningSetService.getById(id);
-    }
-
-    @GetMapping("/movie/{movieId}/latest")
-    public Optional<LearningSetDto> getLatestByMovie(@PathVariable Long movieId) {
-        return learningSetService.getLatestByMovieId(movieId);
     }
 
     @GetMapping("/movie/{movieId}")
@@ -37,18 +28,13 @@ public class LearningSetController {
     }
 
     @GetMapping("/{id}/flashcards")
-    public List<LearningItemDto> getFlashCards(@PathVariable Long id) {
-        return learningSetService.getFlashCardsByLearningSetId(id);
+    public List<LearningItemDto> getFlashCards(@PathVariable Long id, @RequestParam Long userId) {
+        return learningSetService.getFlashCardsByLearningSetId(id, userId);
     }
 
     @GetMapping("/{id}/tests")
-    public List<LearningItemDto> getTestItems(@PathVariable Long id) {
-        return learningSetService.getTestItemsByLearningSetId(id);
-    }
-
-    @PostMapping("/{id}/tests/generate")
-    public List<LearningItemDto> generateTests(@PathVariable Long id) {
-        return learningSetService.generateTestsForSet(id);
+    public List<LearningItemDto> getTestItems(@PathVariable Long id, @RequestParam Long userId) {
+        return learningSetService.getTestItemsByLearningSetId(id, userId);
     }
 
     @PostMapping("/movie/{movieId}/start")
@@ -59,23 +45,7 @@ public class LearningSetController {
         return learningSetService.generateForUser(movieId, userId);
     }
 
-    @PutMapping("/set/{setId}/items")
-    public LearningSetDto updateItems(
-            @PathVariable Long setId,
-            @RequestBody List<LearningItemDto> items) {
-        learningSetService.updateItems(setId, items);
-        return learningSetService.getById(setId);
-    }
-
-    @PostMapping("/set/{setId}/item/{itemId}/regenerate")
-    public LearningItemDto regenerateItem(
-            @PathVariable Long setId,
-            @PathVariable Long itemId,
-            @RequestBody String instructions) {
-        return learningSetService.regenerateItem(setId, itemId, instructions);
-    }
-
-    @PostMapping("/set/{setId}/approve")
+    @PostMapping("/{setId}/approve")
     public void approveSet(@PathVariable Long setId) {
         learningSetService.updateStatus(setId, LearningSetStatus.READY);
     }
@@ -84,7 +54,7 @@ public class LearningSetController {
     public Optional<LearningSetDto> getLatestByUserAndMovie(
             @PathVariable Long movieId,
             @PathVariable Long userId,
-            @RequestParam(required = false) co.backend.user.EnglishLevel level,
+            @RequestParam(required = false) EnglishLevel level,
             @RequestParam(required = false) String interests) {
 
         log.info("getLatestByUserAndMovie called - movieId: {}, userId: {}, level: {}, interests: {}",

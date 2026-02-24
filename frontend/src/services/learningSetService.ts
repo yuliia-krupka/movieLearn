@@ -25,9 +25,9 @@ export interface LearningSetService {
 
     completeTests(userId: number, learningSetId: number, score: number): Promise<void>;
 
-    getFlashCards(learningSetId: number): Promise<FlashCardData[]>;
+    getFlashCards(learningSetId: number, userId: number): Promise<FlashCardData[]>;
 
-    getTestItems(learningSetId: number): Promise<TestItemData[]>;
+    getTestItems(learningSetId: number, userId: number): Promise<TestItemData[]>;
 
     getById(id: number): Promise<LearningSetDto>;
 
@@ -155,8 +155,8 @@ export const learningSetService: LearningSetService = {
         }
     },
 
-    async getFlashCards(learningSetId: number): Promise<FlashCardData[]> {
-        const response = await fetch(`/api/learning-sets/${learningSetId}/flashcards`, {
+    async getFlashCards(learningSetId: number, userId: number): Promise<FlashCardData[]> {
+        const response = await fetch(`/api/learning-sets/${learningSetId}/flashcards?userId=${userId}`, {
             credentials: 'include',
         });
 
@@ -174,8 +174,8 @@ export const learningSetService: LearningSetService = {
         }));
     },
 
-    async getTestItems(learningSetId: number): Promise<TestItemData[]> {
-        const response = await fetch(`/api/learning-sets/${learningSetId}/tests`, {
+    async getTestItems(learningSetId: number, userId: number): Promise<TestItemData[]> {
+        const response = await fetch(`/api/learning-sets/${learningSetId}/tests?userId=${userId}`, {
             credentials: 'include',
         });
 
@@ -266,7 +266,7 @@ export const learningSetService: LearningSetService = {
     },
 
     async approveSet(learningSetId: number): Promise<void> {
-        const response = await fetch(`/api/learning-sets/set/${learningSetId}/approve`, {
+        const response = await fetch(`/api/learning-sets/${learningSetId}/approve`, {
             method: 'POST',
             credentials: 'include',
         });

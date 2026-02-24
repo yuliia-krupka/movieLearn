@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import FlashCard from './FlashCard';
 import ResultsPage from './ResultsPage';
 import MainLayout from "../layout/MainLayout.tsx";
 import '../css/Layout.css';
-import { learningSetService } from '../../services/learningSetService';
-import type { FlashCardData, LearningSetDto, ItemStatusDto } from '../../types/learningSet';
-import { useAuth } from '../auth/useAuth';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {Spin, Result, Button} from 'antd';
+import {learningSetService} from '../../services/learningSetService';
+import type {FlashCardData, ItemStatusDto, LearningSetDto} from '../../types/learningSet';
+import {useAuth} from '../auth/useAuth';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 interface FlashCardsModuleProps {
     movieId?: number;
@@ -16,8 +17,8 @@ interface FlashCardsModuleProps {
 const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { currentUserId } = useAuth();
-    const { id } = useParams<{ id: string }>();
+    const {currentUserId} = useAuth();
+    const {id} = useParams<{ id: string }>();
     const stateMovieId = location.state?.movieId;
     const movieId = props.movieId || stateMovieId;
     const learningSetId = props.learningSetId || (id ? Number(id) : undefined);
@@ -42,17 +43,18 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                 let learningSetData: LearningSetDto;
 
                 if (learningSetId) {
-                    // Use the provided learning set ID
                     learningSetData = await learningSetService.getById(learningSetId);
                 } else {
-                    // Fallback to movie-based logic
-                    const targetMovieId = movieId || 1;
-                    learningSetData = await learningSetService.getOrCreateByMovie(targetMovieId);
+                    learningSetData = await learningSetService.getOrCreateByMovie(movieId);
                 }
 
                 setLearningSet(learningSetData);
-                const flashcardData = await learningSetService.getFlashCards(learningSetData.id);
-                setFlashcards(flashcardData);
+                if (currentUserId) {
+                    const flashcardData = await learningSetService.getFlashCards(learningSetData.id, currentUserId);
+                    setFlashcards(flashcardData);
+                } else {
+                    setError('User not authenticated');
+                }
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load flashcards');
             } finally {
@@ -61,7 +63,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
         };
 
         void loadFlashcards();
-    }, [movieId, learningSetId]);
+    }, [movieId, learningSetId, currentUserId]);
 
     const currentCard = flashcards[currentIndex];
 
@@ -117,7 +119,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
         if (learningSetId) {
             navigate(`/learning-sets/${learningSetId}/tests`);
         } else {
-            navigate('/tests', { state: { movieId: movieId || learningSet?.movieId } });
+            navigate('/tests', {state: {movieId: movieId || learningSet?.movieId}});
         }
     };
 
@@ -141,15 +143,30 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
     if (loading) {
         return (
             <MainLayout className="flashcard-content">
-                <div className="loading">Loading flashcards...</div>
+                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh'}}>
+                    <Spin size="large" tip="Loading flashcards..."/>
+                </div>
             </MainLayout>
         );
     }
 
     if (error) {
+        const isForbidden = error.toLowerCase().includes('forbidden') || error.toLowerCase().includes('access denied');
+
         return (
             <MainLayout className="flashcard-content">
-                <div className="error">Error: {error}</div>
+                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh'}}>
+                    <Result
+                        status={isForbidden ? "403" : "error"}
+                        title={isForbidden ? "Access Denied" : "Error"}
+                        subTitle={isForbidden ? "Sorry, you don't have permission to access this learning set." : error}
+                        extra={
+                            <Button type="primary" onClick={handleBackToMovie}>
+                                Back to Movie
+                            </Button>
+                        }
+                    />
+                </div>
             </MainLayout>
         );
     }

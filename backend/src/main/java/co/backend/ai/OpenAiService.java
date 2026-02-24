@@ -9,6 +9,7 @@ import co.backend.learningItem.LearningItemDto;
 import co.backend.learningItem.LearningItemType;
 import co.backend.learningSet.LearningSet;
 import co.backend.movie.Movie;
+import co.backend.exceptions.AiParsingException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -72,7 +73,7 @@ public class OpenAiService {
                         - text: The English word or phrase.
                         - translation: Ukrainian translation.
                         - transcription: IPA transcription.
-                        - exampleSentence: A sentence using the word (preferably from the movie context).
+                        - exampleSentence: A sentence using the word (from the movie context).
                         
                         Return a JSON array of objects. Do not include markdown formatting like ```json.
                         """,
@@ -232,7 +233,7 @@ public class OpenAiService {
             List<LearningItemDto> generatedItems = getLearningItemDtos(request);
             return generatedItems != null ? generatedItems : new ArrayList<>();
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to parse AI response", e);
+            throw new AiParsingException("Failed to parse AI response", e);
         }
     }
 

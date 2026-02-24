@@ -43,9 +43,8 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize(value = "hasRole('ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oauth2User) {
+    public void deleteUser(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oauth2User) {
         userService.deleteUser(id, oauth2User);
-        return ResponseEntity.ok().body("User deleted successfully");
     }
 
     @PutMapping("/movies/{movieId}")

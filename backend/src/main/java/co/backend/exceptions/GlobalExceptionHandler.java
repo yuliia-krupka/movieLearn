@@ -46,6 +46,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(ex.getMessage()));
     }
 
+    @ExceptionHandler(AiParsingException.class)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    public ResponseEntity<ErrorResponse> handleAiParsingException(AiParsingException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ErrorResponse(ex.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {

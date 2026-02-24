@@ -1,7 +1,6 @@
 package co.backend.learningSet;
 
 import co.backend.ai.OpenAiService;
-import co.backend.ai.dto.AiContext;
 import co.backend.exceptions.BadRequestException;
 import co.backend.exceptions.NotFoundException;
 import co.backend.learningItem.LearningItem;
@@ -9,9 +8,12 @@ import co.backend.learningItem.LearningItemDto;
 import co.backend.learningItem.LearningItemMapper;
 import co.backend.learningItem.LearningItemRepository;
 import co.backend.learningItem.LearningItemType;
+import co.backend.movie.Movie;
 import co.backend.movie.MovieRepository;
+import co.backend.user.EnglishLevel;
+import co.backend.user.User;
 import co.backend.user.UserRepository;
-import co.backend.userLearningItemStatus.UserLearningItemStatusService;
+
 import co.backend.userLearningSet.UserLearningSetService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -38,27 +39,32 @@ public class LearningSetService {
     private final MovieRepository movieRepository;
     private final UserRepository userRepository;
     private final UserLearningSetService userLearningSetService;
-    private final UserLearningItemStatusService userLearningItemStatusService;
 
     public LearningSetDto generateForUser(Long movieId, Long userId) {
         log.info("[BACKEND] generateForUser called - movieId: {}, userId: {}", movieId, userId);
 
-        co.backend.movie.Movie movie = movieRepository.findById(movieId)
+        Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new NotFoundException("Movie not found: " + movieId));
 
-        co.backend.user.User user = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found: " + userId));
 
         log.debug("User level: {}, interests: {}", user.getEnglishLevel(), user.getInterests());
 
+        Optional<LearningSetDto> reusedSet = findReusedSet(movie, user);
+        return reusedSet.orElseGet(() -> generateNewSet(movie, user));
+
+    }
+
+    private Optional<LearningSetDto> findReusedSet(Movie movie, User user) {
         if (user.getEnglishLevel() != null && user.getInterests() != null) {
             log.info("Looking for suitable shared set...");
-            Optional<LearningSet> suitableSet = findSuitableSetEntity(movieId, user.getEnglishLevel(),
+            Optional<LearningSet> suitableSet = findSuitableSetEntity(movie.getId(), user.getEnglishLevel(),
                     user.getInterests());
             if (suitableSet.isPresent()) {
                 log.info("[BACKEND] Found suitable shared set, cloning for user: {}", suitableSet.get().getId());
-                LearningSet clonedSet = cloneSetForUser(suitableSet.get(), userId);
-                return learningSetMapper.toDto(clonedSet);
+                LearningSet clonedSet = cloneSetForUser(suitableSet.get(), user.getId());
+                return Optional.of(learningSetMapper.toDto(clonedSet));
             } else {
                 log.info("No suitable shared set found");
             }
@@ -66,7 +72,7 @@ public class LearningSetService {
 
         if (user.getEnglishLevel() != null) {
             log.info("Looking for user's existing set with same level...");
-            Optional<LearningSetDto> existingSet = getLatestByUserAndMovieWithLevel(userId, movieId,
+            Optional<LearningSetDto> existingSet = getLatestByUserAndMovieWithLevel(user.getId(), movie.getId(),
                     user.getEnglishLevel());
             if (existingSet.isPresent()) {
                 String userInterests = user.getInterests();
@@ -79,7 +85,7 @@ public class LearningSetService {
 
                 if (interestsMatch) {
                     log.info("[BACKEND] Found matching user set, reusing: {}", existingSet.get().getId());
-                    return existingSet.get();
+                    return existingSet;
                 } else {
                     log.info("User has set with same level but different interests, will generate new");
                 }
@@ -88,9 +94,13 @@ public class LearningSetService {
             }
         }
 
+        return Optional.empty();
+    }
+
+    private LearningSetDto generateNewSet(Movie movie, User user) {
         log.info("[BACKEND] Generating new learning set...");
 
-        learningSetRepository.deleteByMovieIdAndCreatorId(movieId, userId);
+        learningSetRepository.deleteByMovieIdAndCreatorId(movie.getId(), user.getId());
 
         List<LearningItemDto> generatedItems = openAiService.generateFlashcards(
                 movie.getTitle(),
@@ -99,22 +109,26 @@ public class LearningSetService {
                 user.getInterests(),
                 user.getEnglishLevel() != null ? user.getEnglishLevel().name() : "B1");
 
-        LearningSet set = new LearningSet();
-        set.setMovie(movie);
-        set.setDate(java.time.LocalDateTime.now());
-        set.setName("AI Set for " + movie.getTitle());
-        set.setCreatorId(userId);
-        set.setStatus(LearningSetStatus.REVIEW);
-        set.setEnglishLevel(user.getEnglishLevel());
-        set.setInterests(user.getInterests());
-
+        LearningSet set = createNewLearningSetEntity(movie, user);
         LearningSet savedSet = learningSetRepository.save(set);
         addItemsToSet(savedSet, generatedItems);
 
-        userLearningSetService.getOrCreate(userId, savedSet.getId());
+        userLearningSetService.getOrCreate(user.getId(), savedSet.getId());
 
         log.info("[BACKEND] Generated new learning set: {} with {} items", savedSet.getId(), generatedItems.size());
         return learningSetMapper.toDto(savedSet);
+    }
+
+    private LearningSet createNewLearningSetEntity(Movie movie, User user) {
+        LearningSet set = new LearningSet();
+        set.setMovie(movie);
+        set.setDate(LocalDateTime.now());
+        set.setName("AI Set for " + movie.getTitle());
+        set.setCreatorId(user.getId());
+        set.setStatus(LearningSetStatus.REVIEW);
+        set.setEnglishLevel(user.getEnglishLevel());
+        set.setInterests(user.getInterests());
+        return set;
     }
 
     public LearningSetDto generateForMovie(Long movieId) {
@@ -134,18 +148,18 @@ public class LearningSetService {
     }
 
     public Optional<LearningSetDto> getLatestByUserAndMovieWithLevel(Long userId, Long movieId,
-                                                                     co.backend.user.EnglishLevel level) {
+                                                                     EnglishLevel level) {
         return learningSetRepository.findTopByMovieIdAndCreatorIdAndEnglishLevelOrderByDateDesc(movieId, userId, level)
                 .map(learningSetMapper::toDto);
     }
 
-    public Optional<LearningSetDto> findSuitableSet(Long movieId, co.backend.user.EnglishLevel level,
+    public Optional<LearningSetDto> findSuitableSet(Long movieId, EnglishLevel level,
                                                     String interests) {
         return findSuitableSetEntity(movieId, level, interests)
                 .map(learningSetMapper::toDto);
     }
 
-    public Optional<LearningSet> findSuitableSetEntity(Long movieId, co.backend.user.EnglishLevel level,
+    public Optional<LearningSet> findSuitableSetEntity(Long movieId, EnglishLevel level,
                                                        String interests) {
         log.info("[BACKEND] findSuitableSetEntity called - movieId: {}, level: {}, interests: {}", movieId, level,
                 interests);
@@ -193,9 +207,9 @@ public class LearningSetService {
 
         LearningSet savedSet = learningSetRepository.save(newSet);
 
-        List<co.backend.learningItem.LearningItem> clonedItems = originalSet.getLearningItems().stream()
+        List<LearningItem> clonedItems = originalSet.getLearningItems().stream()
                 .map(item -> {
-                    co.backend.learningItem.LearningItem newItem = new co.backend.learningItem.LearningItem();
+                    LearningItem newItem = new LearningItem();
                     newItem.setType(item.getType());
                     newItem.setText(item.getText());
                     newItem.setTranslation(item.getTranslation());
@@ -204,13 +218,13 @@ public class LearningSetService {
                     newItem.setCorrectAnswerIndex(item.getCorrectAnswerIndex());
                     newItem.setLearningSet(savedSet);
                     if (item.getAnswers() != null) {
-                        newItem.setAnswers(new java.util.ArrayList<>(item.getAnswers()));
+                        newItem.setAnswers(new ArrayList<>(item.getAnswers()));
                     }
                     return newItem;
                 })
                 .toList();
 
-        savedSet.setLearningItems(new java.util.ArrayList<>(clonedItems));
+        savedSet.setLearningItems(new ArrayList<>(clonedItems));
         learningSetRepository.save(savedSet);
 
         userLearningSetService.getOrCreate(newUserId, savedSet.getId());
@@ -226,15 +240,15 @@ public class LearningSetService {
         String[] userInterestsArray = userInterests.toLowerCase().split("[,\\s]+");
         String[] existingInterestsArray = existingInterests.toLowerCase().split("[,\\s]+");
 
-        java.util.Set<String> userSet = java.util.Arrays.stream(userInterestsArray)
+        Set<String> userSet = Arrays.stream(userInterestsArray)
                 .map(String::trim)
                 .filter(trim -> !trim.isEmpty())
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
 
-        java.util.Set<String> existingSet = java.util.Arrays.stream(existingInterestsArray)
+        Set<String> existingSet = Arrays.stream(existingInterestsArray)
                 .map(String::trim)
                 .filter(trim -> !trim.isEmpty())
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
 
         return userSet.equals(existingSet);
     }
@@ -268,82 +282,15 @@ public class LearningSetService {
         learningSetRepository.save(set);
     }
 
-    public void updateItems(Long id, List<LearningItemDto> items) {
-        LearningSet set = findSetById(id);
-        Long userId = set.getCreatorId();
-
-        java.util.Map<Long, LearningItem> existingItems = set.getLearningItems().stream()
-                .filter(item -> item.getId() != null)
-                .collect(java.util.stream.Collectors.toMap(LearningItem::getId, item -> item));
-
-        java.util.List<LearningItem> updatedItems = new java.util.ArrayList<>();
-        java.util.List<LearningItem> newlyCreatedItems = new java.util.ArrayList<>();
-
-        for (LearningItemDto dto : items) {
-            if (dto.getId() != null && existingItems.containsKey(dto.getId())) {
-                LearningItem existingItem = existingItems.get(dto.getId());
-                existingItem.setText(dto.getText());
-                existingItem.setTranslation(dto.getTranslation());
-                existingItem.setTranscription(dto.getTranscription());
-                existingItem.setExampleSentence(dto.getExampleSentence());
-                updatedItems.add(existingItem);
-                existingItems.remove(dto.getId());
-            } else {
-                LearningItem newItem = learningItemMapper.toEntity(dto);
-                newItem.setLearningSet(set);
-                updatedItems.add(newItem);
-                newlyCreatedItems.add(newItem);
-            }
-        }
-
-        set.getLearningItems().clear();
-        set.getLearningItems().addAll(updatedItems);
-        learningSetRepository.save(set);
-
-        if (userId != null && !newlyCreatedItems.isEmpty()) {
-            for (LearningItem newItem : newlyCreatedItems) {
-                userLearningItemStatusService.createStatusIfStarted(userId, newItem);
-            }
-            userLearningSetService.resetScoresIfIncomplete(userId, id);
-        }
-    }
-
-    public LearningItemDto regenerateItem(Long setId, Long itemId, String instructions) {
-        LearningSet set = findSetById(setId);
-
-        co.backend.learningItem.LearningItem item = set.getLearningItems().stream()
-                .filter(i -> i.getId().equals(itemId))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Item not found in set: " + itemId));
-
-        AiContext context = openAiService.extractAiContext(set);
-
-        LearningItemDto currentDto = learningItemMapper.toDto(item);
-        LearningItemDto updatedDto = openAiService.regenerateItem(currentDto, instructions,
-                context.movieTitle(), context.movieDescription(), context.scriptContent(),
-                context.englishLevel(), context.interests());
-
-        item.setText(updatedDto.getText());
-        item.setTranslation(updatedDto.getTranslation());
-        item.setTranscription(updatedDto.getTranscription());
-        item.setExampleSentence(updatedDto.getExampleSentence());
-
-        learningSetRepository.save(set);
-
-        if (set.getCreatorId() != null) {
-            userLearningItemStatusService.resetProgress(set.getCreatorId(), item.getId());
-            userLearningSetService.resetScoresIfIncomplete(set.getCreatorId(), set.getId());
-        }
-
-        return learningItemMapper.toDto(item);
-    }
-
-    public List<LearningItemDto> getFlashCardsByLearningSetId(Long learningSetId) {
+    public List<LearningItemDto> getFlashCardsByLearningSetId(Long learningSetId, Long userId) {
+        LearningSet set = findSetById(learningSetId);
+        validateOwnership(set, userId);
         return getDtosByType(learningSetId, LearningItemType.FLASH_CARD);
     }
 
-    public List<LearningItemDto> getTestItemsByLearningSetId(Long learningSetId) {
+    public List<LearningItemDto> getTestItemsByLearningSetId(Long learningSetId, Long userId) {
         LearningSet set = findSetById(learningSetId);
+        validateOwnership(set, userId);
 
         List<LearningItem> existingTests = getEntitiesByType(set, LearningItemType.TEST);
         List<LearningItem> flashcards = getEntitiesByType(set, LearningItemType.FLASH_CARD);
@@ -355,31 +302,45 @@ public class LearningSetService {
 
         if (flashcards.isEmpty()) {
             log.warn("No flashcards found, returning empty tests for learning set: {}", learningSetId);
-            return existingTests.stream().map(learningItemMapper::toDto).toList();
+            return mapToDtoList(existingTests);
         }
 
-        LocalDateTime latestFlashcardUpdate = flashcards.stream()
-                .map(flashcard -> flashcard.getUpdatedAt() != null ? flashcard.getUpdatedAt()
-                        : flashcard.getCreatedAt())
-                .max(Comparator.naturalOrder())
-                .orElse(null);
-
-        LocalDateTime latestTestCreation = existingTests.stream()
-                .map(LearningItem::getCreatedAt)
-                .max(Comparator.naturalOrder())
-                .orElse(null);
-
-        if (latestFlashcardUpdate.isAfter(latestTestCreation)) {
+        if (areTestsOutdated(flashcards, existingTests)) {
             log.info("Flashcards updated after tests, regenerating tests for learning set: {}", learningSetId);
-            log.debug("Latest flashcard update: {}, Latest test creation: {}", latestFlashcardUpdate,
-                    latestTestCreation);
-
             deleteTestsForSet(learningSetId);
             return generateTestsForSet(learningSetId);
         }
 
         log.info("Tests are up to date, returning existing tests for learning set: {}", learningSetId);
-        return existingTests.stream().map(learningItemMapper::toDto).toList();
+        return mapToDtoList(existingTests);
+    }
+
+    private boolean areTestsOutdated(List<LearningItem> flashcards, List<LearningItem> existingTests) {
+        LocalDateTime latestFlashcardUpdate = getLatestFlashcardUpdateTime(flashcards);
+        LocalDateTime latestTestCreation = getLatestTestCreationTime(existingTests);
+
+        log.debug("Latest flashcard update: {}, Latest test creation: {}", latestFlashcardUpdate, latestTestCreation);
+        return latestFlashcardUpdate != null && latestTestCreation != null
+                && latestFlashcardUpdate.isAfter(latestTestCreation);
+    }
+
+    private LocalDateTime getLatestFlashcardUpdateTime(List<LearningItem> flashcards) {
+        return flashcards.stream()
+                .map(flashcard -> flashcard.getUpdatedAt() != null ? flashcard.getUpdatedAt()
+                        : flashcard.getCreatedAt())
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+    }
+
+    private LocalDateTime getLatestTestCreationTime(List<LearningItem> tests) {
+        return tests.stream()
+                .map(LearningItem::getCreatedAt)
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+    }
+
+    private List<LearningItemDto> mapToDtoList(List<LearningItem> items) {
+        return items.stream().map(learningItemMapper::toDto).toList();
     }
 
     private void deleteTestsForSet(Long learningSetId) {
@@ -422,6 +383,13 @@ public class LearningSetService {
         }
         return learningSetRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Learning set not found: " + id));
+    }
+
+    private void validateOwnership(LearningSet set, Long userId) {
+        if (set.getCreatorId() != null && !set.getCreatorId().equals(userId)) {
+            throw new co.backend.exceptions.ForbiddenException(
+                    "You do not have permission to access this learning set.");
+        }
     }
 
     private void addItemsToSet(LearningSet set, List<LearningItemDto> dtos) {

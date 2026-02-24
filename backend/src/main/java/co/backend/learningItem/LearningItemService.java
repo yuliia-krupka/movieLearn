@@ -75,7 +75,7 @@ public class LearningItemService {
             LearningItem item = learningItemMapper.toEntity(dto);
             item.setLearningSet(learningSet);
             if (item.getType() == null) {
-                item.setType(co.backend.learningItem.LearningItemType.FLASH_CARD);
+                item.setType(LearningItemType.FLASH_CARD);
             }
             return item;
         }).toList();

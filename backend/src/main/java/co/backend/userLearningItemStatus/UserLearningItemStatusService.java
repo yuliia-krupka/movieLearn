@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import co.backend.learningItem.LearningItem;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -69,7 +71,7 @@ public class UserLearningItemStatusService {
                 .anyMatch(status -> status.getTotalAttempts() > 0 || status.getStatus() == LearningStatus.LEARNED);
     }
 
-    public void createStatusIfStarted(Long userId, co.backend.learningItem.LearningItem newItem) {
+    public void createStatusIfStarted(Long userId, LearningItem newItem) {
         if (hasProgress(userId, newItem.getLearningSet().getId())) {
             UserLearningItemStatus newStatus = new UserLearningItemStatus();
             newStatus.setUser(userRepository.findById(userId)
@@ -81,15 +83,6 @@ public class UserLearningItemStatusService {
             newStatus.setStatus(LearningStatus.IN_PROGRESS);
             statusRepository.save(newStatus);
         }
-    }
-
-    public void resetProgress(Long userId, Long learningItemId) {
-        statusRepository.findByUserIdAndLearningItemId(userId, learningItemId).ifPresent(status -> {
-            status.setCorrectAnswers(0);
-            status.setTotalAttempts(0);
-            status.setStatus(LearningStatus.IN_PROGRESS);
-            statusRepository.save(status);
-        });
     }
 
     public List<UserLearningItemStatusDto> getStatusesByLearningSet(Long userId, Long learningSetId) {

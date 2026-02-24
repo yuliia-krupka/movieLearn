@@ -14,13 +14,6 @@ public class UserLearningSetController {
 
     private final UserLearningSetService userLearningSetService;
 
-    @PostMapping("/start")
-    public UserLearningSetDto start(
-            @RequestParam Long userId,
-            @RequestParam Long learningSetId) {
-        return userLearningSetService.getOrCreate(userId, learningSetId);
-    }
-
     @PostMapping("/complete-flashcards")
     public UserLearningSetDto completeFlashcards(
             @RequestParam Long userId,

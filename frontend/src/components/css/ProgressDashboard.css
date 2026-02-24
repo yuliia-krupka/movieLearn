@@ -1,5 +1,5 @@
 .stats-layout {
-    background: #f0f2f5;
+    background: #ffffff;
 }
 
 .stats-container {
@@ -123,7 +123,8 @@
 
 .stat-badges-row {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    white-space: nowrap;
     gap: 8px;
     align-items: center;
 }

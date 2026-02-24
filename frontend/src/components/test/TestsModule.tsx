@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import TestCard from './TestCard';
 import ResultsPage from '../flash-card/ResultsPage';
 import MainLayout from '../layout/MainLayout';
-import {Spin} from 'antd';
+import {Spin, Result, Button} from 'antd';
 import '../css/Layout.css';
 import '../css/Test.css';
 import '../css/MovieDetails.css';
@@ -70,7 +70,10 @@ const TestsModule: React.FC = () => {
 
                 const generateTimeout = setTimeout(() => setIsGeneratingTests(true), 500);
 
-                const items = await learningSetService.getTestItems(learningSetData.id);
+                const items = currentUserId
+                    ? await learningSetService.getTestItems(learningSetData.id, currentUserId)
+                    : [];
+
                 clearTimeout(generateTimeout);
                 setIsGeneratingTests(false);
 
@@ -192,9 +195,22 @@ const TestsModule: React.FC = () => {
     }
 
     if (error) {
+        const isForbidden = error.toLowerCase().includes('forbidden') || error.toLowerCase().includes('access denied');
+
         return (
             <MainLayout className="flashcard-content">
-                <div className="error">Error: {error}</div>
+                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh'}}>
+                    <Result
+                        status={isForbidden ? "403" : "error"}
+                        title={isForbidden ? "Access Denied" : "Error"}
+                        subTitle={isForbidden ? "Sorry, you don't have permission to access this test." : error}
+                        extra={
+                            <Button type="primary" onClick={handleBackToMovie}>
+                                Back to Movie
+                            </Button>
+                        }
+                    />
+                </div>
             </MainLayout>
         );
     }
