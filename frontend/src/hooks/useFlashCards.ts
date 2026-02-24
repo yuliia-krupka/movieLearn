@@ -32,10 +32,10 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
                 setLearningSet(set);
 
                 if (currentUserId) {
-                    const cards = await learningSetService.getFlashCards(setId, currentUserId);
+                    const cards = await learningSetService.getFlashCards(setId);
                     setFlashcards(cards);
 
-                    const statuses = await learningSetService.getItemStatuses(currentUserId, setId);
+                    const statuses = await learningSetService.getItemStatuses(setId);
                     const allLearned = cards.length > 0 && cards.every(card => {
                         const status = statuses.find(s => s.learningItemId === card.id);
                         return status?.status === 'LEARNED' || status?.status === 'SKIPPED';

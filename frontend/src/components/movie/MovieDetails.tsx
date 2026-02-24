@@ -74,11 +74,11 @@ const MovieDetails: React.FC = () => {
 
             if (currentUserId && !isAdmin) {
                 const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
-                learningSetService.getLatestByUserAndMovie(Number(id), currentUserId, user?.englishLevel, interestsStr)
+                learningSetService.getLatestByUserAndMovie(Number(id), user?.englishLevel, interestsStr)
                     .then(setLearningSet)
                     .catch(err => console.error('Error fetching learning set:', err));
 
-                axios.get(`/api/user-learning-sets/movie/${id}/user/${currentUserId}`, {withCredentials: true})
+                axios.get(`/api/user-learning-sets/movie/${id}`, {withCredentials: true})
                     .then(() => setIsUserStarted(true))
                     .catch(err => {
                         if (axios.isAxiosError(err) && err.response?.status === 404) {
@@ -88,7 +88,7 @@ const MovieDetails: React.FC = () => {
                         }
                     });
             }
-        }, [id, navigate, currentUserId, user]);
+        }, [id, navigate, currentUserId, user, isAdmin]);
 
 
         const handleDelete = async () => {
@@ -134,7 +134,6 @@ const MovieDetails: React.FC = () => {
 
                     const existingSet = await learningSetService.getLatestByUserAndMovie(
                         Number(id),
-                        currentUserId,
                         user?.englishLevel,
                         interestsStr
                     );
@@ -149,7 +148,7 @@ const MovieDetails: React.FC = () => {
                         console.log('No existing set found, generating new one...');
                         setIsGenerating(true);
 
-                        learningSet = await learningSetService.startLearningForUser(Number(id), currentUserId);
+                        learningSet = await learningSetService.startLearningForUser(Number(id));
                         console.log('Generated new learning set:', learningSet.id);
                     }
 

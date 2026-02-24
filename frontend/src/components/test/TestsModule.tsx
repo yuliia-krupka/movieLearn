@@ -47,8 +47,7 @@ const TestsModule: React.FC = () => {
                     setIsChecking(true);
                     const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
                     const userLearningSet = await learningSetService.getLatestByUserAndMovie(
-                        Number(movieId),
-                        currentUserId,
+                        Number(id),
                         user?.englishLevel,
                         interestsStr
                     );
@@ -71,7 +70,7 @@ const TestsModule: React.FC = () => {
                 const generateTimeout = setTimeout(() => setIsGeneratingTests(true), 500);
 
                 const items = currentUserId
-                    ? await learningSetService.getTestItems(learningSetData.id, currentUserId)
+                    ? await learningSetService.getTestItems(learningSetData.id)
                     : [];
 
                 clearTimeout(generateTimeout);
@@ -125,16 +124,16 @@ const TestsModule: React.FC = () => {
             });
 
             const answersPromise = bulkAnswers.length > 0
-                ? learningSetService.recordAnswersBulk(currentUserId, bulkAnswers)
+                ? learningSetService.recordAnswersBulk(bulkAnswers)
                 : Promise.resolve();
 
             const correctCount = bulkAnswers.filter(a => a.correct).length;
             const score = Math.round((correctCount / testItems.length) * 100);
 
-            const completionPromise = learningSetService.completeTests(currentUserId, learningSet.id, score);
+            const completionPromise = learningSetService.completeTests(learningSet.id, score);
 
             Promise.all([answersPromise, completionPromise])
-                .then(() => learningSetService.getItemStatuses(currentUserId, learningSet.id))
+                .then(() => learningSetService.getItemStatuses(learningSet.id))
                 .then(statuses => setItemStatuses(statuses))
                 .catch(() => console.error('Failed to save results'));
         }

@@ -13,21 +13,21 @@ export type {MovieProgress};
 export interface LearningSetService {
     getOrCreateByMovie(movieId: number): Promise<LearningSetDto>;
 
-    getLatestByUserAndMovie(movieId: number, userId: number, level?: string, interests?: string): Promise<LearningSetDto | null>;
+    getLatestByUserAndMovie(movieId: number, level?: string, interests?: string): Promise<LearningSetDto | null>;
 
-    recordAnswer(userId: number, learningItemId: number, correct: boolean): Promise<void>;
+    recordAnswer(learningItemId: number, correct: boolean): Promise<void>;
 
-    recordAnswersBulk(userId: number, answers: { learningItemId: number, correct: boolean }[]): Promise<void>;
+    recordAnswersBulk(answers: { learningItemId: number, correct: boolean }[]): Promise<void>;
 
-    getItemStatuses(userId: number, learningSetId: number): Promise<ItemStatusDto[]>;
+    getItemStatuses(learningSetId: number): Promise<ItemStatusDto[]>;
 
-    completeFlashcards(userId: number, learningSetId: number, score: number): Promise<void>;
+    completeFlashcards(learningSetId: number, score: number): Promise<void>;
 
-    completeTests(userId: number, learningSetId: number, score: number): Promise<void>;
+    completeTests(learningSetId: number, score: number): Promise<void>;
 
-    getFlashCards(learningSetId: number, userId: number): Promise<FlashCardData[]>;
+    getFlashCards(learningSetId: number): Promise<FlashCardData[]>;
 
-    getTestItems(learningSetId: number, userId: number): Promise<TestItemData[]>;
+    getTestItems(learningSetId: number): Promise<TestItemData[]>;
 
     getById(id: number): Promise<LearningSetDto>;
 
@@ -42,11 +42,11 @@ export interface LearningSetService {
 
     regenerate(learningSetId: number, feedback: string, itemIds: number[]): Promise<FlashCardData[]>;
 
-    startLearningForUser(movieId: number, userId: number): Promise<LearningSetDto>;
+    startLearningForUser(movieId: number): Promise<LearningSetDto>;
 
     approveSet(learningSetId: number): Promise<void>;
 
-    getUserProgress(userId: number): Promise<MovieProgress[]>;
+    getUserProgress(): Promise<MovieProgress[]>;
 }
 
 export const learningSetService: LearningSetService = {
@@ -63,8 +63,8 @@ export const learningSetService: LearningSetService = {
         return response.json();
     },
 
-    async getLatestByUserAndMovie(movieId: number, userId: number, level?: string, interests?: string): Promise<LearningSetDto | null> {
-        let url = `/api/learning-sets/movie/${movieId}/user/${userId}/latest`;
+    async getLatestByUserAndMovie(movieId: number, level?: string, interests?: string): Promise<LearningSetDto | null> {
+        let url = `/api/learning-sets/movie/${movieId}/latest`;
         const params = new URLSearchParams();
         if (level) params.append('level', level);
         if (interests) params.append('interests', interests);
@@ -83,9 +83,8 @@ export const learningSetService: LearningSetService = {
         return data || null;
     },
 
-    async recordAnswer(userId: number, learningItemId: number, correct: boolean): Promise<void> {
+    async recordAnswer(learningItemId: number, correct: boolean): Promise<void> {
         const params = new URLSearchParams({
-            userId: String(userId),
             learningItemId: String(learningItemId),
             correct: String(correct),
         });
@@ -98,8 +97,8 @@ export const learningSetService: LearningSetService = {
         }
     },
 
-    async recordAnswersBulk(userId: number, answers: { learningItemId: number, correct: boolean }[]): Promise<void> {
-        const response = await fetch(`/api/user-learning-status/answers/bulk?userId=${userId}`, {
+    async recordAnswersBulk(answers: { learningItemId: number, correct: boolean }[]): Promise<void> {
+        const response = await fetch(`/api/user-learning-status/answers/bulk`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(answers),
@@ -110,9 +109,9 @@ export const learningSetService: LearningSetService = {
         }
     },
 
-    async getItemStatuses(userId: number, learningSetId: number): Promise<ItemStatusDto[]> {
+    async getItemStatuses(learningSetId: number): Promise<ItemStatusDto[]> {
         const response = await fetch(
-            `/api/user-learning-status/set/${learningSetId}/user/${userId}`,
+            `/api/user-learning-status/set/${learningSetId}`,
             {credentials: 'include'}
         );
         if (!response.ok) return [];
@@ -125,9 +124,8 @@ export const learningSetService: LearningSetService = {
         }));
     },
 
-    async completeFlashcards(userId: number, learningSetId: number, score: number): Promise<void> {
+    async completeFlashcards(learningSetId: number, score: number): Promise<void> {
         const params = new URLSearchParams({
-            userId: String(userId),
             learningSetId: String(learningSetId),
             score: String(score),
         });
@@ -140,9 +138,8 @@ export const learningSetService: LearningSetService = {
         }
     },
 
-    async completeTests(userId: number, learningSetId: number, score: number): Promise<void> {
+    async completeTests(learningSetId: number, score: number): Promise<void> {
         const params = new URLSearchParams({
-            userId: String(userId),
             learningSetId: String(learningSetId),
             score: String(score),
         });
@@ -155,8 +152,8 @@ export const learningSetService: LearningSetService = {
         }
     },
 
-    async getFlashCards(learningSetId: number, userId: number): Promise<FlashCardData[]> {
-        const response = await fetch(`/api/learning-sets/${learningSetId}/flashcards?userId=${userId}`, {
+    async getFlashCards(learningSetId: number): Promise<FlashCardData[]> {
+        const response = await fetch(`/api/learning-sets/${learningSetId}/flashcards`, {
             credentials: 'include',
         });
 
@@ -174,8 +171,8 @@ export const learningSetService: LearningSetService = {
         }));
     },
 
-    async getTestItems(learningSetId: number, userId: number): Promise<TestItemData[]> {
-        const response = await fetch(`/api/learning-sets/${learningSetId}/tests?userId=${userId}`, {
+    async getTestItems(learningSetId: number): Promise<TestItemData[]> {
+        const response = await fetch(`/api/learning-sets/${learningSetId}/tests`, {
             credentials: 'include',
         });
 
@@ -253,8 +250,8 @@ export const learningSetService: LearningSetService = {
         }));
     },
 
-    async startLearningForUser(movieId: number, userId: number): Promise<LearningSetDto> {
-        const response = await fetch(`/api/learning-sets/movie/${movieId}/start?userId=${userId}`, {
+    async startLearningForUser(movieId: number): Promise<LearningSetDto> {
+        const response = await fetch(`/api/learning-sets/movie/${movieId}/start`, {
             method: 'POST',
             credentials: 'include',
         });
@@ -273,8 +270,8 @@ export const learningSetService: LearningSetService = {
         if (!response.ok) throw new Error('Failed to approve set');
     },
 
-    async getUserProgress(userId: number): Promise<MovieProgress[]> {
-        const response = await fetch(`/api/user-learning-sets/user/${userId}/progress`, {
+    async getUserProgress(): Promise<MovieProgress[]> {
+        const response = await fetch(`/api/user-learning-sets/progress`, {
             credentials: 'include',
         });
         if (!response.ok) throw new Error('Failed to get user progress');

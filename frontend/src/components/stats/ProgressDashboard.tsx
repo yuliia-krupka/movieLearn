@@ -16,7 +16,7 @@ const ProgressDashboard: React.FC = () => {
 
     useEffect(() => {
         if (currentUserId) {
-            learningSetService.getUserProgress(currentUserId)
+            learningSetService.getUserProgress()
                 .then((data: MovieProgress[]) => setProgress(data))
                 .catch((err: unknown) => console.error('Failed to load progress:', err))
                 .finally(() => setLoading(false));
@@ -78,7 +78,8 @@ const ProgressDashboard: React.FC = () => {
                     <Row gutter={[24, 24]} className="movie-stats-grid">
                         {progress.map((item: MovieProgress) => (
                             <Col xs={24} md={progress.length === 1 ? 16 : 12} lg={progress.length === 1 ? 16 : 12}
-                                 xl={progress.length === 1 ? 12 : 8} key={item.learningSetId}>
+                                 xl={progress.length === 1 ? 12 : (progress.length === 2 ? 12 : 8)}
+                                 key={item.learningSetId}>
                                 <Card
                                     hoverable
                                     className="movie-stat-card"

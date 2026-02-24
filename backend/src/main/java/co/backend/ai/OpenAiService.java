@@ -10,6 +10,7 @@ import co.backend.learningItem.LearningItemType;
 import co.backend.learningSet.LearningSet;
 import co.backend.movie.Movie;
 import co.backend.exceptions.AiParsingException;
+import co.backend.exceptions.AiOperationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +27,8 @@ import org.springframework.web.client.RestClient;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.web.client.ResourceAccessException;
 
 @Service
 @RequiredArgsConstructor
@@ -218,9 +221,14 @@ public class OpenAiService {
         } catch (HttpClientErrorException.NotFound e) {
             log.warn("Model {} not found, falling back to {}", modelName, FALLBACK_MODEL);
             return callWithModel(userPrompt, FALLBACK_MODEL, temperature);
+        } catch (ResourceAccessException e) {
+            log.error("Network or connection reset error calling OpenAI. Prompt: {}, Error: {}", userPrompt,
+                    e.getMessage());
+            throw new AiOperationException("AI generation taking too long or connection interrupted. Please try again.",
+                    e);
         } catch (Exception e) {
             log.error("Error calling OpenAI for list. Prompt: {}, Error: {}", userPrompt, e.getMessage(), e);
-            throw new RuntimeException("AI operation failed: " + e.getMessage());
+            throw new AiOperationException("AI operation failed: " + e.getMessage(), e);
         }
     }
 
@@ -247,6 +255,10 @@ public class OpenAiService {
             } catch (Exception ex) {
                 return fallback;
             }
+        } catch (ResourceAccessException e) {
+            log.error("Network or connection reset error calling OpenAI for single item. Error: {}", e.getMessage());
+            throw new AiOperationException("AI generation taking too long or connection interrupted. Please try again.",
+                    e);
         } catch (Exception e) {
             log.error("Error calling OpenAI for single item", e);
             return fallback;

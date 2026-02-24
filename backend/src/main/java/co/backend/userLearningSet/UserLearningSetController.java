@@ -7,40 +7,50 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+
+import co.backend.user.UserService;
+
 @RestController
 @RequestMapping("/api/user-learning-sets")
 @AllArgsConstructor
 public class UserLearningSetController {
 
     private final UserLearningSetService userLearningSetService;
+    private final UserService userService;
 
     @PostMapping("/complete-flashcards")
     public UserLearningSetDto completeFlashcards(
-            @RequestParam Long userId,
+            @AuthenticationPrincipal OAuth2User oauth2User,
             @RequestParam Long learningSetId,
             @RequestParam int score) {
+        Long userId = userService.getCurrentUser(oauth2User).getId();
         return userLearningSetService.completeFlashcards(userId, learningSetId, score);
     }
 
     @PostMapping("/complete-tests")
     public UserLearningSetDto completeTests(
-            @RequestParam Long userId,
+            @AuthenticationPrincipal OAuth2User oauth2User,
             @RequestParam Long learningSetId,
             @RequestParam int score) {
+        Long userId = userService.getCurrentUser(oauth2User).getId();
         return userLearningSetService.completeTests(userId, learningSetId, score);
     }
 
-    @GetMapping("/movie/{movieId}/user/{userId}")
+    @GetMapping("/movie/{movieId}")
     public ResponseEntity<UserLearningSetDto> getByUserAndMovie(
             @PathVariable Long movieId,
-            @PathVariable Long userId) {
+            @AuthenticationPrincipal OAuth2User oauth2User) {
+        Long userId = userService.getCurrentUser(oauth2User).getId();
         return userLearningSetService.getByUserAndMovie(userId, movieId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/user/{userId}/progress")
-    public List<MovieProgressDto> getProgress(@PathVariable Long userId) {
+    @GetMapping("/progress")
+    public List<MovieProgressDto> getProgress(@AuthenticationPrincipal OAuth2User oauth2User) {
+        Long userId = userService.getCurrentUser(oauth2User).getId();
         return userLearningSetService.getUserProgressSummary(userId);
     }
 }

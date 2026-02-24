@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+
+import co.backend.user.UserService;
+
 @RestController
 @RequestMapping("/api/learning-sets")
 @AllArgsConstructor
@@ -16,6 +21,7 @@ import java.util.Optional;
 public class LearningSetController {
 
     private final LearningSetService learningSetService;
+    private final UserService userService;
 
     @GetMapping("/{id}")
     public LearningSetDto getById(@PathVariable Long id) {
@@ -28,19 +34,22 @@ public class LearningSetController {
     }
 
     @GetMapping("/{id}/flashcards")
-    public List<LearningItemDto> getFlashCards(@PathVariable Long id, @RequestParam Long userId) {
+    public List<LearningItemDto> getFlashCards(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oauth2User) {
+        Long userId = userService.getCurrentUser(oauth2User).getId();
         return learningSetService.getFlashCardsByLearningSetId(id, userId);
     }
 
     @GetMapping("/{id}/tests")
-    public List<LearningItemDto> getTestItems(@PathVariable Long id, @RequestParam Long userId) {
+    public List<LearningItemDto> getTestItems(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oauth2User) {
+        Long userId = userService.getCurrentUser(oauth2User).getId();
         return learningSetService.getTestItemsByLearningSetId(id, userId);
     }
 
     @PostMapping("/movie/{movieId}/start")
     public LearningSetDto startLearning(
             @PathVariable Long movieId,
-            @RequestParam Long userId) {
+            @AuthenticationPrincipal OAuth2User oauth2User) {
+        Long userId = userService.getCurrentUser(oauth2User).getId();
         log.info("[BACKEND] startLearning called - movieId: {}, userId: {}", movieId, userId);
         return learningSetService.generateForUser(movieId, userId);
     }
@@ -50,12 +59,13 @@ public class LearningSetController {
         learningSetService.updateStatus(setId, LearningSetStatus.READY);
     }
 
-    @GetMapping("/movie/{movieId}/user/{userId}/latest")
+    @GetMapping("/movie/{movieId}/latest")
     public Optional<LearningSetDto> getLatestByUserAndMovie(
             @PathVariable Long movieId,
-            @PathVariable Long userId,
+            @AuthenticationPrincipal OAuth2User oauth2User,
             @RequestParam(required = false) EnglishLevel level,
             @RequestParam(required = false) String interests) {
+        Long userId = userService.getCurrentUser(oauth2User).getId();
 
         log.info("getLatestByUserAndMovie called - movieId: {}, userId: {}, level: {}, interests: {}",
                 movieId, userId, level, interests);

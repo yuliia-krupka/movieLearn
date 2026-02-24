@@ -50,7 +50,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
 
                 setLearningSet(learningSetData);
                 if (currentUserId) {
-                    const flashcardData = await learningSetService.getFlashCards(learningSetData.id, currentUserId);
+                    const flashcardData = await learningSetService.getFlashCards(learningSetData.id);
                     setFlashcards(flashcardData);
                 } else {
                     setError('User not authenticated');
@@ -91,19 +91,19 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
             const correctCount = Array.from(results.values()).filter(Boolean).length;
             const score = Math.round((correctCount / flashcards.length) * 100);
 
-            learningSetService.completeFlashcards(currentUserId, learningSet.id, score)
+            learningSetService.completeFlashcards(learningSet.id, score)
                 .catch(err => console.error('Failed to complete flashcards:', err));
 
             const answerPromises = Array.from(results.entries()).map(([index, correct]) => {
                 const card = flashcards[index];
                 if (card) {
-                    return learningSetService.recordAnswer(currentUserId, card.id, correct);
+                    return learningSetService.recordAnswer(card.id, correct);
                 }
                 return Promise.resolve();
             });
 
             Promise.all(answerPromises)
-                .then(() => learningSetService.getItemStatuses(currentUserId, learningSet.id))
+                .then(() => learningSetService.getItemStatuses(learningSet.id))
                 .then(statuses => setItemStatuses(statuses))
                 .catch(err => console.error('Failed to save answers:', err));
         }

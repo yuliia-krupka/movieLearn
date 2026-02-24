@@ -165,12 +165,20 @@ const UpdateAccount = () => {
                         )}
 
                         <Form.Item>
-                            <Button
-                                htmlType="submit"
-                                className="update-profile-btn"
-                            >
-                                Save Changes
-                            </Button>
+                            <div className="form-actions-update">
+                                <Button
+                                    className="blue-btn"
+                                    onClick={() => navigate('/account')}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    htmlType="submit"
+                                    className="yellow-btn"
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
                         </Form.Item>
                     </Form>
                 </Card>
