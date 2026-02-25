@@ -61,7 +61,7 @@ public class OpenAiService {
     }
 
     public List<LearningItemDto> generateFlashcards(String movieTitle, String description, byte[] scriptBytes,
-                                                    String interests, String level) {
+            String interests, String level) {
         String scriptContent = parseScript(scriptBytes);
 
         String userPrompt = String.format(
@@ -71,13 +71,13 @@ public class OpenAiService {
                         Script Excerpt: %s
                         User Interests: %s
                         English Level: %s
-                        
+
                         For each item, provide:
                         - text: The English word or phrase (MAX 70 chars).
                         - translation: Ukrainian translation (MAX 150 chars).
                         - transcription: IPA transcription (MAX 100 chars).
                         - exampleSentence: A sentence using the word from the movie context (MAX 150 chars).
-                        
+
                         Return a JSON array of objects. Do not include markdown formatting like ```json.
                         """,
                 movieTitle, description, scriptContent, interests, level);
@@ -90,18 +90,18 @@ public class OpenAiService {
         String userPrompt = String.format("""
                 Based on the following flashcards, generate a language test.
                 For each flashcard, create one test question.
-                
+
                 VARY the question types significantly across the test items. Do NOT just ask for translations.
                 Use these types as inspiration:
                 1. Usage: "Choose the correct use of 'elaborate':"
                 2. Definition: "'Subtle' is best described as:"
                 3. Context: "Fill in the blank: 'She felt ___ after sharing her secret.'"
                 4. Synonym/Antonym: "Which of these is a synonym for 'inevitable'?"
-                
+
                 Each test question MUST have exactly 4 options (one correct, three incorrect).
-                
+
                 Flashcards: %s
-                
+
                 For each test item, provide:
                 - text: The English question or sentence with a blank (MAX 255 chars).
                 - translation: The Ukrainian translation of the word being tested (MAX 150 chars).
@@ -109,7 +109,7 @@ public class OpenAiService {
                 - exampleSentence: The full correct sentence or a brief definition (MAX 150 chars).
                 - answers: An array of exactly 4 strings (options) (Each option MAX 100 chars).
                 - correctAnswerIndex: The integer index (0-3) of the correct answer in the answers array.
-                
+
                 Return a JSON array of objects. Do not include markdown formatting like ```json.
                 """, flashcardsJson);
 
@@ -117,7 +117,7 @@ public class OpenAiService {
     }
 
     public List<LearningItemDto> regenerateBatch(List<LearningItemDto> originalItems, String instructions,
-                                                 String movieTitle, String description, String scriptContent, String level, String interests) {
+            String movieTitle, String description, String scriptContent, String level, String interests) {
         String originalTexts = String.join(", ", originalItems.stream().map(LearningItemDto::getText).toList());
         String itemsJson = toJson(originalItems);
         String userPrompt = String.format(
@@ -128,10 +128,10 @@ public class OpenAiService {
                         Script Excerpt: %s
                         User English Level: %s
                         User Interests: %s
-                        
+
                         Original Items to CHANGE:
                         %s
-                        
+
                         CRITICAL INSTRUCTIONS:
                         1. For EVERY item in "Original Items", you MUST provide a NEW English word or phrase.
                         2. DO NOT ECHO BACK these words: [%s].
@@ -199,13 +199,12 @@ public class OpenAiService {
             log.warn("Model {} not found, falling back to {}", modelName, FALLBACK_MODEL);
             return callWithModel(userPrompt, FALLBACK_MODEL, temperature);
         } catch (ResourceAccessException e) {
-            log.error("Network or connection reset error calling OpenAI. Prompt: {}, Error: {}", userPrompt,
-                    e.getMessage());
+            log.error("Network or connection reset error calling OpenAI. Error: {}", e.getMessage());
             throw new AiOperationException("AI generation taking too long or connection interrupted. Please try again.",
                     e);
         } catch (Exception e) {
-            log.error("Error calling OpenAI for list. Prompt: {}, Error: {}", userPrompt, e.getMessage(), e);
-            throw new AiOperationException("AI operation failed: " + e.getMessage(), e);
+            log.error("Error calling OpenAI. Error: {}", e.getMessage(), e);
+            throw new AiOperationException("AI operation failed: " + e.getMessage() + ". Please try again.", e);
         }
     }
 

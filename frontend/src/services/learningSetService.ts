@@ -245,7 +245,10 @@ export const learningSetService: LearningSetService = {
             body: JSON.stringify({learningSetId, feedback, itemIds}),
             credentials: 'include',
         });
-        if (!response.ok) throw new Error('Failed to regenerate items');
+        if (!response.ok) {
+            const errorMsg = await response.json().then(d => d.message).catch(() => 'Failed to regenerate items');
+            throw new Error(errorMsg);
+        }
         const items: ApiFlashCard[] = await response.json();
         return items.map((item) => ({
             word: item.text,

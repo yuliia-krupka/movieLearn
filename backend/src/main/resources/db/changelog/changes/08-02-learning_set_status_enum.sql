@@ -1,0 +1,2 @@
+ALTER TABLE learning_set
+    MODIFY COLUMN status ENUM ('REVIEW', 'READY') DEFAULT 'REVIEW';

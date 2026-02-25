@@ -1,0 +1,2 @@
+ALTER TABLE user_learning_item_status
+    MODIFY COLUMN status ENUM ('IN_PROGRESS', 'LEARNED') NOT NULL DEFAULT 'IN_PROGRESS';

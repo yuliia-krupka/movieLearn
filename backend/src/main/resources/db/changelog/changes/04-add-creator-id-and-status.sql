@@ -1,0 +1,3 @@
+ALTER TABLE learning_set
+    ADD COLUMN creator_id INT DEFAULT NULL,
+    ADD COLUMN status VARCHAR(50) DEFAULT 'GENERATING';

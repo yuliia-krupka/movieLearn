@@ -63,7 +63,7 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
                 setLoading(false);
             }
         };
-        loadData();
+        void loadData();
     }, [learningSetIdParam, currentUserId]);
 
     const handleRegenerate = async () => {
@@ -89,7 +89,8 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
             setFeedback('');
         } catch (error) {
             console.error('Failed to regenerate items:', error);
-            message.error('Failed to regenerate items');
+            const errorMessage = error instanceof Error ? error.message : 'Failed to regenerate items';
+            message.error(errorMessage);
         } finally {
             setRegenerating(false);
         }
