@@ -206,7 +206,10 @@ export const learningSetService: LearningSetService = {
             body: JSON.stringify(item),
             credentials: 'include',
         });
-        if (!response.ok) throw new Error('Failed to create item');
+        if (!response.ok) {
+            const errorMsg = await response.json().then(d => d.message).catch(() => 'Failed to create item');
+            throw new Error(errorMsg);
+        }
         return response.json();
     },
 
@@ -220,7 +223,10 @@ export const learningSetService: LearningSetService = {
             body: JSON.stringify(item),
             credentials: 'include',
         });
-        if (!response.ok) throw new Error('Failed to update item');
+        if (!response.ok) {
+            const errorMsg = await response.json().then(d => d.message).catch(() => 'Failed to update item');
+            throw new Error(errorMsg);
+        }
         return response.json();
     },
 

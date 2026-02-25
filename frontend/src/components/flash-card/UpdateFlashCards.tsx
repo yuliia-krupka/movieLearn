@@ -6,7 +6,13 @@ import {Spin} from 'antd';
 import {useAuth} from '../auth/useAuth';
 import '../css/UpdateFlashCards.css';
 import '../css/MovieDetails.css';
-import {useFlashCards} from '../../hooks/useFlashCards';
+import {
+    useFlashCards,
+    WORD_LIMIT,
+    TRANSLATION_LIMIT,
+    SENTENCE_LIMIT,
+    TRANSCRIPTION_LIMIT
+} from '../../hooks/useFlashCards';
 import {learningSetService} from '../../services/learningSetService';
 
 const UpdateFlashCards: React.FC = () => {
@@ -190,47 +196,81 @@ const UpdateFlashCards: React.FC = () => {
                     <div key={card.id || card.tempId}
                          className={`word-card ${card.id && selectedCardIds.includes(card.id) ? 'selected' : ''}`}>
                         <div className="card-selection" style={{display: 'none'}}>
-                            {/* Hidden manual checkbox since we use action buttons now */}
                         </div>
 
                         <div className="word-content">
                             {card.isEditing ? (
                                 <>
                                     <div className="input-group">
-                                        <label className="input-label">Word</label>
+                                        <div className="input-header">
+                                            <label className="input-label">Word</label>
+                                            {(card.word?.length || 0) > WORD_LIMIT && (
+                                                <span className="char-counter limit-exceeded">
+                                                    {card.word?.length || 0}/{WORD_LIMIT}
+                                                </span>
+                                            )}
+                                        </div>
                                         <input
-                                            className="edit-input"
+                                            className={`edit-input ${card.errors?.word ? 'error' : ''}`}
                                             value={card.word || ''}
                                             onChange={(e) => updateCardState(card.id, card.tempId, 'word', e.target.value)}
                                             placeholder="Word"
                                         />
+                                        {card.errors?.word && <div className="error-message">{card.errors.word}</div>}
                                     </div>
                                     <div className="input-group">
-                                        <label className="input-label">Example Sentence</label>
+                                        <div className="input-header">
+                                            <label className="input-label">Example Sentence</label>
+                                            {(card.exampleSentence?.length || 0) > SENTENCE_LIMIT && (
+                                                <span className="char-counter limit-exceeded">
+                                                    {card.exampleSentence?.length || 0}/{SENTENCE_LIMIT}
+                                                </span>
+                                            )}
+                                        </div>
                                         <input
-                                            className="edit-input"
+                                            className={`edit-input ${card.errors?.exampleSentence ? 'error' : ''}`}
                                             value={card.exampleSentence || ''}
                                             onChange={(e) => updateCardState(card.id, card.tempId, 'exampleSentence', e.target.value)}
                                             placeholder="Example Sentence"
                                         />
+                                        {card.errors?.exampleSentence &&
+                                            <div className="error-message">{card.errors.exampleSentence}</div>}
                                     </div>
                                     <div className="input-group">
-                                        <label className="input-label">Transcription</label>
+                                        <div className="input-header">
+                                            <label className="input-label">Transcription</label>
+                                            {(card.transcription?.length || 0) > TRANSCRIPTION_LIMIT && (
+                                                <span className="char-counter limit-exceeded">
+                                                    {card.transcription?.length || 0}/{TRANSCRIPTION_LIMIT}
+                                                </span>
+                                            )}
+                                        </div>
                                         <input
-                                            className="edit-input"
+                                            className={`edit-input ${card.errors?.transcription ? 'error' : ''}`}
                                             value={card.transcription || ''}
                                             onChange={(e) => updateCardState(card.id, card.tempId, 'transcription', e.target.value)}
                                             placeholder="Transcription (e.g., [həˈləʊ])"
                                         />
+                                        {card.errors?.transcription &&
+                                            <div className="error-message">{card.errors.transcription}</div>}
                                     </div>
                                     <div className="input-group">
-                                        <label className="input-label">Translation</label>
+                                        <div className="input-header">
+                                            <label className="input-label">Translation</label>
+                                            {(card.translation?.length || 0) > TRANSLATION_LIMIT && (
+                                                <span className="char-counter limit-exceeded">
+                                                    {card.translation?.length || 0}/{TRANSLATION_LIMIT}
+                                                </span>
+                                            )}
+                                        </div>
                                         <input
-                                            className="edit-input"
+                                            className={`edit-input ${card.errors?.translation ? 'error' : ''}`}
                                             value={card.translation || ''}
                                             onChange={(e) => updateCardState(card.id, card.tempId, 'translation', e.target.value)}
                                             placeholder="Translation"
                                         />
+                                        {card.errors?.translation &&
+                                            <div className="error-message">{card.errors.translation}</div>}
                                     </div>
                                     <div className="card-actions">
                                         <button className="save-btn" onClick={() => handleSaveCard(card)}>

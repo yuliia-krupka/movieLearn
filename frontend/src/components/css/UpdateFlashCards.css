@@ -250,6 +250,37 @@
     border-color: #7367f0;
 }
 
+.edit-input.error {
+    border-color: #ff4d4f;
+}
+
+.edit-input.error:focus {
+    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
+
+.input-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.char-counter {
+    font-size: 0.8rem;
+    color: #8c8c8c;
+}
+
+.char-counter.limit-exceeded {
+    color: #ff4d4f;
+    font-weight: bold;
+}
+
+.error-message {
+    color: #ff4d4f;
+    font-size: 0.8rem;
+    margin-top: 4px;
+}
+
 .card-actions {
     display: flex;
     gap: 12px;

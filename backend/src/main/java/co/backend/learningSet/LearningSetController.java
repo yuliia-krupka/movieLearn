@@ -70,17 +70,6 @@ public class LearningSetController {
         log.info("getLatestByUserAndMovie called - movieId: {}, userId: {}, level: {}, interests: {}",
                 movieId, userId, level, interests);
 
-        if (level != null && interests != null) {
-            log.info("Looking for suitable shared set for movieId: {} with level {}...", movieId, level);
-            Optional<LearningSetDto> suitableSet = learningSetService.findSuitableSet(movieId, level, interests);
-            if (suitableSet.isPresent()) {
-                log.info("Found suitable shared set: {}", suitableSet.get().getId());
-                return suitableSet;
-            } else {
-                log.info("No suitable shared set found for movieId: {} with level {}", movieId, level);
-            }
-        }
-
         if (level != null) {
             log.info("Looking for user-specific set for userId: {}, movieId: {} with level {}...", userId, movieId,
                     level);

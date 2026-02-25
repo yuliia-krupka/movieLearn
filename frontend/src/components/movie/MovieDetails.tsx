@@ -125,32 +125,16 @@ const MovieDetails: React.FC = () => {
                     });
 
                     const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
-                    console.log('Checking for existing learning set...', {
+                    console.log('Starting study session...', {
                         movieId: id,
                         userId: currentUserId,
                         level: user?.englishLevel,
                         interests: interestsStr
                     });
 
-                    const existingSet = await learningSetService.getLatestByUserAndMovie(
-                        Number(id),
-                        user?.englishLevel,
-                        interestsStr
-                    );
-
-                    setIsChecking(false);
-
-                    let learningSet;
-                    if (existingSet) {
-                        console.log('Found existing learning set, reusing:', existingSet.id);
-                        learningSet = existingSet;
-                    } else {
-                        console.log('No existing set found, generating new one...');
-                        setIsGenerating(true);
-
-                        learningSet = await learningSetService.startLearningForUser(Number(id));
-                        console.log('Generated new learning set:', learningSet.id);
-                    }
+                    setIsGenerating(true);
+                    const learningSet = await learningSetService.startLearningForUser(Number(id));
+                    console.log('Learning set ready:', learningSet.id);
 
                     setIsUserStarted(true);
 

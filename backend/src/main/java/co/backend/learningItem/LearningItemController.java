@@ -4,6 +4,7 @@ import co.backend.ai.dto.RegenerateRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -15,13 +16,13 @@ public class LearningItemController {
     private final LearningItemService learningItemService;
 
     @PutMapping("/{id}")
-    public LearningItemDto update(@PathVariable Long id, @RequestBody LearningItemDto dto) {
+    public LearningItemDto update(@PathVariable Long id, @Valid @RequestBody LearningItemDto dto) {
         return learningItemService.update(id, dto);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public LearningItemDto create(@RequestBody LearningItemDto dto) {
+    public LearningItemDto create(@Valid @RequestBody LearningItemDto dto) {
         return learningItemService.create(dto);
     }
 

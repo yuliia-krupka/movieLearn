@@ -7,7 +7,18 @@ export interface EditableFlashCard extends Partial<FlashCardData> {
     isNew?: boolean;
     isEditing?: boolean;
     tempId?: number;
+    errors?: {
+        word?: string;
+        translation?: string;
+        exampleSentence?: string;
+        transcription?: string;
+    };
 }
+
+export const WORD_LIMIT = 70;
+export const TRANSLATION_LIMIT = 150;
+export const SENTENCE_LIMIT = 150;
+export const TRANSCRIPTION_LIMIT = 100;
 
 export const useFlashCards = (learningSetIdParam: string | undefined, currentUserId: number | undefined) => {
     const [learningSetId, setLearningSetId] = useState<number | null>(null);
@@ -19,6 +30,7 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
     const [isTestUnlocked, setIsTestUnlocked] = useState(false);
     const [isRefineExpanded, setIsRefineExpanded] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [editingSnapshots, setEditingSnapshots] = useState<Record<string, EditableFlashCard>>({});
 
     useEffect(() => {
         const loadData = async () => {
@@ -83,33 +95,75 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
         }
     };
 
+    const validateCard = (card: EditableFlashCard) => {
+        const errors: EditableFlashCard['errors'] = {};
+
+        const word = card.word?.trim() || '';
+        const translation = card.translation?.trim() || '';
+        const sentence = card.exampleSentence?.trim() || '';
+        const transcription = card.transcription?.trim() || '';
+
+        if (!word) errors.word = 'Word is required';
+        else if (word.length > WORD_LIMIT) errors.word = `Word is too long (max ${WORD_LIMIT})`;
+
+        if (!translation) errors.translation = 'Translation is required';
+        else if (translation.length > TRANSLATION_LIMIT) errors.translation = `Translation is too long (max ${TRANSLATION_LIMIT})`;
+
+        if (sentence.length > SENTENCE_LIMIT) errors.exampleSentence = `Sentence is too long (max ${SENTENCE_LIMIT})`;
+        if (transcription.length > TRANSCRIPTION_LIMIT) errors.transcription = `Transcription is too long (max ${TRANSCRIPTION_LIMIT})`;
+
+        return errors;
+    };
+
     const handleSaveCard = async (card: EditableFlashCard) => {
         if (!learningSetId) return;
-        if (!card.word || !card.translation) {
-            message.warning('Word and translation are required');
+
+        const errors = validateCard(card);
+        if (Object.keys(errors).length > 0) {
+            setFlashcards(prev => prev.map(c =>
+                (c.id && c.id === card.id) || (c.tempId && c.tempId === card.tempId)
+                    ? {...c, errors}
+                    : c
+            ));
+            message.warning('Please fix validation errors before saving');
             return;
         }
+
+        const word = card.word!.trim();
+        const translation = card.translation!.trim();
 
         try {
             if (card.id) {
                 await learningSetService.updateItem(card.id, {
                     id: card.id,
-                    text: card.word!,
-                    translation: card.translation!,
-                    exampleSentence: card.exampleSentence || '',
-                    transcription: card.transcription || '',
+                    text: word,
+                    translation: translation,
+                    exampleSentence: card.exampleSentence?.trim() || '',
+                    transcription: card.transcription?.trim() || '',
                     type: 'FLASH_CARD',
                     answers: [],
                     learningSetId: learningSetId
                 });
                 message.success('Card updated');
-                setFlashcards(prev => prev.map(c => c.id === card.id ? {...card, isEditing: false} : c));
+                setFlashcards(prev => prev.map(c => c.id === card.id ? {
+                    ...card,
+                    word,
+                    translation,
+                    isEditing: false,
+                    errors: undefined
+                } : c));
+
+                setEditingSnapshots(prev => {
+                    const next = {...prev};
+                    delete next[`id-${card.id}`];
+                    return next;
+                });
             } else {
                 const savedItem = await learningSetService.createItem({
-                    text: card.word!,
-                    translation: card.translation!,
-                    exampleSentence: card.exampleSentence || '',
-                    transcription: card.transcription || '',
+                    text: word,
+                    translation: translation,
+                    exampleSentence: card.exampleSentence?.trim() || '',
+                    transcription: card.transcription?.trim() || '',
                     type: 'FLASH_CARD',
                     answers: [],
                     learningSetId: learningSetId
@@ -124,13 +178,15 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
                         exampleSentence: savedItem.exampleSentence,
                         transcription: savedItem.transcription,
                         isNew: false,
-                        isEditing: false
+                        isEditing: false,
+                        errors: undefined
                     } : c
                 ));
             }
         } catch (error) {
             console.error('Failed to save card:', error);
-            message.error('Failed to save card');
+            const errorMessage = error instanceof Error ? error.message : 'Failed to save card';
+            message.error(errorMessage);
         }
     };
 
@@ -144,6 +200,13 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
                 (card.id && c.id !== card.id) ||
                 (card.tempId && c.tempId !== card.tempId)
             ));
+
+            const key = card.id ? `id-${card.id}` : `temp-${card.tempId}`;
+            setEditingSnapshots(prev => {
+                const next = {...prev};
+                delete next[key];
+                return next;
+            });
         } catch (error) {
             console.error('Failed to delete card:', error);
             message.error('Failed to delete card');
@@ -151,11 +214,36 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
     };
 
     const toggleEdit = (card: EditableFlashCard) => {
-        setFlashcards(prev => prev.map(c =>
-            (c.id && c.id === card.id) || (c.tempId && c.tempId === card.tempId)
-                ? {...c, isEditing: !c.isEditing}
-                : c
-        ));
+        const key = card.id ? `id-${card.id}` : `temp-${card.tempId}`;
+
+        if (!card.isEditing) {
+            setEditingSnapshots(prev => ({...prev, [key!]: {...card}}));
+            setFlashcards(prev => prev.map(c =>
+                (c.id && c.id === card.id) || (c.tempId && c.tempId === card.tempId)
+                    ? {...c, isEditing: true, errors: undefined}
+                    : c
+            ));
+        } else {
+            const snapshot = editingSnapshots[key!];
+            if (snapshot) {
+                setFlashcards(prev => prev.map(c =>
+                    (c.id && c.id === card.id) || (c.tempId && c.tempId === card.tempId)
+                        ? {...snapshot, isEditing: false, errors: undefined}
+                        : c
+                ));
+                setEditingSnapshots(prev => {
+                    const next = {...prev};
+                    delete next[key!];
+                    return next;
+                });
+            } else {
+                setFlashcards(prev => prev.map(c =>
+                    (c.id && c.id === card.id) || (c.tempId && c.tempId === card.tempId)
+                        ? {...c, isEditing: false, errors: undefined}
+                        : c
+                ));
+            }
+        }
     };
 
     const toggleSelection = (id: number) => {
@@ -175,11 +263,23 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
     };
 
     const updateCardState = (id: number | undefined, tempId: number | undefined, field: 'word' | 'translation' | 'exampleSentence' | 'transcription', value: string) => {
-        setFlashcards(prev => prev.map(c =>
-            (id && c.id === id) || (tempId && c.tempId === tempId)
-                ? {...c, [field]: value}
-                : c
-        ));
+        setFlashcards(prev => prev.map(c => {
+            if ((id && c.id === id) || (tempId && c.tempId === tempId)) {
+                const updatedCard = {...c, [field]: value};
+                // Real-time validation for the specific field
+                const allErrors = validateCard(updatedCard);
+                const updatedErrors = {...c.errors};
+
+                if (allErrors[field]) {
+                    updatedErrors[field] = allErrors[field];
+                } else {
+                    delete updatedErrors[field];
+                }
+
+                return {...updatedCard, errors: Object.keys(updatedErrors).length > 0 ? updatedErrors : undefined};
+            }
+            return c;
+        }));
     };
 
     const handleAddCustomCard = () => {
@@ -190,7 +290,8 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
             exampleSentence: '',
             transcription: '',
             isEditing: true,
-            isNew: true
+            isNew: true,
+            errors: undefined
         };
         setFlashcards(prev => [newCard, ...prev]);
     };

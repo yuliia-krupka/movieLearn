@@ -56,7 +56,7 @@ public class OpenAiService {
                 movie != null ? movie.getTitle() : "Unknown",
                 movie != null ? movie.getDescription() : "",
                 movie != null ? parseScript(movie.getScript()) : "",
-                set.getEnglishLevel() != null ? set.getEnglishLevel().name() : "Intermediate",
+                set.getEnglishLevel() != null ? set.getEnglishLevel().name() : "B1",
                 set.getInterests() != null ? set.getInterests() : "");
     }
 
@@ -73,40 +73,16 @@ public class OpenAiService {
                         English Level: %s
                         
                         For each item, provide:
-                        - text: The English word or phrase.
-                        - translation: Ukrainian translation.
-                        - transcription: IPA transcription.
-                        - exampleSentence: A sentence using the word (from the movie context).
+                        - text: The English word or phrase (MAX 70 chars).
+                        - translation: Ukrainian translation (MAX 150 chars).
+                        - transcription: IPA transcription (MAX 100 chars).
+                        - exampleSentence: A sentence using the word from the movie context (MAX 150 chars).
                         
                         Return a JSON array of objects. Do not include markdown formatting like ```json.
                         """,
                 movieTitle, description, scriptContent, interests, level);
 
         return callOpenAiList(userPrompt);
-    }
-
-    public LearningItemDto regenerateItem(LearningItemDto original, String instructions, String movieTitle,
-                                          String description, String scriptContent, String level, String interests) {
-        String userPrompt = String.format("""
-                        Update the following flashcard based on these instructions: "%s"
-                        Movie: "%s"
-                        Description: "%s"
-                        Script Excerpt: %s
-                        User English Level: %s
-                        User Interests: %s
-                        
-                        Original Item to CHANGE (Text: "%s"):
-                        %s
-                        
-                        CRITICAL INSTRUCTIONS:
-                        1. You MUST provide a DIFFERENT English "text" than the original. Do not echo back "%s".
-                        2. If the original was good, provide a better synonym or a more advanced phrase from the script.
-                        3. Return ONLY one updated flashcard as a single JSON object.
-                        4. Do NOT include tests or questions.
-                        """, instructions, movieTitle, description, scriptContent, level, interests, original.getText(),
-                toJson(original), original.getText());
-
-        return callOpenAiSingle(userPrompt, original, 1.0);
     }
 
     public List<LearningItemDto> generateTests(List<LearningItemDto> flashcards) {
@@ -127,11 +103,11 @@ public class OpenAiService {
                 Flashcards: %s
                 
                 For each test item, provide:
-                - text: The English question or sentence with a blank (e.g. "She felt ___ after sharing her secret.").
-                - translation: The Ukrainian translation of the word being tested.
-                - transcription: IPA transcription of the word.
-                - exampleSentence: The full correct sentence or a brief definition.
-                - answers: An array of exactly 4 strings (options).
+                - text: The English question or sentence with a blank (MAX 255 chars).
+                - translation: The Ukrainian translation of the word being tested (MAX 150 chars).
+                - transcription: IPA transcription of the word (MAX 100 chars).
+                - exampleSentence: The full correct sentence or a brief definition (MAX 150 chars).
+                - answers: An array of exactly 4 strings (options) (Each option MAX 100 chars).
                 - correctAnswerIndex: The integer index (0-3) of the correct answer in the answers array.
                 
                 Return a JSON array of objects. Do not include markdown formatting like ```json.
@@ -163,6 +139,7 @@ public class OpenAiService {
                         4. Return the results as a JSON array.
                         5. Do NOT include test items. Return ONLY vocabulary flashcards.
                         6. Total items returned MUST BE (Number of Originals) + (Number of New requested).
+                        7. ADHERE TO LIMITS: text (70 chars), translation (150 chars), exampleSentence (150 chars), transcription (100 chars).
                         """,
                 instructions, movieTitle, description, scriptContent, level, interests, itemsJson, originalTexts);
 
@@ -245,81 +222,70 @@ public class OpenAiService {
         }
     }
 
-    private LearningItemDto callOpenAiSingle(String userPrompt, LearningItemDto fallback, double temperature) {
-        try {
-            return callSingleWithModel(userPrompt, modelName, fallback, temperature);
-        } catch (HttpClientErrorException.NotFound e) {
-            log.warn("Model {} not found, falling back to {}", modelName, FALLBACK_MODEL);
-            try {
-                return callSingleWithModel(userPrompt, FALLBACK_MODEL, fallback, temperature);
-            } catch (Exception ex) {
-                return fallback;
-            }
-        } catch (ResourceAccessException e) {
-            log.error("Network or connection reset error calling OpenAI for single item. Error: {}", e.getMessage());
-            throw new AiOperationException("AI generation taking too long or connection interrupted. Please try again.",
-                    e);
-        } catch (Exception e) {
-            log.error("Error calling OpenAI for single item", e);
-            return fallback;
-        }
-    }
-
-    private LearningItemDto callSingleWithModel(String userPrompt, String model, LearningItemDto fallback,
-                                                double temperature) {
-        ChatRequest request = new ChatRequest(model, List.of(
-                new Message("system", SYSTEM_PROMPT),
-                new Message("user", userPrompt)), temperature);
-
-        try {
-            LearningItemDto generatedItem = getLearningItemDto(request);
-            return generatedItem != null ? generatedItem : fallback;
-        } catch (JsonProcessingException e) {
-            return fallback;
-        }
-    }
-
-    @Nullable
-    private LearningItemDto getLearningItemDto(ChatRequest request) throws JsonProcessingException {
-        ChatResponse response = openAiRestClient.post()
-                .uri("/chat/completions")
-                .body(request)
-                .retrieve()
-                .body(ChatResponse.class);
-
-        if (response != null && !response.getChoices().isEmpty()) {
-            String content = response.getChoices().get(0).getMessage().getContent();
-            content = cleanJsonContent(content);
-
-            GeneratedItem item = objectMapper.readValue(content, GeneratedItem.class);
-            return mapToDto(item);
-        }
-        return null;
-    }
-
     @Nullable
     private List<LearningItemDto> getLearningItemDtos(ChatRequest request) throws JsonProcessingException {
-        ChatResponse response = openAiRestClient.post()
-                .uri("/chat/completions")
-                .body(request)
-                .retrieve()
-                .body(ChatResponse.class);
+        int maxRetries = 3;
+        int attempt = 0;
 
-        if (response != null && !response.getChoices().isEmpty()) {
-            String content = response.getChoices().get(0).getMessage().getContent();
-            content = cleanJsonContent(content);
+        while (true) {
+            attempt++;
+            try {
+                ChatResponse response = openAiRestClient.post()
+                        .uri("/chat/completions")
+                        .body(request)
+                        .retrieve()
+                        .body(ChatResponse.class);
 
-            if (content.startsWith("{")) {
-                GeneratedItem item = objectMapper.readValue(content, GeneratedItem.class);
-                return List.of(mapToDto(item));
+                if (response != null && !response.getChoices().isEmpty()) {
+                    String content = response.getChoices().get(0).getMessage().getContent();
+                    validateResponse(content, 1);
+                    content = cleanJsonContent(content);
+
+                    if (content.startsWith("{")) {
+                        GeneratedItem item = objectMapper.readValue(content, GeneratedItem.class);
+                        return List.of(mapToDto(item));
+                    }
+
+                    List<GeneratedItem> generatedItems = objectMapper.readValue(content, new TypeReference<>() {
+                    });
+
+                    return generatedItems.stream().map(this::mapToDto).toList();
+                }
+                return null;
+            } catch (AiOperationException e) {
+                if (attempt >= maxRetries) {
+                    log.error("AI request failed after {} attempts. Last error: {}", maxRetries, e.getMessage());
+                    throw e;
+                }
+                log.warn("AI generation attempt {} failed: {}. Retrying...", attempt, e.getMessage());
+            } catch (JsonProcessingException e) {
+                if (attempt >= maxRetries) {
+                    log.error("JSON Parsing failed after {} attempts.", maxRetries, e);
+                    throw e;
+                }
+                log.warn("JSON Parsing attempt {} failed. Retrying...", attempt);
             }
-
-            List<GeneratedItem> generatedItems = objectMapper.readValue(content, new TypeReference<>() {
-            });
-
-            return generatedItems.stream().map(this::mapToDto).toList();
         }
-        return null;
+    }
+
+    private void validateResponse(String content, int expectedMinItems) {
+        if (content == null || content.isBlank()) {
+            throw new AiOperationException(
+                    "The response received from the AI is empty. Please try again.", null);
+        }
+
+        int minLength = expectedMinItems * 50;
+        if (content.length() < minLength && !content.trim().startsWith("[")) {
+            log.warn("AI response suspicious (too short): {}", content);
+            throw new AiOperationException(
+                    "The response from the AI is incorrect or too short. Please try again.", null);
+        }
+
+        if (content.toLowerCase().contains("i apologize") || content.toLowerCase().contains("cannot fulfill")) {
+            log.warn("AI refused to generate content: {}", content);
+            throw new AiOperationException(
+                    "AI was unable to generate content for this request. Try again.", null);
+        }
     }
 
     private String cleanJsonContent(String content) {

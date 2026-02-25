@@ -57,19 +57,6 @@ public class LearningSetService {
     }
 
     private Optional<LearningSetDto> findReusedSet(Movie movie, User user) {
-        if (user.getEnglishLevel() != null && user.getInterests() != null) {
-            log.info("Looking for suitable shared set...");
-            Optional<LearningSet> suitableSet = findSuitableSetEntity(movie.getId(), user.getEnglishLevel(),
-                    user.getInterests());
-            if (suitableSet.isPresent()) {
-                log.info("[BACKEND] Found suitable shared set, cloning for user: {}", suitableSet.get().getId());
-                LearningSet clonedSet = cloneSetForUser(suitableSet.get(), user.getId());
-                return Optional.of(learningSetMapper.toDto(clonedSet));
-            } else {
-                log.info("No suitable shared set found");
-            }
-        }
-
         if (user.getEnglishLevel() != null) {
             log.info("Looking for user's existing set with same level...");
             Optional<LearningSetDto> existingSet = getLatestByUserAndMovieWithLevel(user.getId(), movie.getId(),
@@ -87,10 +74,24 @@ public class LearningSetService {
                     log.info("[BACKEND] Found matching user set, reusing: {}", existingSet.get().getId());
                     return existingSet;
                 } else {
-                    log.info("User has set with same level but different interests, will generate new");
+                    log.info("User has set with same level but different interests, will see if a shared one exists");
                 }
             } else {
                 log.info("No existing user set found with same level");
+            }
+        }
+
+        if (user.getEnglishLevel() != null && user.getInterests() != null) {
+            log.info("Looking for suitable shared set...");
+            Optional<LearningSet> suitableSet = findSuitableSetEntity(movie.getId(), user.getEnglishLevel(),
+                    user.getInterests());
+            if (suitableSet.isPresent()) {
+                log.info("[BACKEND] Found suitable shared set, cloning for user: {}", suitableSet.get().getId());
+                learningSetRepository.deleteByMovieIdAndCreatorId(movie.getId(), user.getId());
+                LearningSet clonedSet = cloneSetForUser(suitableSet.get(), user.getId());
+                return Optional.of(learningSetMapper.toDto(clonedSet));
+            } else {
+                log.info("No suitable shared set found");
             }
         }
 
