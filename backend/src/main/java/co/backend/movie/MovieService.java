@@ -5,6 +5,7 @@ import co.backend.genre.Genre;
 import co.backend.genre.GenreRepository;
 import co.backend.user.User;
 import co.backend.user.UserRepository;
+import co.backend.userLearningSet.UserLearningSetRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class MovieService {
     private final GenreRepository genreRepository;
     private final UserRepository userRepository;
     private final MovieMapper movieMapper;
+    private final UserLearningSetRepository userLearningSetRepository;
 
     public List<MovieDto> getAllMovies() {
         return movieRepository.findAll().stream()
@@ -172,18 +174,20 @@ public class MovieService {
     }
 
     public List<MovieDto> getMoviesByUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
-
-        List<Movie> movies = user.getMovies();
-
-        return movies.stream()
+        return userLearningSetRepository.findAllByUserId(userId).stream()
+                .map(uls -> uls.getLearningSet().getMovie())
+                .filter(Objects::nonNull)
+                .distinct()
                 .map(movieMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public int getMoviesCountByUserId(Long userId) {
-        return movieRepository.countMoviesByUsers_Id(userId);
+        return (int) userLearningSetRepository.findAllByUserId(userId).stream()
+                .map(uls -> uls.getLearningSet().getMovie())
+                .filter(Objects::nonNull)
+                .distinct()
+                .count();
     }
 
 }

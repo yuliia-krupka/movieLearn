@@ -258,7 +258,7 @@ const MovieDetails: React.FC = () => {
                                             Back to Movies
                                         </Button>
                                         <div className="movie-details-action-group">
-                                            {isUserStarted && learningSet && learningSet.status === 'READY' && (
+                                            {isUserStarted && learningSet && (learningSet.status === 'READY' || learningSet.status === 'REVIEW') && (
                                                 <Button
                                                     className="secondary-action-btn"
                                                     onClick={() => navigate(`/learning-sets/${learningSet.id}/update`)}
