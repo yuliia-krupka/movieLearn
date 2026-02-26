@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {SoundOutlined} from '@ant-design/icons';
 import '../css/FlashCard.css';
 
 interface FlashCardProps {
@@ -80,7 +81,7 @@ const FlashCard: React.FC<FlashCardProps> = ({
                                     {status ? 'KNOWN' : "DON'T KNOW"}
                                 </div>
                             )}
-                            <h2>{word.toUpperCase()}</h2>
+                            <h2 style={{margin: 0}}>{word.toUpperCase()}</h2>
                             {transcription && (
                                 <p className="transcription">{transcription}</p>
                             )}
@@ -88,6 +89,18 @@ const FlashCard: React.FC<FlashCardProps> = ({
                                 <p className="example-sentence">{exampleSentence}</p>
                             )}
                             <p>Tap to see translation</p>
+                            <div style={{display: 'flex', justifyContent: 'center', marginTop: '15px'}}>
+                                <SoundOutlined
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const utterance = new SpeechSynthesisUtterance(word);
+                                        utterance.lang = 'en-US';
+                                        window.speechSynthesis.speak(utterance);
+                                    }}
+                                    style={{cursor: 'pointer', fontSize: '1.4rem', color: '#666'}}
+                                    title="Listen to pronunciation"
+                                />
+                            </div>
                         </div>
                         <div className="back">
                             <h2>{translation.toUpperCase()}</h2>

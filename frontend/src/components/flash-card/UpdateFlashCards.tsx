@@ -1,7 +1,7 @@
 import React from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
-import {CloseOutlined, CheckOutlined, PlusOutlined, CaretRightOutlined} from '@ant-design/icons';
+import {CloseOutlined, CheckOutlined, PlusOutlined, CaretRightOutlined, SoundOutlined} from '@ant-design/icons';
 import {Spin} from 'antd';
 import {useAuth} from '../auth/useAuth';
 import '../css/UpdateFlashCards.css';
@@ -286,7 +286,22 @@ const UpdateFlashCards: React.FC = () => {
                                 </>
                             ) : (
                                 <div className="word-content-display" onClick={() => toggleEdit(card)}>
-                                    <div className="word-text">{card.word}</div>
+                                    <div className="word-text"
+                                         style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                        {card.word}
+                                        {card.word && (
+                                            <SoundOutlined
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    const utterance = new SpeechSynthesisUtterance(card.word!);
+                                                    utterance.lang = 'en-US';
+                                                    window.speechSynthesis.speak(utterance);
+                                                }}
+                                                style={{cursor: 'pointer', color: '#1890ff', fontSize: '1.2rem'}}
+                                                title="Listen to pronunciation"
+                                            />
+                                        )}
+                                    </div>
                                     {card.transcription &&
                                         <div className="word-transcription">{card.transcription}</div>}
                                     <div className="word-sentence">"{card.exampleSentence}"</div>

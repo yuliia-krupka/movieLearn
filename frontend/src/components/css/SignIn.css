@@ -33,6 +33,19 @@
     margin-top: -8px;
 }
 
+.ukrainian-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(24, 144, 255, 0.1);
+    color: #1890ff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 24px;
+}
+
 .google-button {
     background-color: #F49E4C !important;
     border-color: #F49E4C !important;
@@ -115,7 +128,7 @@
 .info-section h2 {
     font-size: 2rem;
     color: #333;
-    margin-bottom: 60px;
+    margin-bottom: 20px;
     text-align: center;
     font-weight: 700;
 }
