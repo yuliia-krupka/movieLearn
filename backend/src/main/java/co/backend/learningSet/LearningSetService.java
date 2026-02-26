@@ -1,6 +1,7 @@
 package co.backend.learningSet;
 
 import co.backend.ai.OpenAiService;
+import co.backend.ai.ScriptParser;
 import co.backend.exceptions.BadRequestException;
 import co.backend.exceptions.NotFoundException;
 import co.backend.learningItem.LearningItem;
@@ -36,6 +37,7 @@ public class LearningSetService {
     private final LearningItemRepository learningItemRepository;
     private final TestDataProvider testDataProvider;
     private final OpenAiService openAiService;
+    private final ScriptParser scriptParser;
     private final MovieRepository movieRepository;
     private final UserRepository userRepository;
     private final UserLearningSetService userLearningSetService;
@@ -106,7 +108,7 @@ public class LearningSetService {
         List<LearningItemDto> generatedItems = openAiService.generateFlashcards(
                 movie.getTitle(),
                 movie.getDescription(),
-                movie.getScript(),
+                scriptParser.parse(movie.getScript()),
                 user.getInterests(),
                 user.getEnglishLevel() != null ? user.getEnglishLevel().name() : "B1");
 

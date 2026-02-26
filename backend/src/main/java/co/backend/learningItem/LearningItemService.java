@@ -1,7 +1,8 @@
 package co.backend.learningItem;
 
 import co.backend.ai.OpenAiService;
-import co.backend.ai.dto.AiContext;
+import co.backend.ai.ScriptParser;
+import co.backend.movie.Movie;
 import co.backend.exceptions.BadRequestException;
 import co.backend.exceptions.NotFoundException;
 import co.backend.learningSet.LearningSet;
@@ -22,6 +23,7 @@ public class LearningItemService {
     private final LearningSetRepository learningSetRepository;
     private final LearningItemMapper learningItemMapper;
     private final OpenAiService openAiService;
+    private final ScriptParser scriptParser;
     private final UserLearningItemStatusService userLearningItemStatusService;
     private final UserLearningSetService userLearningSetService;
 
@@ -64,11 +66,15 @@ public class LearningItemService {
 
         List<LearningItemDto> dtos = items.stream().map(learningItemMapper::toDto).toList();
 
-        AiContext context = openAiService.extractAiContext(learningSet);
-
-        List<LearningItemDto> regeneratedDtos = openAiService.regenerateBatch(dtos, feedback,
-                context.movieTitle(), context.movieDescription(), context.scriptContent(),
-                context.englishLevel(), context.interests());
+        Movie movie = learningSet.getMovie();
+        List<LearningItemDto> regeneratedDtos = openAiService.regenerateBatch(
+                dtos, feedback,
+                movie != null ? movie.getTitle() : "Unknown",
+                movie != null ? movie.getDescription() : "",
+                movie != null ? scriptParser.parse(movie.getScript()) : "",
+                learningSet.getEnglishLevel() != null ? learningSet.getEnglishLevel().name() : "B1",
+                learningSet.getInterests() != null ? learningSet.getInterests() : ""
+        );
         learningSet.getLearningItems().removeAll(items);
 
         List<LearningItem> newItems = regeneratedDtos.stream().map(dto -> {
