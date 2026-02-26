@@ -10,46 +10,7 @@ import type {
 
 export type {MovieProgress};
 
-export interface LearningSetService {
-    getOrCreateByMovie(movieId: number): Promise<LearningSetDto>;
-
-    getLatestByUserAndMovie(movieId: number, level?: string, interests?: string): Promise<LearningSetDto | null>;
-
-    recordAnswer(learningItemId: number, correct: boolean): Promise<void>;
-
-    recordAnswersBulk(answers: { learningItemId: number, correct: boolean }[]): Promise<void>;
-
-    getItemStatuses(learningSetId: number): Promise<ItemStatusDto[]>;
-
-    completeFlashcards(learningSetId: number, score: number): Promise<void>;
-
-    completeTests(learningSetId: number, score: number): Promise<void>;
-
-    getFlashCards(learningSetId: number): Promise<FlashCardData[]>;
-
-    getTestItems(learningSetId: number): Promise<TestItemData[]>;
-
-    getById(id: number): Promise<LearningSetDto>;
-
-    createItem(item: Partial<ApiFlashCard> & { learningSetId: number, type: string }): Promise<ApiFlashCard>;
-
-    updateItem(id: number, item: Partial<ApiFlashCard> & {
-        learningSetId: number,
-        type: string
-    }): Promise<ApiFlashCard>;
-
-    deleteItem(id: number): Promise<void>;
-
-    regenerate(learningSetId: number, feedback: string, itemIds: number[]): Promise<FlashCardData[]>;
-
-    startLearningForUser(movieId: number): Promise<LearningSetDto>;
-
-    approveSet(learningSetId: number): Promise<void>;
-
-    getUserProgress(): Promise<MovieProgress[]>;
-}
-
-export const learningSetService: LearningSetService = {
+export const learningSetService = {
     async getOrCreateByMovie(movieId: number): Promise<LearningSetDto> {
         const response = await fetch(`/api/learning-sets/movie/${movieId}`, {
             credentials: 'include',

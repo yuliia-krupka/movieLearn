@@ -156,12 +156,6 @@ public class LearningSetService {
                 .map(learningSetMapper::toDto);
     }
 
-    public Optional<LearningSetDto> findSuitableSet(Long movieId, EnglishLevel level,
-                                                    String interests) {
-        return findSuitableSetEntity(movieId, level, interests)
-                .map(learningSetMapper::toDto);
-    }
-
     public Optional<LearningSet> findSuitableSetEntity(Long movieId, EnglishLevel level,
                                                        String interests) {
         log.info("[BACKEND] findSuitableSetEntity called - movieId: {}, level: {}, interests: {}", movieId, level,

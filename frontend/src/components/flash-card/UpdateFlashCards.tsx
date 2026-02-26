@@ -67,7 +67,7 @@ const UpdateFlashCards: React.FC = () => {
             <MainLayout className="update-flashcards-container">
                 <div className="loading-spinner-container">
                     <Spin size="large" tip="Loading vocabulary...">
-                        <div style={{padding: 50}}/>
+                        <div className="loading-spacer"/>
                     </Spin>
                 </div>
             </MainLayout>
@@ -122,13 +122,7 @@ const UpdateFlashCards: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="info-message" style={{
-                    marginTop: '16px',
-                    color: '#8c8c8c',
-                    fontSize: '0.9rem',
-                    textAlign: 'center',
-                    fontStyle: 'italic'
-                }}>
+                <div className="info-message">
                     Tip: Clicking 'I know' during flashcard review marks the word as learned and unlocks tests.
                 </div>
             </div>
@@ -137,21 +131,15 @@ const UpdateFlashCards: React.FC = () => {
                 <div
                     className="custom-request-title"
                     onClick={() => setIsRefineExpanded(!isRefineExpanded)}
-                    style={{cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}
                 >
                     Refine Flashcards
                     <CaretRightOutlined
-                        style={{
-                            transform: isRefineExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-                            transition: 'transform 0.3s',
-                            color: '#faad14',
-                            fontSize: '20px'
-                        }}
+                        className={`refine-toggle-icon ${isRefineExpanded ? 'expanded' : ''}`}
                     />
                 </div>
 
                 {isRefineExpanded && (
-                    <div className="refine-content" style={{marginTop: '16px'}}>
+                    <div className="refine-content">
                         <div className="custom-request-subtitle">
                             Select words you don't like and describe how to improve them (e.g., "Too easy", "Make it
                             more
@@ -172,6 +160,7 @@ const UpdateFlashCards: React.FC = () => {
                                 className="generate-btn"
                                 onClick={handleRegenerate}
                                 disabled={regenerating || selectedCardIds.length === 0}
+                                title={""}
                             >
                                 {regenerating ? 'Regenerating...' : `Regenerate Selected (${selectedCardIds.length})`}
                             </button>
@@ -181,11 +170,24 @@ const UpdateFlashCards: React.FC = () => {
             </div>
 
             <div className="suggested-words-header">
-                <div className="suggested-words-title">
-                    "{learningSet?.name || 'Movie Title'}" - <span>Review Words</span>
+                <div>
+                    <div className="suggested-words-title">
+                        "{learningSet?.name || 'Movie Title'}" - <span>Review Words</span>
+                    </div>
+                    <div style={{color: '#8c8c8c', fontSize: '0.85rem', marginTop: '4px'}}>
+                        You can have a maximum of 20 flashcards per set.
+                    </div>
                 </div>
-                <div style={{display: 'flex', gap: '10px'}}>
-                    <button className="add-custom-btn" onClick={handleAddCustomCard}>
+                <div className="add-word-container">
+                    {flashcards.length >= 20 && (
+                        <span className="limit-warning-text">Max limit of 20 cards reached.</span>
+                    )}
+                    <button
+                        className="add-custom-btn"
+                        onClick={handleAddCustomCard}
+                        disabled={flashcards.length >= 20}
+                        title={flashcards.length >= 20 ? "Maximum limit of 20 flashcards reached." : ""}
+                    >
                         <PlusOutlined/> Add Custom Word
                     </button>
                 </div>
@@ -195,7 +197,7 @@ const UpdateFlashCards: React.FC = () => {
                 {flashcards.map((card) => (
                     <div key={card.id || card.tempId}
                          className={`word-card ${card.id && selectedCardIds.includes(card.id) ? 'selected' : ''}`}>
-                        <div className="card-selection" style={{display: 'none'}}>
+                        <div className="card-selection">
                         </div>
 
                         <div className="word-content">
@@ -283,7 +285,7 @@ const UpdateFlashCards: React.FC = () => {
                                     </div>
                                 </>
                             ) : (
-                                <div onClick={() => toggleEdit(card)} style={{cursor: 'pointer'}}>
+                                <div className="word-content-display" onClick={() => toggleEdit(card)}>
                                     <div className="word-text">{card.word}</div>
                                     {card.transcription &&
                                         <div className="word-transcription">{card.transcription}</div>}

@@ -49,7 +49,7 @@ public class OpenAiService {
                         For each item, provide:
                         - text: The English word or phrase (MAX 70 chars).
                         - translation: Ukrainian translation (MAX 150 chars).
-                        - transcription: IPA transcription (MAX 100 chars).
+                        - transcription: IPA transcription enclosed in slashes, e.g. /wɜːrd/ (MAX 100 chars).
                         - exampleSentence: A sentence using the word from the movie context (MAX 150 chars).
                         """,
                 movieTitle, description, scriptContent, interests, level);
@@ -77,7 +77,7 @@ public class OpenAiService {
                 For each test item, provide:
                 - text: The English question or sentence with a blank (MAX 255 chars).
                 - translation: The Ukrainian translation of the word being tested (MAX 150 chars).
-                - transcription: IPA transcription of the word (MAX 100 chars).
+                - transcription: IPA transcription of the word enclosed in slashes, e.g. /wɜːrd/ (MAX 100 chars).
                 - exampleSentence: The full correct sentence or a brief definition (MAX 150 chars).
                 - answers: An array of exactly 4 strings (options) (Each option MAX 100 chars).
                 - correctAnswerIndex: The integer index (0-3) of the correct answer in the answers array.
@@ -115,7 +115,7 @@ public class OpenAiService {
                         4. Return the results as a JSON array.
                         5. Do NOT include test items. Return ONLY vocabulary flashcards.
                         6. Total items returned MUST BE (Number of Originals) + (Number of New requested).
-                        7. ADHERE TO LIMITS: text (70 chars), translation (150 chars), exampleSentence (150 chars), transcription (100 chars).
+                        7. ADHERE TO LIMITS: text (70 chars), translation (150 chars), exampleSentence (150 chars), transcription (100 chars enclosed in slashes).
                         """,
                 instructions, movieTitle, description, scriptContent, level, interests, itemsJson, originalTexts);
 

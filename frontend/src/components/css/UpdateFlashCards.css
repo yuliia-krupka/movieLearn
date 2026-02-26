@@ -7,6 +7,10 @@
     width: 100%;
 }
 
+.loading-spacer {
+    padding: 50px;
+}
+
 .custom-request-card {
     background: #fff;
     border-radius: 12px;
@@ -20,6 +24,24 @@
     font-weight: 600;
     margin-bottom: 8px;
     color: #1a1a1a;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.refine-toggle-icon {
+    transition: transform 0.3s;
+    color: #faad14;
+    font-size: 20px;
+}
+
+.refine-toggle-icon.expanded {
+    transform: rotate(90deg);
+}
+
+.refine-content {
+    margin-top: 16px;
 }
 
 .custom-request-subtitle {
@@ -86,6 +108,17 @@
     color: #1a1a1a;
 }
 
+.add-word-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.limit-warning-text {
+    color: #ff4d4f;
+    font-size: 13px;
+}
+
 .add-custom-btn {
     background: #7367f0;
     color: white;
@@ -101,6 +134,11 @@
 
 .add-custom-btn:hover {
     background: #685dd8;
+}
+
+.add-custom-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .word-card {
@@ -172,8 +210,16 @@
     background-color: rgba(255, 82, 82, 0.05);
 }
 
+.card-selection {
+    display: none;
+}
+
 .word-content {
     flex: 1;
+}
+
+.word-content-display {
+    cursor: pointer;
 }
 
 .word-header {
@@ -378,6 +424,14 @@
     color: #666;
     font-size: 16px;
     margin-bottom: 32px;
+}
+
+.info-message {
+    margin-top: 16px;
+    color: #8c8c8c;
+    font-size: 0.9rem;
+    text-align: center;
+    font-style: italic;
 }
 
 .dashboard-actions {
