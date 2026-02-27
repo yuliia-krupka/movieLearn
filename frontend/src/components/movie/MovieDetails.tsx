@@ -120,28 +120,25 @@ const MovieDetails: React.FC = () => {
                 try {
                     setIsChecking(true);
 
-                    await axios.put(`/api/users/movies/${id}`, null, {
-                        withCredentials: true,
-                    });
+                    if (!isUserStarted) {
+                        await axios.put(`/api/users/movies/${id}`, null, {
+                            withCredentials: true,
+                        });
+                    }
 
-                    const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
-                    console.log('Starting study session...', {
-                        movieId: id,
-                        userId: currentUserId,
-                        level: user?.englishLevel,
-                        interests: interestsStr
-                    });
+                    if (!learningSet) {
+                        setIsGenerating(true);
+                    }
 
-                    setIsGenerating(true);
-                    const learningSet = await learningSetService.startLearningForUser(Number(id));
-                    console.log('Learning set ready:', learningSet.id);
+                    const readySet = await learningSetService.startLearningForUser(Number(id));
+                    console.log('Learning set ready:', readySet.id);
 
                     setIsUserStarted(true);
 
-                    if (learningSet.status === 'REVIEW') {
-                        navigate(`/learning-sets/${learningSet.id}/update`);
+                    if (readySet.status === 'REVIEW') {
+                        navigate(`/learning-sets/${readySet.id}/update`);
                     } else {
-                        navigate(`/learning-sets/${learningSet.id}/flashcards`);
+                        navigate(`/learning-sets/${readySet.id}/flashcards`);
                     }
                 } catch
                     (e: unknown) {
@@ -244,7 +241,7 @@ const MovieDetails: React.FC = () => {
                                             Back to Movies
                                         </Button>
                                         <div className="movie-details-action-group">
-                                            {isUserStarted && learningSet && (learningSet.status === 'READY' || learningSet.status === 'REVIEW') && (
+                                            {learningSet && (learningSet.status === 'READY' || learningSet.status === 'REVIEW') && (
                                                 <Button
                                                     className="secondary-action-btn"
                                                     onClick={() => navigate(`/learning-sets/${learningSet.id}/update`)}
@@ -256,7 +253,7 @@ const MovieDetails: React.FC = () => {
                                                 className="primary-action-btn"
                                                 onClick={handleStartStudying}
                                             >
-                                                {isUserStarted ? 'Continue Studying' : 'Start Studying'}
+                                                {learningSet ? 'Continue Studying' : 'Start Studying'}
                                             </Button>
                                         </div>
                                     </div>
