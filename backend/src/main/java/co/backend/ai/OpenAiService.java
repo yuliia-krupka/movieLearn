@@ -26,10 +26,12 @@ public class OpenAiService {
     private final LearningItemMapper learningItemMapper;
 
     private static final String SYSTEM_PROMPT = """
-            You are a helpful assistant that generates language learning flashcards based on movie content.
-            The user is a Ukrainian speaker learning English.
-            Generate content that matches the user's English level and interests.
-            Output purely JSON.
+            You are a specialized language learning assistant. Your goal is to extract high-value vocabulary from movie scripts.
+            Target Audience: Ukrainian speakers learning English.
+            Key Rule: A flashcard 'text' field must be a single word, a collocation, a phrasal verb, or an idiom.
+            NEVER use full sentences or long dialogue lines as the 'text' of a flashcard, even if they appear in the script.
+            Adjust the complexity and rarity of chosen vocabulary based on the user's English level (especially for B2-C2 levels).
+            Output strictly valid JSON.
             """;
 
     public List<LearningItemDto> generateFlashcards(
@@ -40,17 +42,26 @@ public class OpenAiService {
             String level) {
         String userPrompt = String.format(
                 """
-                        Generate 10 flashcards (words or phrases) from the movie "%s".
-                        Movie Description: %s
+                        Extract 10 high-quality vocabulary items (words, idioms, or collocations) from the movie "%s".
+                        
+                        Context:
+                        Description: %s
                         Script Excerpt: %s
-                        User Interests: %s
+                        
+                        User Profile:
+                        Interests: %s
                         English Level: %s
+                        
+                        Selection Guidelines:
+                        1. NO FULL SENTENCES: The 'text' field must be a vocabulary unit (e.g., "resounding success", "take into account", "epiphany"), NOT a full sentence from the dialogue.
+                        2. LEVEL-APPROPRIATE: For B2, C1, and C2 levels, strictly avoid simple words. Prioritize sophisticated academic vocabulary, industry-specific terms, and native-like idioms found in the script.
+                        3. INTERESTS: Focus on items relevant to user's interests if they appear in the script.
                         
                         For each item, provide:
                         - text: The English word or phrase (MAX 70 chars).
-                        - translation: Ukrainian translation (MAX 150 chars).
-                        - transcription: IPA transcription enclosed in slashes, e.g. /wɜːrd/ (MAX 100 chars).
-                        - exampleSentence: A sentence using the word from the movie context (MAX 150 chars).
+                        - translation: Accurate Ukrainian translation (MAX 150 chars).
+                        - transcription: IPA transcription enclosed in slashes (MAX 100 chars).
+                        - exampleSentence: The actual sentence from the movie where this item is used (MAX 150 chars).
                         """,
                 movieTitle, description, scriptContent, interests, level);
 
@@ -99,23 +110,24 @@ public class OpenAiService {
         String userPrompt = String.format(
                 """
                         Update the following flashcards based on these instructions: "%s"
+                        
+                        Context:
                         Movie: "%s"
                         Description: "%s"
                         Script Excerpt: %s
                         User English Level: %s
                         User Interests: %s
                         
-                        Original Items to CHANGE:
+                        Original Items to REPLACE:
                         %s
                         
-                        CRITICAL INSTRUCTIONS:
-                        1. For EVERY item in "Original Items", you MUST provide a NEW English word or phrase.
-                        2. DO NOT ECHO BACK these words: [%s].
-                        3. If the user asks to "add N more", add N NEW items from the movie script in addition to the updated originals.
-                        4. Return the results as a JSON array.
-                        5. Do NOT include test items. Return ONLY vocabulary flashcards.
-                        6. Total items returned MUST BE (Number of Originals) + (Number of New requested).
-                        7. ADHERE TO LIMITS: text (70 chars), translation (150 chars), exampleSentence (150 chars), transcription (100 chars enclosed in slashes).
+                        CRITICAL CONSTRAINTS:
+                        1. NEW VOCABULARY: For EVERY item in "Original Items", you MUST provide a DIFFERENT English word or phrase from the script.
+                        2. NO DUPLICATES: DO NOT reuse these words: [%s].
+                        3. NO FULL SENTENCES: Ensure the 'text' field contains only a word or phrase, never a full sentence.
+                        4. SOPHISTICATION: If level is B2, C1, or C2, use advanced collocations and idioms from the script.
+                        5. ADHERE TO LIMITS: text (70 chars), translation (150 chars), exampleSentence (150 chars), transcription (100 chars in slashes).
+                        6. Return the results as a JSON array of vocabulary flashcards only.
                         """,
                 instructions, movieTitle, description, scriptContent, level, interests, itemsJson, originalTexts);
 

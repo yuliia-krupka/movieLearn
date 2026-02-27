@@ -80,7 +80,7 @@ public class UserLearningSetService {
     }
 
     public List<MovieProgressDto> getUserProgressSummary(Long userId) {
-        return userLearningSetRepository.findAllByUserId(userId).stream()
+        return userLearningSetRepository.findAllByUserIdWithLearningSetAndMovie(userId).stream()
                 .map(uls -> createProgressDto(userId, uls))
                 .toList();
     }

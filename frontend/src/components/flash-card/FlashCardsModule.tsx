@@ -206,6 +206,9 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
         <MainLayout className="flashcard-content" fullHeight>
             {learningSet && (
                 <div className="learning-set-info">
+                    <button className="back-to-movie-btn" onClick={handleBackToMovie}>
+                        ← Back to Movie
+                    </button>
                     <h2>{learningSet.name}</h2>
                 </div>
             )}

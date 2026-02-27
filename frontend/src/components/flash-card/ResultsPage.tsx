@@ -1,5 +1,6 @@
 import React from 'react';
 import type {FlashCardData, ItemStatusDto} from '../../types/learningSet';
+import {SoundOutlined} from '@ant-design/icons';
 import MainLayout from '../layout/MainLayout';
 import '../css/Results.css';
 
@@ -105,7 +106,19 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
                                     {known ? '✓' : '✗'}
                                 </span>
                                 <div className="result-card-content">
-                                    <span className="result-word">{card.word}</span>
+                                    <div className="result-word-container">
+                                        <span className="result-word">{card.word}</span>
+                                        <SoundOutlined
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const utterance = new SpeechSynthesisUtterance(card.word);
+                                                utterance.lang = 'en-US';
+                                                window.speechSynthesis.speak(utterance);
+                                            }}
+                                            className="result-voice-icon"
+                                            title="Listen to pronunciation"
+                                        />
+                                    </div>
 
                                     {!isTestResult && (
                                         <>

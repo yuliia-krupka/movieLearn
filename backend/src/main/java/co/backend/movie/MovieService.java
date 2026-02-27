@@ -27,9 +27,9 @@ public class MovieService {
     private final MovieMapper movieMapper;
     private final UserLearningSetRepository userLearningSetRepository;
 
-    public List<MovieDto> getAllMovies() {
+    public List<MovieSummaryDto> getAllMovies() {
         return movieRepository.findAll().stream()
-                .map(movieMapper::toDto)
+                .map(movieMapper::toSummaryDto)
                 .collect(Collectors.toList());
     }
 
@@ -153,7 +153,7 @@ public class MovieService {
         return movieMapper.toDto(movie);
     }
 
-    public List<MovieDto> getMoviesByGenres(List<String> genreNames) {
+    public List<MovieSummaryDto> getMoviesByGenres(List<String> genreNames) {
         List<Genre> genres = genreRepository.findAllByNameIn(genreNames);
         if (genres.isEmpty()) {
             throw new NotFoundException("Genres not found");
@@ -162,28 +162,28 @@ public class MovieService {
         List<Movie> movies = movieRepository.findByGenresIn(genres);
 
         return movies.stream()
-                .map(movieMapper::toDto)
+                .map(movieMapper::toSummaryDto)
                 .collect(Collectors.toList());
     }
 
-    public List<MovieDto> getMoviesByTitle(String title) {
+    public List<MovieSummaryDto> getMoviesByTitle(String title) {
         List<Movie> movies = movieRepository.findByTitleContainingIgnoreCase(title);
         return movies.stream()
-                .map(movieMapper::toDto)
+                .map(movieMapper::toSummaryDto)
                 .collect(Collectors.toList());
     }
 
-    public List<MovieDto> getMoviesByUser(Long userId) {
-        return userLearningSetRepository.findAllByUserId(userId).stream()
+    public List<MovieSummaryDto> getMoviesByUser(Long userId) {
+        return userLearningSetRepository.findAllByUserIdWithLearningSetAndMovie(userId).stream()
                 .map(uls -> uls.getLearningSet().getMovie())
                 .filter(Objects::nonNull)
                 .distinct()
-                .map(movieMapper::toDto)
+                .map(movieMapper::toSummaryDto)
                 .collect(Collectors.toList());
     }
 
     public int getMoviesCountByUserId(Long userId) {
-        return (int) userLearningSetRepository.findAllByUserId(userId).stream()
+        return (int) userLearningSetRepository.findAllByUserIdWithLearningSetAndMovie(userId).stream()
                 .map(uls -> uls.getLearningSet().getMovie())
                 .filter(Objects::nonNull)
                 .distinct()

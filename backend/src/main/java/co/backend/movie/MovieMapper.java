@@ -9,4 +9,7 @@ public interface MovieMapper {
 
     @Mapping(target = "genres", source = "genres")
     MovieDto toDto(Movie movie);
+
+    @Mapping(target = "genres", source = "genres")
+    MovieSummaryDto toSummaryDto(Movie movie);
 }

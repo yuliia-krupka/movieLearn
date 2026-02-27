@@ -24,8 +24,8 @@ public class MovieController {
     private final UserService userService;
 
     @GetMapping()
-    public List<MovieDto> getMovies(@RequestParam(required = false) List<String> genre,
-                                    @RequestParam(required = false) String title) {
+    public List<MovieSummaryDto> getMovies(@RequestParam(required = false) List<String> genre,
+                                           @RequestParam(required = false) String title) {
         if (title != null && !title.isBlank()) {
             return movieService.getMoviesByTitle(title);
         } else if (genre != null && !genre.isEmpty()) {
@@ -90,7 +90,7 @@ public class MovieController {
     }
 
     @GetMapping("/home")
-    public List<MovieDto> getHomeMovies(@AuthenticationPrincipal OAuth2User principal) {
+    public List<MovieSummaryDto> getHomeMovies(@AuthenticationPrincipal OAuth2User principal) {
         User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
         return movieService.getMoviesByUser(user.getId());
     }

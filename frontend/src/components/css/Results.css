@@ -91,7 +91,6 @@
     align-items: center;
 }
 
-/* Go to Test / Back to Flashcards - Yellow */
 .results-go-to-test,
 .results-back-flashcards {
     padding: 12px 32px;
@@ -129,7 +128,6 @@
     color: #4A63CB;
 }
 
-/* --- Movie title (sticky, below header) --- */
 .results-movie-title {
     font-size: 1.15rem;
     font-weight: 600;
@@ -163,7 +161,6 @@
     transform: none;
 }
 
-/* --- Scrollable card list --- */
 .results-list {
     display: flex;
     flex-direction: column;
@@ -198,7 +195,6 @@
     border-left-color: #ff4d4f;
 }
 
-/* Status badge */
 .result-status-badge {
     margin-left: auto;
     flex-shrink: 0;
@@ -217,15 +213,9 @@
 }
 
 .status-in-progress {
-    color: #7c5cfc;
-    border-color: #7c5cfc;
+    color: #5A73DB;
+    border-color: #5A73DB;
     background: rgba(124, 92, 252, 0.06);
-}
-
-.status-skipped {
-    color: #888;
-    border-color: #ccc;
-    background: rgba(0, 0, 0, 0.02);
 }
 
 .status-not-started {
@@ -234,7 +224,6 @@
     background: rgba(0, 0, 0, 0.02);
 }
 
-/* Icon */
 .result-icon {
     flex-shrink: 0;
     width: 32px;
@@ -254,7 +243,6 @@
     color: #ff4d4f;
 }
 
-/* Card text */
 .result-card-content {
     display: flex;
     flex-direction: column;
@@ -265,6 +253,23 @@
     font-weight: 700;
     font-size: 1rem;
     color: #333;
+}
+
+.result-word-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.result-voice-icon {
+    color: #5A73DB;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: transform 0.2s;
+}
+
+.result-voice-icon:hover {
+    transform: scale(1.1);
 }
 
 .result-transcription {
@@ -286,7 +291,6 @@
     color: #888;
 }
 
-/* --- Responsive --- */
 @media (max-width: 768px) {
     .results-container {
         padding: 0 16px;

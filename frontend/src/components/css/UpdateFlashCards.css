@@ -120,7 +120,7 @@
 }
 
 .add-custom-btn {
-    background: #7367f0;
+    background: #5A73DB;
     color: white;
     border: none;
     padding: 10px 24px;
@@ -133,7 +133,7 @@
 }
 
 .add-custom-btn:hover {
-    background: #685dd8;
+    background: #6B83E3;
 }
 
 .add-custom-btn:disabled {
@@ -241,7 +241,7 @@
 
 .word-text:focus {
     outline: none;
-    border-bottom: 2px solid #7367f0;
+    border-bottom: 2px solid #5A73DB;
 }
 
 .word-transcription {
@@ -293,7 +293,7 @@
 
 .edit-input:focus {
     outline: none;
-    border-color: #7367f0;
+    border-color: #5A73DB;
 }
 
 .edit-input.error {
@@ -334,7 +334,7 @@
 }
 
 .save-btn {
-    background: #7367f0;
+    background: #5A73DB;
     color: white;
     border: none;
     padding: 6px 16px;
@@ -377,7 +377,7 @@
 }
 
 .start-learning-btn {
-    background: #fa8c16;
+    background: #F49E4C;
     color: white;
     border: none;
     padding: 10px 24px;
@@ -475,7 +475,7 @@
 }
 
 .tests-btn {
-    background: linear-gradient(135deg, #7367f0 0%, #a09bf5 100%);
+    background: linear-gradient(135deg, #5A73DB 0%, #a09bf5 100%);
     color: white;
 }
 
