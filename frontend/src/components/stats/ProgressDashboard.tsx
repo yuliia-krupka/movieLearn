@@ -25,7 +25,7 @@ const ProgressDashboard: React.FC = () => {
 
     if (loading) {
         return (
-            <MainLayout>
+            <MainLayout className="content stats-layout">
                 <div className="stats-loading">
                     <Spin size="large" tip="Loading your movie statistics...">
                         <div style={{padding: 50}}/>

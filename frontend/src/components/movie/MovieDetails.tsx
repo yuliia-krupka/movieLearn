@@ -156,9 +156,11 @@ const MovieDetails: React.FC = () => {
         ;
 
         if (loading) return (
-            <div className="loading-spinner-container">
-                <Spin size="large"/>
-            </div>
+            <MainLayout className="content">
+                <div className="loading-spinner-container">
+                    <Spin size="large"/>
+                </div>
+            </MainLayout>
         );
         if (!movie) return null;
 
