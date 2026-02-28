@@ -1,0 +1,105 @@
+.userList-container {
+    background: var(--color-bg);
+    padding: 24px;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.userList-title {
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.list-item {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.avatar-default {
+    background-color: var(--color-primary);
+}
+
+.user-name-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.user-name {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.role-tag {
+    font-size: 11px;
+}
+
+.you-tag {
+    font-size: 10px;
+    background-color: #808080;
+    color: white;
+}
+
+.user-email {
+    margin-top: 4px;
+    font-size: 14px;
+}
+
+@media (max-width: 767px) {
+    .userList-container {
+        padding: 16px;
+    }
+
+    .userList-title {
+        font-size: 20px;
+        margin-bottom: 16px;
+    }
+
+    .user-name {
+        font-size: 14px;
+    }
+
+    .role-tag {
+        font-size: 10px;
+    }
+
+    .you-tag {
+        font-size: 9px;
+    }
+
+    .user-email {
+        font-size: 12px;
+    }
+
+    .list-item {
+        padding: 12px 0;
+    }
+
+    .list-item-actions {
+        flex-direction: column !important;
+        align-items: flex-start;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .list-item-actions .ant-btn,
+    .list-item-actions .ant-select {
+        width: 100% !important;
+    }
+}
+
+/* Search Button Styles */
+.userList-container .ant-input-search-button {
+    background-color: var(--color-accent) !important;
+    border-color: var(--color-accent) !important;
+}
+
+.userList-container .ant-input-search-button:hover,
+.userList-container .ant-input-search-button:focus,
+.userList-container .ant-input-search-button:active {
+    background-color: #ffb875 !important;
+    border-color: #ffb875 !important;
+    color: white !important;
+}

@@ -2,7 +2,7 @@ import React from 'react';
 import type {FlashCardData, ItemStatusDto} from '../../types/learningSet';
 import {SoundOutlined} from '@ant-design/icons';
 import MainLayout from '../layout/MainLayout';
-import '../css/Results.css';
+import './Results.css';
 
 interface ResultsPageProps {
     flashcards: FlashCardData[];

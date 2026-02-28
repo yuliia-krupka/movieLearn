@@ -1,11 +1,11 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
-import { CloseOutlined, CheckOutlined, PlusOutlined, CaretRightOutlined, SoundOutlined } from '@ant-design/icons';
-import { Spin } from 'antd';
-import { useAuth } from '../auth/useAuth';
-import '../css/UpdateFlashCards.css';
-import '../css/MovieDetails.css';
+import {CloseOutlined, CheckOutlined, PlusOutlined, CaretRightOutlined, SoundOutlined} from '@ant-design/icons';
+import {Spin} from 'antd';
+import {useAuth} from '../auth/useAuth';
+import './UpdateFlashCards.css';
+import '../movie/MovieDetails.css';
 import {
     useFlashCards,
     WORD_LIMIT,
@@ -13,12 +13,12 @@ import {
     SENTENCE_LIMIT,
     TRANSCRIPTION_LIMIT
 } from '../../hooks/useFlashCards';
-import { learningSetService } from '../../services/learningSetService';
+import {learningSetService} from '../../services/learningSetService';
 
 const UpdateFlashCards: React.FC = () => {
-    const { id: routeId } = useParams<{ id: string }>();
+    const {id: routeId} = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { currentUserId } = useAuth();
+    const {currentUserId} = useAuth();
 
     const {
         learningSet,
@@ -67,7 +67,7 @@ const UpdateFlashCards: React.FC = () => {
             <MainLayout className="update-flashcards-container">
                 <div className="loading-spinner-container">
                     <Spin size="large" tip="Loading vocabulary...">
-                        <div className="loading-spacer" />
+                        <div className="loading-spacer"/>
                     </Spin>
                 </div>
             </MainLayout>
@@ -174,7 +174,7 @@ const UpdateFlashCards: React.FC = () => {
                     <div className="suggested-words-title">
                         "{learningSet?.name || 'Movie Title'}" - <span>Review Words</span>
                     </div>
-                    <div style={{ color: '#8c8c8c', fontSize: '0.85rem', marginTop: '4px' }}>
+                    <div style={{color: '#8c8c8c', fontSize: '0.85rem', marginTop: '4px'}}>
                         You can have a maximum of 20 flashcards per set.
                     </div>
                 </div>
@@ -188,7 +188,7 @@ const UpdateFlashCards: React.FC = () => {
                         disabled={flashcards.length >= 20}
                         title={flashcards.length >= 20 ? "Maximum limit of 20 flashcards reached." : ""}
                     >
-                        <PlusOutlined /> Add Custom Word
+                        <PlusOutlined/> Add Custom Word
                     </button>
                 </div>
             </div>
@@ -196,7 +196,7 @@ const UpdateFlashCards: React.FC = () => {
             <div className="cards-list">
                 {flashcards.map((card) => (
                     <div key={card.id || card.tempId}
-                        className={`word-card ${card.id && selectedCardIds.includes(card.id) ? 'selected' : ''}`}>
+                         className={`word-card ${card.id && selectedCardIds.includes(card.id) ? 'selected' : ''}`}>
                         <div className="card-selection">
                         </div>
 
@@ -276,10 +276,10 @@ const UpdateFlashCards: React.FC = () => {
                                     </div>
                                     <div className="card-actions">
                                         <button className="save-btn" onClick={() => handleSaveCard(card)}>
-                                            <CheckOutlined /> Save
+                                            <CheckOutlined/> Save
                                         </button>
                                         <button className="cancel-btn"
-                                            onClick={() => card.isNew ? handleDeleteCard(card) : toggleEdit(card)}>
+                                                onClick={() => card.isNew ? handleDeleteCard(card) : toggleEdit(card)}>
                                             Cancel
                                         </button>
                                     </div>
@@ -287,7 +287,7 @@ const UpdateFlashCards: React.FC = () => {
                             ) : (
                                 <div className="word-content-display" onClick={() => toggleEdit(card)}>
                                     <div className="word-text"
-                                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                         style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                                         {card.word}
                                         {card.word && (
                                             <SoundOutlined
@@ -297,7 +297,7 @@ const UpdateFlashCards: React.FC = () => {
                                                     utterance.lang = 'en-US';
                                                     window.speechSynthesis.speak(utterance);
                                                 }}
-                                                style={{ cursor: 'pointer', color: '#5A73DB', fontSize: '1.2rem' }}
+                                                style={{cursor: 'pointer', color: '#5A73DB', fontSize: '1.2rem'}}
                                                 title="Listen to pronunciation"
                                             />
                                         )}
@@ -316,13 +316,13 @@ const UpdateFlashCards: React.FC = () => {
                                     className={`word-status-btn reject ${card.id && selectedCardIds.includes(card.id) ? 'active' : ''}`}
                                     onClick={() => card.id && (selectedCardIds.includes(card.id) ? null : toggleSelection(card.id))}
                                 >
-                                    <CloseOutlined />
+                                    <CloseOutlined/>
                                 </button>
                                 <button
                                     className={`word-status-btn approve ${!card.id || !selectedCardIds.includes(card.id) ? 'active' : ''}`}
                                     onClick={() => card.id && (selectedCardIds.includes(card.id) ? toggleSelection(card.id) : null)}
                                 >
-                                    <CheckOutlined />
+                                    <CheckOutlined/>
                                 </button>
                             </div>
                         )}

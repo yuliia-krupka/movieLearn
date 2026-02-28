@@ -1,0 +1,59 @@
+.step-segments {
+    display: flex;
+    position: relative;
+    background-color: var(--color-border-light);
+    border-radius: var(--radius-sm);
+    padding: 6px;
+    margin-bottom: 24px;
+    gap: 0;
+}
+
+.step-slider {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    height: calc(100% - 12px);
+    background-color: var(--color-bg);
+    border-radius: var(--radius-xs);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    z-index: 1;
+}
+
+.step-segment {
+    flex: 1;
+    text-align: center;
+    padding: 10px 0;
+    border-radius: var(--radius-xs);
+    font-weight: 600;
+    color: var(--color-text-subtle);
+    cursor: pointer;
+    transition: color 0.3s;
+    user-select: none;
+    z-index: 2;
+    position: relative;
+}
+
+.step-segment:hover:not(.active) {
+    color: var(--color-text-muted);
+}
+
+.step-segment.active {
+    color: var(--color-text-strong);
+}
+
+.step-content {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

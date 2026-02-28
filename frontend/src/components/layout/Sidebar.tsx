@@ -7,7 +7,7 @@ import {
 import {useNavigate, useLocation} from "react-router-dom";
 import SidebarDrawer from "./SidebarDrawer.tsx";
 
-import "../css/Sidebar.css";
+import "./Sidebar.css";
 import {getMenuItems} from "./Menu.tsx";
 import {useAuth} from "../auth/useAuth.tsx";
 
@@ -37,6 +37,7 @@ const Sidebar: React.FC = () => {
                     icon={<MenuOutlined/>}
                     onClick={() => setDrawerVisible(true)}
                     className={`sidebar-menu-button ${drawerVisible ? 'hidden' : ''}`}
+                    aria-label="Open navigation menu"
                 />
                 <SidebarDrawer
                     open={drawerVisible}

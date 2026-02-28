@@ -6,7 +6,7 @@ import MainLayout from '../layout/MainLayout.tsx';
 import AdminMovieCard from './AdminMovieCard';
 import {useMovies} from '../hooks/useMovies';
 import axios from 'axios';
-import '../css/AdminMoviesList.css';
+import './AdminMoviesList.css';
 
 const AdminMoviesList: React.FC = () => {
     const navigate = useNavigate();

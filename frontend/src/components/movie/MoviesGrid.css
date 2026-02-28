@@ -1,0 +1,62 @@
+.ant-pagination {
+    display: flex !important;
+    justify-content: center !important;
+    margin: 0 !important;
+}
+
+.loading-container {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+}
+
+.movies-grid-container {
+    width: 100%;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.movies-grid-header {
+    flex-shrink: 0;
+}
+
+.movies-grid-header-row {
+    margin-bottom: 16px;
+}
+
+.movies-grid-genre-select {
+    width: 200px;
+}
+
+.movies-grid-loading,
+.movies-grid-empty {
+    display: flex;
+    justify-content: center;
+    padding: 50px 0;
+    flex: 1;
+}
+
+.movies-grid-content {
+    flex: 1;
+    padding-bottom: 16px;
+}
+
+.movies-grid-col {
+    display: flex;
+    justify-content: center;
+}
+
+.movies-grid-pagination-container {
+    flex-shrink: 0;
+    padding: 16px 0;
+    border-top: 1px solid var(--color-border-light);
+    background-color: var(--color-bg);
+}
+
+.movies-grid-pagination {
+    text-align: center;
+    margin: 0;
+}

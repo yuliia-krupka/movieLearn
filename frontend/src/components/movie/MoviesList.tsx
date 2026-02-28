@@ -1,14 +1,11 @@
 import React from 'react';
 import MainLayout from "../layout/MainLayout.tsx";
 import MoviesGrid from "./MoviesGrid";
-import '../css/Layout.css';
+import '../layout/Layout.css';
 
 const MoviesList: React.FC = () => {
     return (
-        <MainLayout className="content-movies" contentStyle={{
-            overflow: 'hidden',
-            height: 'calc(100vh - 90px)',
-        }}>
+        <MainLayout className="content-movies">
             <MoviesGrid
                 apiEndpoint="/api/movies"
                 title="Choose your movie to start a lesson!"

@@ -1,0 +1,173 @@
+.admin-movies-header {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.admin-movies-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--color-text-strong);
+}
+
+.admin-movies-subtitle {
+    color: var(--color-text-muted);
+    font-size: 14px;
+}
+
+.add-movie-btn {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+    padding: 0 24px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgba(90, 115, 219, 0.4);
+    transition: all 0.3s ease;
+}
+
+.add-movie-btn:hover {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    opacity: 0.8;
+}
+
+.admin-movie-card-container {
+    width: 100%;
+    max-width: 270px;
+    margin: 0 auto;
+}
+
+.admin-movie-card {
+    border-radius: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.admin-movie-card .ant-card-cover {
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-movie-card .ant-card-cover img {
+    width: 100%;
+    height: 90px;
+    object-fit: cover;
+    display: block;
+}
+
+.admin-movie-card .ant-card-body {
+    padding: 12px 12px 0 12px;
+}
+
+.admin-movie-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-strong);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-movie-genre {
+    font-size: 12px;
+    color: var(--color-primary);
+    font-style: italic;
+    text-transform: capitalize;
+    margin-bottom: 12px;
+}
+
+.admin-card-actions {
+    display: flex;
+    border-top: 1px solid var(--color-border-light);
+    background: var(--color-bg-secondary);
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    overflow: hidden;
+}
+
+.admin-action-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 10px 0;
+    color: var(--color-text-secondary);
+    transition: background 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+}
+
+.admin-action-btn:not(:last-child) {
+    border-right: 1px solid var(--color-border-light) !important;
+}
+
+.admin-action-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.admin-action-btn.delete:hover {
+    background-color: var(--color-bg);
+    color: var(--color-error);
+}
+
+.ant-pagination {
+    margin: 0;
+    text-align: center;
+}
+
+.admin-movies-layout .ant-layout-content {
+    padding: 0 24px;
+}
+
+.admin-movies-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.admin-movies-header {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-shrink: 0;
+    margin-top: 24px;
+}
+
+.admin-movies-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.admin-movies-loading {
+    text-align: center;
+    padding: 50px;
+    flex: 1;
+}
+
+.admin-movies-list-wrapper {
+    flex: 1;
+    padding-bottom: 16px;
+}
+
+.admin-movie-col {
+    display: flex;
+    justify-content: center;
+}
+
+.admin-movies-pagination-container {
+    flex-shrink: 0;
+    padding: 16px 0;
+    border-top: 1px solid var(--color-border-light);
+    background-color: var(--color-bg);
+}

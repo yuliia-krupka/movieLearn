@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { SoundOutlined } from '@ant-design/icons';
-import '../css/FlashCard.css';
+import './FlashCard.css';
 
 interface FlashCardProps {
     word: string;
@@ -55,25 +55,59 @@ const FlashCard: React.FC<FlashCardProps> = ({
         onNext?.();
     };
 
+    const handlePronunciation = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation();
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = 'en-US';
+            window.speechSynthesis.speak(utterance);
+        }
+    }, [word]);
+
+    const handleCardKeyDown = (e: React.KeyboardEvent) => {
+        switch (e.key) {
+            case 'Enter':
+            case ' ':
+                e.preventDefault();
+                setIsFlipped(!isFlipped);
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                if (hasPrevious) handlePrevious();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                if (hasNext) handleNext();
+                break;
+        }
+    };
+
     return (
         <div className="flashcard-container">
             <div className="nav-buttons-mobile">
                 {hasPrevious && (
-                    <button className="nav-button-mobile" onClick={handlePrevious}>
+                    <button className="nav-button-mobile" onClick={handlePrevious} aria-label="Previous card">
                         &#10094;
                     </button>
                 )}
                 {hasNext && (
-                    <button className="nav-button-mobile" onClick={handleNext}>
+                    <button className="nav-button-mobile" onClick={handleNext} aria-label="Next card">
                         &#10095;
                     </button>
                 )}
             </div>
 
             <div className="card-area">
-                {hasPrevious && <button className="nav-button nav-prev" onClick={handlePrevious}>&#10094;</button>}
+                {hasPrevious && <button className="nav-button nav-prev" onClick={handlePrevious} aria-label="Previous card">&#10094;</button>}
 
-                <div className="card-wrapper" onClick={handleCardClick}>
+                <div
+                    className="card-wrapper"
+                    onClick={handleCardClick}
+                    onKeyDown={handleCardKeyDown}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={isFlipped ? `Translation: ${translation}. Press Enter to flip back` : `Word: ${word}. Press Enter to see translation`}
+                >
                     <div className={`card ${isFlipped ? 'flipped' : ''}`}>
                         <div className="front">
                             {status !== undefined && (
@@ -81,7 +115,7 @@ const FlashCard: React.FC<FlashCardProps> = ({
                                     {status ? 'KNOWN' : "DON'T KNOW"}
                                 </div>
                             )}
-                            <h2 style={{ margin: 0 }}>{word.toUpperCase()}</h2>
+                            <h2>{word.toUpperCase()}</h2>
                             {transcription && (
                                 <p className="transcription">{transcription}</p>
                             )}
@@ -89,17 +123,15 @@ const FlashCard: React.FC<FlashCardProps> = ({
                                 <p className="example-sentence">{exampleSentence}</p>
                             )}
                             <p>Tap to see translation</p>
-                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
-                                <SoundOutlined
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        const utterance = new SpeechSynthesisUtterance(word);
-                                        utterance.lang = 'en-US';
-                                        window.speechSynthesis.speak(utterance);
-                                    }}
-                                    style={{ cursor: 'pointer', fontSize: '1.4rem', color: '#5A73DB' }}
-                                    title="Listen to pronunciation"
-                                />
+                            <div className="sound-icon-wrapper">
+                                <button
+                                    className="sound-icon-button"
+                                    onClick={handlePronunciation}
+                                    aria-label={`Listen to pronunciation of ${word}`}
+                                    type="button"
+                                >
+                                    <SoundOutlined className="sound-icon" />
+                                </button>
                             </div>
                         </div>
                         <div className="back">
@@ -109,7 +141,7 @@ const FlashCard: React.FC<FlashCardProps> = ({
                     </div>
                 </div>
 
-                {hasNext && <button className="nav-button nav-next" onClick={handleNext}>&#10095;</button>}
+                {hasNext && <button className="nav-button nav-next" onClick={handleNext} aria-label="Next card">&#10095;</button>}
             </div>
 
             <div className="actions">
@@ -133,7 +165,7 @@ const FlashCard: React.FC<FlashCardProps> = ({
                 )}
             </div>
             {completionHint && (
-                <div style={{ textAlign: 'center', marginTop: '10px', fontStyle: 'italic', color: '#888' }}>
+                <div className="completion-hint">
                     {completionHint}
                 </div>
             )}

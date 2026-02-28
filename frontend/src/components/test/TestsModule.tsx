@@ -3,10 +3,12 @@ import TestCard from './TestCard';
 import ResultsPage from '../flash-card/ResultsPage';
 import MainLayout from '../layout/MainLayout';
 import {Result, Button} from 'antd';
-import '../css/Layout.css';
-import '../css/Test.css';
-import '../css/MovieDetails.css';
+import '../layout/Layout.css';
+import './Test.css';
+import '../movie/MovieDetails.css';
 import {learningSetService} from '../../services/learningSetService';
+import {learningItemService} from '../../services/learningItemService';
+import {progressService} from '../../services/progressService';
 import type {TestItemData, LearningSetDto, ItemStatusDto} from '../../types/learningSet';
 import {useAuth} from '../auth/useAuth';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
@@ -60,7 +62,7 @@ const TestsModule: React.FC = () => {
                 setLearningSet(learningSetData);
 
                 const items = currentUserId
-                    ? await learningSetService.getTestItems(learningSetData.id)
+                    ? await learningItemService.getTestItems(learningSetData.id)
                     : [];
 
                 const shuffledItems = items.map(item => {
@@ -109,16 +111,16 @@ const TestsModule: React.FC = () => {
             });
 
             const answersPromise = bulkAnswers.length > 0
-                ? learningSetService.recordAnswersBulk(bulkAnswers)
+                ? progressService.recordAnswersBulk(bulkAnswers)
                 : Promise.resolve();
 
             const correctCount = bulkAnswers.filter(a => a.correct).length;
             const score = Math.round((correctCount / testItems.length) * 100);
 
-            const completionPromise = learningSetService.completeTests(learningSet.id, score);
+            const completionPromise = progressService.completeTests(learningSet.id, score);
 
             Promise.all([answersPromise, completionPromise])
-                .then(() => learningSetService.getItemStatuses(learningSet.id))
+                .then(() => progressService.getItemStatuses(learningSet.id))
                 .then(statuses => setItemStatuses(statuses))
                 .catch(() => console.error('Failed to save results'));
         }

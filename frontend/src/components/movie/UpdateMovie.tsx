@@ -14,10 +14,10 @@ import {
 import {SaveFilled, CloseOutlined, FileOutlined, DeleteOutlined} from '@ant-design/icons';
 import useMessage from 'antd/es/message/useMessage';
 
-import '../css/Layout.css';
-import '../css/movies.css';
-import '../css/CreateMovie.css';
-import '../css/UpdateMovie.css';
+import '../layout/Layout.css';
+import './movies.css';
+import './CreateMovie.css';
+import './UpdateMovie.css';
 
 import useUpdateMovie from '../hooks/useUpdateMovie.tsx';
 import AddGenreModal from '../genre/AddGenreModal.tsx';

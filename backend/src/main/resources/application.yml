@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: movieLearn
+
+  # --- DataSource ---
+  datasource:
+    url: jdbc:mysql://localhost:3306/mvlearndb?allowMultiQueries=true
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:rootpassword}
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+
+  # --- Google OAuth2 ---
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+            scope: profile,email
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+
+  # --- File Upload ---
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+      enabled: true
+
+  # --- AI ---
+  ai:
+    openai:
+      api-key: ${OPENAI_KEY}
+      chat:
+        options:
+          model: gpt-5.1-2025-11-13
+
+# --- Frontend ---
+frontend:
+  url: http://localhost:5173
+
+# --- CORS ---
+cors:
+  allowed-origins: ${frontend.url}
+
+# --- Logging ---
+logging:
+  level:
+    co.backend: DEBUG

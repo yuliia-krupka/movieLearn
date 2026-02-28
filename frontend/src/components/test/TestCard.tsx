@@ -1,5 +1,5 @@
 import React from 'react';
-import '../css/Test.css';
+import './Test.css';
 
 interface TestCardProps {
     question: string;

@@ -21,9 +21,9 @@ import AddGenreModal from '../genre/AddGenreModal.tsx';
 import MainLayout from '../layout/MainLayout.tsx';
 import useMessage from 'antd/es/message/useMessage';
 import {ErrorHandler} from '../err/ErrorHandler.tsx';
-import '../css/Layout.css';
-import '../css/movies.css';
-import '../css/CreateMovie.css';
+import '../layout/Layout.css';
+import './movies.css';
+import './CreateMovie.css';
 
 const {Title} = Typography;
 const {TextArea} = Input;

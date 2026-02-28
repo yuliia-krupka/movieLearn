@@ -1,6 +1,6 @@
 import React from 'react';
 import MoviesGrid from "./MoviesGrid";
-import '../css/Layout.css';
+import '../layout/Layout.css';
 import MainLayout from "../layout/MainLayout.tsx";
 
 const HomePage: React.FC = () => {

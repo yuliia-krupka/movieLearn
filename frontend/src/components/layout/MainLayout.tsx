@@ -2,7 +2,7 @@ import React, {type ReactNode, type CSSProperties} from 'react';
 import {Layout} from 'antd';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
-import '../css/Layout.css';
+import './Layout.css';
 
 const {Content} = Layout;
 

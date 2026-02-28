@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import MainLayout from '../layout/MainLayout';
-import {learningSetService} from '../../services/learningSetService';
+import {progressService} from '../../services/progressService';
 import type {MovieProgress} from '../../types/learningSet';
 import {useAuth} from '../auth/useAuth';
 import {Spin, Progress, Card, Row, Col, Statistic, Tag, Empty} from 'antd';
 import {CheckCircleOutlined, TrophyOutlined, BookOutlined} from '@ant-design/icons';
-import '../css/ProgressDashboard.css';
+import './ProgressDashboard.css';
 import {useNavigate} from 'react-router-dom';
 
 const ProgressDashboard: React.FC = () => {
@@ -16,7 +16,7 @@ const ProgressDashboard: React.FC = () => {
 
     useEffect(() => {
         if (currentUserId) {
-            learningSetService.getUserProgress()
+            progressService.getUserProgress()
                 .then((data: MovieProgress[]) => setProgress(data))
                 .catch((err: unknown) => console.error('Failed to load progress:', err))
                 .finally(() => setLoading(false));

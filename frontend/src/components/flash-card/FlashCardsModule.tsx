@@ -2,9 +2,11 @@ import React, {useEffect, useState} from 'react';
 import FlashCard from './FlashCard';
 import ResultsPage from './ResultsPage';
 import MainLayout from "../layout/MainLayout.tsx";
-import '../css/Layout.css';
-import {Spin, Result, Button} from 'antd';
+import '../layout/Layout.css';
+import {Spin, Result, Button, Empty} from 'antd';
 import {learningSetService} from '../../services/learningSetService';
+import {learningItemService} from '../../services/learningItemService';
+import {progressService} from '../../services/progressService';
 import type {FlashCardData, ItemStatusDto, LearningSetDto} from '../../types/learningSet';
 import {useAuth} from '../auth/useAuth';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
@@ -50,7 +52,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
 
                 setLearningSet(learningSetData);
                 if (currentUserId) {
-                    const flashcardData = await learningSetService.getFlashCards(learningSetData.id);
+                    const flashcardData = await learningItemService.getFlashCards(learningSetData.id);
                     setFlashcards(flashcardData);
                 } else {
                     setError('User not authenticated');
@@ -91,19 +93,19 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
             const correctCount = Array.from(results.values()).filter(Boolean).length;
             const score = Math.round((correctCount / flashcards.length) * 100);
 
-            learningSetService.completeFlashcards(learningSet.id, score)
+            progressService.completeFlashcards(learningSet.id, score)
                 .catch(err => console.error('Failed to complete flashcards:', err));
 
             const answerPromises = Array.from(results.entries()).map(([index, correct]) => {
                 const card = flashcards[index];
                 if (card) {
-                    return learningSetService.recordAnswer(card.id, correct);
+                    return progressService.recordAnswer(card.id, correct);
                 }
                 return Promise.resolve();
             });
 
             Promise.all(answerPromises)
-                .then(() => learningSetService.getItemStatuses(learningSet.id))
+                .then(() => progressService.getItemStatuses(learningSet.id))
                 .then(statuses => setItemStatuses(statuses))
                 .catch(err => console.error('Failed to save answers:', err));
         }
@@ -176,7 +178,15 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
     if (flashcards.length === 0) {
         return (
             <MainLayout className="flashcard-content">
-                <div className="no-data">No flashcards available</div>
+                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh'}}>
+                    <Empty
+                        description="No flashcards available for this learning set"
+                    >
+                        <Button type="primary" onClick={handleBackToMovie}>
+                            Back to Movie
+                        </Button>
+                    </Empty>
+                </div>
             </MainLayout>
         );
     }

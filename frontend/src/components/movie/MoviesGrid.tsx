@@ -1,19 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     Row, Col, Typography, Pagination,
     Spin, Empty, Select, Space
 } from 'antd';
 import MovieCard from "./MovieCard";
-import {useGenres} from '../hooks/useGenres';
-import {useLocation} from 'react-router-dom';
+import { useGenres } from '../hooks/useGenres';
+import { useLocation } from 'react-router-dom';
 import useMessage from 'antd/es/message/useMessage';
-import '../css/MoviesGrid.css';
+import './MoviesGrid.css';
 
-const {Title} = Typography;
-const {Option} = Select;
+const { Title } = Typography;
+const { Option } = Select;
 
-import {useMovies} from '../hooks/useMovies';
-import '../css/MoviesGrid.css';
+import { useMovies } from '../hooks/useMovies';
 
 interface MoviesGridProps {
     apiEndpoint: string;
@@ -23,20 +22,26 @@ interface MoviesGridProps {
 }
 
 const MoviesGrid: React.FC<MoviesGridProps> = ({
-                                                   apiEndpoint,
-                                                   title,
-                                                   emptyMessage = "No movies available. Please check back later!",
-                                                   showGenreFilter = true,
-                                               }) => {
-    const {genres, loading: genresLoading} = useGenres();
+    apiEndpoint,
+    title,
+    emptyMessage = "No movies available. Please check back later!",
+    showGenreFilter = true,
+}) => {
+    const { genres, loading: genresLoading } = useGenres();
     const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const location = useLocation();
     const [messageApi, contextHolder] = useMessage();
 
 
-    const searchParams = new URLSearchParams(location.search);
-    const searchQuery = searchParams.get('search');
+    const searchQuery = useMemo(() => {
+        const params = new URLSearchParams(location.search);
+        return params.get('search');
+    }, [location.search]);
+
+    const handleGenreChange = useCallback((values: string[]) => {
+        setSelectedGenres(values);
+    }, []);
 
     useEffect(() => {
         const state = location.state as { message?: string } | null;
@@ -47,7 +52,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
         }
     }, [location.state, messageApi]);
 
-    const {movies, loading} = useMovies({
+    const { movies, loading } = useMovies({
         apiEndpoint,
         searchQuery,
         selectedGenres
@@ -79,18 +84,20 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
     }
 
 
-    const filteredMovies = searchQuery ? movies : (
-        selectedGenres.length === 0
-            ? movies
-            : movies.filter(movie =>
-                selectedGenres.some(genre => movie.genres.includes(genre))
-            )
-    );
+    const filteredMovies = useMemo(() =>
+        searchQuery ? movies : (
+            selectedGenres.length === 0
+                ? movies
+                : movies.filter(movie =>
+                    selectedGenres.some(genre => movie.genres.includes(genre))
+                )
+        ), [movies, searchQuery, selectedGenres]);
 
-    const currentMovies = filteredMovies.slice(
-        (currentPage - 1) * cardsPerPage,
-        currentPage * cardsPerPage
-    );
+    const currentMovies = useMemo(() =>
+        filteredMovies.slice(
+            (currentPage - 1) * cardsPerPage,
+            currentPage * cardsPerPage
+        ), [filteredMovies, currentPage, cardsPerPage]);
 
     useEffect(() => {
         setCurrentPage(1);
@@ -115,12 +122,12 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                                     mode="multiple"
                                     placeholder="Filter by genre"
                                     className="movies-grid-genre-select"
-                                    onChange={setSelectedGenres}
+                                    onChange={handleGenreChange}
                                     value={selectedGenres}
                                     allowClear
-                                    maxTagCount={2}
+                                    maxTagCount="responsive"
                                 >
-                                    {genres.map(({id, name}) => (
+                                    {genres.map(({ id, name }) => (
                                         <Option key={id} value={name}>{name}</Option>
                                     ))}
                                 </Select>
@@ -132,7 +139,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
 
             {isLoading ? (
                 <div className="movies-grid-loading">
-                    <Spin size="large"/>
+                    <Spin size="large" />
                 </div>
             ) : filteredMovies.length === 0 ? (
                 <div className="movies-grid-empty">
@@ -142,7 +149,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                             : selectedGenres.length > 0
                                 ? "No movies match the selected genres"
                                 : emptyMessage
-                    }/>
+                    } />
                 </div>
             ) : (
                 <>
@@ -154,7 +161,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                                     span={colSpan}
                                     className="movies-grid-col"
                                 >
-                                    <MovieCard movie={movie}/>
+                                    <MovieCard movie={movie} />
                                 </Col>
                             ))}
                         </Row>

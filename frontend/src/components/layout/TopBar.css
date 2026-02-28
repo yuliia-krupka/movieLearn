@@ -1,0 +1,74 @@
+.topbar {
+    background-color: var(--color-bg);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 64px;
+    padding: 0 20px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.topbar-avatar {
+    background-color: var(--color-border-light);
+}
+
+.topbar-username {
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.admin-dashboard-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.admin-dashboard-btn:hover {
+    background-color: rgba(0, 0, 0, 0.025);
+    color: var(--color-primary);
+}
+
+.admin-dashboard-btn:hover .anticon {
+    color: var(--color-primary);
+}
+
+.admin-dashboard-icon {
+    font-size: 18px;
+}
+
+.topbar-search {
+    max-width: 240px;
+}
+
+.topbar .ant-input-search-button {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent);
+}
+
+.topbar .ant-input-search-button:hover,
+.topbar .ant-input-search-button:focus,
+.topbar .ant-input-search-button:active {
+    border-color: var(--color-accent-hover) !important;
+    background-color: var(--color-accent-hover) !important;
+    opacity: 1;
+}
+
+@media (max-width: 576px) {
+    .topbar-username {
+        display: none;
+    }
+}

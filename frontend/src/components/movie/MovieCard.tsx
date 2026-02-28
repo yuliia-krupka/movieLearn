@@ -1,8 +1,8 @@
 import React from 'react';
 import {Card} from 'antd';
 import {useNavigate} from 'react-router-dom';
-import '../css/MovieCard.css';
-import '../css/movies.css';
+import './MovieCard.css';
+import './movies.css';
 
 const {Meta} = Card;
 
@@ -12,7 +12,7 @@ interface MovieCardProps {
     movie: Movie;
 }
 
-const MovieCard: React.FC<MovieCardProps> = ({movie}) => {
+const MovieCard: React.FC<MovieCardProps> = React.memo(({movie}) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
@@ -25,11 +25,21 @@ const MovieCard: React.FC<MovieCardProps> = ({movie}) => {
             : `data:image/jpeg;base64,${movie.image}`
         : null;
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClick();
+        }
+    };
+
     return (
         <Card
             hoverable
             className="movie-card"
             onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            tabIndex={0}
+            aria-label={`${movie.title} — ${movie.genres.slice(0, 2).join(', ')}`}
             style={{cursor: 'pointer'}}
             cover={
                 imageSource ? (
@@ -37,6 +47,9 @@ const MovieCard: React.FC<MovieCardProps> = ({movie}) => {
                         alt={`${movie.title} cover`}
                         src={imageSource}
                         className="movie-card-cover"
+                        loading="lazy"
+                        width={270}
+                        height={200}
                     />
                 ) : (
                     <div className="movie-card-placeholder"/>
@@ -57,6 +70,8 @@ const MovieCard: React.FC<MovieCardProps> = ({movie}) => {
             </div>
         </Card>
     );
-};
+});
+
+MovieCard.displayName = 'MovieCard';
 
 export default MovieCard;

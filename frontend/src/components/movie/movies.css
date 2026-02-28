@@ -1,0 +1,77 @@
+.ant-pagination {
+    display: flex !important;
+    justify-content: center !important;
+    margin: 16px 0 !important;
+}
+
+.loading-container {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+}
+
+.yellow-btn {
+    background-color: var(--color-accent) !important;
+    border-color: var(--color-accent) !important;
+    color: #fff !important;
+    border-radius: var(--radius-pill);
+    align-self: center;
+    transition: all 0.3s;
+}
+
+.blue-btn {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: #fff !important;
+    border-radius: var(--radius-pill);
+    align-self: center;
+    transition: all 0.3s;
+}
+
+.ant-form-item-label>label {
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.ant-input,
+.ant-input:focus,
+.ant-select-selector,
+.ant-select-selector:focus {
+    border-radius: var(--radius-xs);
+}
+
+.form-actions-center {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.page-title-center {
+    text-align: center;
+}
+
+.page-title-container {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.page-title-marginless {
+    margin: 0;
+}
+
+.section-divider {
+    margin: 32px 0;
+}
+
+.file-section-margin {
+    margin-bottom: 24px;
+}
+
+.success-text {
+    color: var(--color-success);
+}
+
+.form-actions-margin-center {
+    margin-top: 40px;
+    text-align: center;
+}

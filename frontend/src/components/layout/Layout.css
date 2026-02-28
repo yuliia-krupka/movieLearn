@@ -1,0 +1,39 @@
+.account-root-layout {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.account-root-layout>.ant-layout {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.content,
+.content-movies {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin: 10px;
+    background-color: var(--color-bg);
+    border-radius: var(--radius-sm);
+}
+
+.content {
+    overflow-y: auto;
+}
+
+.content-movies {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.fixed-layout {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.fixed-layout .ant-layout-content {
+    overflow-y: auto;
+    height: calc(100vh - 64px);
+    padding: 24px;
+}

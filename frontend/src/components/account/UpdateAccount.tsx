@@ -3,8 +3,8 @@ import {Button, Form, Input, Typography, Card, Spin, Alert} from "antd";
 import {useNavigate} from "react-router-dom";
 import MainLayout from "../layout/MainLayout.tsx";
 import {useUserProfile} from "../hooks/useUserProfile.ts";
-import '../css/Account.css';
-import '../css/Layout.css'
+import './Account.css';
+import '../layout/Layout.css'
 import useMessage from "antd/es/message/useMessage";
 import {useAuth} from "../auth/useAuth.tsx";
 

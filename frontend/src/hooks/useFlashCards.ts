@@ -1,6 +1,8 @@
 import {useState, useEffect} from 'react';
 import {message} from 'antd';
 import {learningSetService} from '../services/learningSetService';
+import {learningItemService} from '../services/learningItemService';
+import {progressService} from '../services/progressService';
 import type {FlashCardData, LearningSetDto} from '../types/learningSet';
 
 export interface EditableFlashCard extends Partial<FlashCardData> {
@@ -44,10 +46,10 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
                 setLearningSet(set);
 
                 if (currentUserId) {
-                    const cards = await learningSetService.getFlashCards(setId);
+                    const cards = await learningItemService.getFlashCards(setId);
                     setFlashcards(cards);
 
-                    const statuses = await learningSetService.getItemStatuses(setId);
+                    const statuses = await progressService.getItemStatuses(setId);
                     const allLearned = cards.length > 0 && cards.every(card => {
                         const status = statuses.find(s => s.learningItemId === card.id);
                         return status?.status === 'LEARNED' || status?.status === 'SKIPPED';
@@ -74,7 +76,7 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
 
         try {
             setRegenerating(true);
-            const newCards = await learningSetService.regenerate(learningSetId, feedback, selectedCardIds);
+            const newCards = await learningItemService.regenerate(learningSetId, feedback, selectedCardIds);
 
             setFlashcards(prev => {
                 const remaining = prev.filter(c => c.id && !selectedCardIds.includes(c.id));
@@ -135,7 +137,7 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
 
         try {
             if (card.id) {
-                await learningSetService.updateItem(card.id, {
+                await learningItemService.updateItem(card.id, {
                     id: card.id,
                     text: word,
                     translation: translation,
@@ -160,7 +162,7 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
                     return next;
                 });
             } else {
-                const savedItem = await learningSetService.createItem({
+                const savedItem = await learningItemService.createItem({
                     text: word,
                     translation: translation,
                     exampleSentence: card.exampleSentence?.trim() || '',
@@ -194,7 +196,7 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
     const handleDeleteCard = async (card: EditableFlashCard) => {
         try {
             if (card.id) {
-                await learningSetService.deleteItem(card.id);
+                await learningItemService.deleteItem(card.id);
                 message.success('Card removed');
             }
             setFlashcards(prev => prev.filter(c =>

@@ -1,0 +1,47 @@
+.genre-selector-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.add-genre-btn {
+    background-color: var(--color-accent);
+    color: var(--color-text-white);
+    border: none;
+    padding: 8px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-left: 10px;
+    transition: all 0.3s ease;
+}
+
+.add-genre-btn:hover {
+    background-color: var(--color-accent);
+    color: var(--color-text-white) !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.genre-option-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.genre-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.genre-edit-btn {
+    color: var(--color-primary);
+    padding: 2px 4px;
+    height: auto;
+    min-width: auto;
+}
+
+.genre-delete-btn {
+    color: var(--color-error);
+    padding: 2px 4px;
+    height: auto;
+    min-width: auto;
+}

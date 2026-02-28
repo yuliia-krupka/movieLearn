@@ -6,9 +6,9 @@ import axios from "axios";
 import MainLayout from "../layout/MainLayout.tsx";
 import {useAuth} from '../auth/useAuth';
 import {learningSetService} from '../../services/learningSetService';
-import '../css/MovieDetails.css';
-import '../css/movies.css';
-import '../css/Layout.css';
+import './MovieDetails.css';
+import './movies.css';
+import '../layout/Layout.css';
 import type {LearningSetDto} from "../../types/learningSet.ts";
 
 

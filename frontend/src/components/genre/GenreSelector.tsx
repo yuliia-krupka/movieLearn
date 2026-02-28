@@ -5,7 +5,7 @@ import {type Genre} from '../../types/genre';
 import GenreOptionItem from './GenreOptionItem';
 import axios from 'axios';
 import type useMessage from "antd/es/message/useMessage";
-import '../css/GenreSelector.css';
+import './GenreSelector.css';
 
 interface GenreSelectorProps {
     genres: Genre[];

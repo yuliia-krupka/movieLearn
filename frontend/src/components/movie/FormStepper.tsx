@@ -1,5 +1,5 @@
 import React from 'react';
-import '../css/FormStepper.css';
+import './FormStepper.css';
 
 interface FormStepperProps {
     currentStep: number;

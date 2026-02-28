@@ -8,8 +8,8 @@ import {useEffect} from "react";
 import MainLayout from "../layout/MainLayout.tsx";
 import {useUserProfile} from "../hooks/useUserProfile.ts";
 import {useAuth} from "../auth/useAuth.tsx";
-import '../css/Account.css';
-import '../css/Layout.css'
+import './Account.css';
+import '../layout/Layout.css'
 
 const {Title, Text} = Typography;
 

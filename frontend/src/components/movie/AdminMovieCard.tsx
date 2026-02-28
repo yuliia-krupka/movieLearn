@@ -3,7 +3,7 @@ import {Card, Modal} from 'antd';
 import {EditOutlined, DeleteOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
 import type {Movie} from '../../types/movie';
-import '../css/AdminMoviesList.css';
+import './AdminMoviesList.css';
 
 interface AdminMovieCardProps {
     movie: Movie;

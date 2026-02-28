@@ -1,7 +1,7 @@
 import React from "react";
 import {Layout, Avatar, Typography, Input, message as antMessage} from "antd";
 import {useNavigate} from "react-router-dom";
-import "../css/TopBar.css";
+import "./TopBar.css";
 import {useAuth} from "../auth/useAuth";
 
 const {Header} = Layout;
@@ -37,6 +37,7 @@ const TopBar: React.FC = () => {
                     enterButton
                     className="topbar-search"
                     allowClear
+                    aria-label="Search movies"
                 />
 
                 <div className="topbar-user">

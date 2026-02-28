@@ -4,8 +4,8 @@ import {TeamOutlined, VideoCameraAddOutlined, ArrowRightOutlined, DashboardOutli
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import MainLayout from '../layout/MainLayout.tsx';
-import '../css/Layout.css';
-import '../css/AdminDashboard.css';
+import '../layout/Layout.css';
+import './AdminDashboard.css';
 
 const {Title, Text} = Typography;
 const AdminDashboard: React.FC = () => {
