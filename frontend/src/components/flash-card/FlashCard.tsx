@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { SoundOutlined } from '@ant-design/icons';
+import React, {useState, useCallback} from 'react';
+import {SoundOutlined} from '@ant-design/icons';
 import './FlashCard.css';
 
 interface FlashCardProps {
@@ -20,21 +20,21 @@ interface FlashCardProps {
 }
 
 const FlashCard: React.FC<FlashCardProps> = ({
-    word,
-    translation,
-    exampleSentence,
-    transcription,
-    status,
-    onPrevious,
-    onNext,
-    onKnow,
-    onDontKnow,
-    hasPrevious = true,
-    hasNext = true,
-    allReviewed = false,
-    onSeeResults,
-    completionHint
-}) => {
+                                                 word,
+                                                 translation,
+                                                 exampleSentence,
+                                                 transcription,
+                                                 status,
+                                                 onPrevious,
+                                                 onNext,
+                                                 onKnow,
+                                                 onDontKnow,
+                                                 hasPrevious = true,
+                                                 hasNext = true,
+                                                 allReviewed = false,
+                                                 onSeeResults,
+                                                 completionHint
+                                             }) => {
     const [isFlipped, setIsFlipped] = useState(false);
 
     const handleCardClick = () => setIsFlipped(!isFlipped);
@@ -98,7 +98,8 @@ const FlashCard: React.FC<FlashCardProps> = ({
             </div>
 
             <div className="card-area">
-                {hasPrevious && <button className="nav-button nav-prev" onClick={handlePrevious} aria-label="Previous card">&#10094;</button>}
+                {hasPrevious && <button className="nav-button nav-prev" onClick={handlePrevious}
+                                        aria-label="Previous card">&#10094;</button>}
 
                 <div
                     className="card-wrapper"
@@ -130,7 +131,7 @@ const FlashCard: React.FC<FlashCardProps> = ({
                                     aria-label={`Listen to pronunciation of ${word}`}
                                     type="button"
                                 >
-                                    <SoundOutlined className="sound-icon" />
+                                    <SoundOutlined className="sound-icon"/>
                                 </button>
                             </div>
                         </div>
@@ -141,7 +142,8 @@ const FlashCard: React.FC<FlashCardProps> = ({
                     </div>
                 </div>
 
-                {hasNext && <button className="nav-button nav-next" onClick={handleNext} aria-label="Next card">&#10095;</button>}
+                {hasNext && <button className="nav-button nav-next" onClick={handleNext}
+                                    aria-label="Next card">&#10095;</button>}
             </div>
 
             <div className="actions">
@@ -150,7 +152,7 @@ const FlashCard: React.FC<FlashCardProps> = ({
                 ) : (
                     <>
                         <button
-                            className={status === true ? 'active-known' : ''}
+                            className={`know-btn ${status === true ? 'active-known' : ''}`}
                             onClick={handleKnow}
                         >
                             I know

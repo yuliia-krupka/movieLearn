@@ -175,7 +175,7 @@
 .example-sentence {
     font-style: italic;
     font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--color-text-white) !important;
     margin: 16px 0;
     padding: 0 20px;
     line-height: 1.4;
@@ -207,7 +207,7 @@
 .sound-icon {
     cursor: pointer;
     font-size: 1.4rem;
-    color: var(--color-primary);
+    color: var(--color-primary-hover);
 }
 
 .card-wrapper:focus-visible .card {
@@ -242,7 +242,7 @@
     letter-spacing: 1px;
     background: rgba(255, 255, 255, 0.2);
     border: 2px solid rgba(255, 255, 255, 0.8);
-    color: white;
+    color: var(--color-text-white);
     backdrop-filter: blur(4px);
 }
 
@@ -258,13 +258,13 @@
 
 .active-known {
     background: var(--color-accent);
-    color: white;
+    color: var(--color-text-white);
     transform: scale(1.05);
 }
 
 .active-unknown {
     background: var(--color-primary);
-    color: white;
+    color: var(--color-text-white);
     transform: scale(1.05);
 }
 
@@ -286,16 +286,31 @@
 }
 
 .actions button:hover {
-    background: #fff2e8;
+    background: var(--color-bg);
 }
 
 .actions .dont-know-btn {
     border-color: var(--color-primary);
     color: var(--color-primary);
+    background: var(--color-bg);
 }
 
 .actions .dont-know-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-text-white);
+    background-color: var(--color-primary);
+}
+
+.actions .know-btn {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
     background: var(--color-bg);
+}
+
+.actions .know-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-text-white);
+    background-color: var(--color-accent);
 }
 
 .flashcard-counter {
@@ -313,7 +328,7 @@
     border-radius: var(--radius-lg);
     border: none;
     background: var(--color-primary);
-    color: #fff;
+    color: var(--color-text-white);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;

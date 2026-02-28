@@ -44,29 +44,29 @@
 }
 
 
-.blue-btn {
+.form-actions-update .blue-btn {
     margin: 0 auto;
     display: block;
     border-radius: var(--radius-pill);
-    background-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
     font-size: 14px !important;
-    color: var(--color-text-white);
+    background-color: var(--color-bg) !important;
 }
 
-.blue-btn:hover {
+.form-actions-update .blue-btn:hover {
     background-color: var(--color-primary-hover) !important;
     border-color: var(--color-primary-hover) !important;
     color: var(--color-text-white) !important;
     opacity: 0.9;
 }
 
-.yellow-btn {
+.form-actions-update .yellow-btn {
     border-radius: var(--radius-pill);
-    background-color: var(--color-accent);
-    border-color: var(--color-accent) !important;
+    border-color: var(--color-accent);
+    color: var(--color-accent) !important;
     font-size: 14px !important;
-    color: var(--color-text-white);
+    background-color: var(--color-bg) !important;
 }
 
 .yellow-btn-outline {
@@ -76,9 +76,10 @@
     font-size: 14px !important;
 }
 
-.yellow-btn:hover {
+.form-actions-update .yellow-btn:hover {
     background-color: var(--color-accent-hover) !important;
     border-color: var(--color-accent-hover) !important;
+    color: var(--color-text-white) !important;
 }
 
 .yellow-btn-outline:hover {
