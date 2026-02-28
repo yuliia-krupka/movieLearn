@@ -9,13 +9,28 @@
     color: var(--color-text-white);
     border: none;
     padding: 8px 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
     margin-left: 10px;
-    transition: all 0.3s ease;
+    transition: var(--transition-base);
+    border-radius: var(--radius-pill);
+}
+
+.cancel-btn {
+    background-color: var(--color-primary) !important;
+    color: var(--color-text-white) !important;
+    border-color: var(--color-primary-hover) !important;
+    padding: 8px 20px;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-pill);
+}
+
+.cancel-btn:hover {
+    background-color: var(--color-primary-hover) !important;
+    border-color: var(--color-primary-hover) !important;
 }
 
 .add-genre-btn:hover {
-    background-color: var(--color-accent);
+    background-color: var(--color-accent-hover) !important;
     color: var(--color-text-white) !important;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }

@@ -36,18 +36,18 @@
     left: 0;
     right: 0;
     padding: 40px 20px 20px;
-    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9));
+    background: var(--gradient-dark-overlay);
     text-align: center;
 }
 
 .movie-title-main {
     color: white !important;
     font-size: 45px;
-    font-family: "Krona One", sans-serif;
+    font-family: var(--font-heading);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    animation: movieTitleEnter 1.2s ease-out forwards;
+    animation: movieTitleEnter var(--transition-extra-slow) ease-out forwards;
     opacity: 0;
 }
 
@@ -93,13 +93,13 @@
 .movie-actions .primary-action-btn {
     background-color: var(--color-accent) !important;
     border-color: var(--color-accent) !important;
-    color: white !important;
+    color: var(--color-text-white) !important;
     font-weight: 600 !important;
     border-radius: var(--radius-pill) !important;
     font-size: 0.9rem !important;
     padding: 0 24px !important;
     height: 40px !important;
-    transition: all 0.3s ease !important;
+    transition: var(--transition-base) !important;
     box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045) !important;
 }
 
@@ -110,41 +110,20 @@
 }
 
 .movie-actions .secondary-action-btn {
-    background-color: transparent !important;
-    border: 1px solid var(--color-placeholder) !important;
-    color: rgba(0, 0, 0, 0.88) !important;
+    background-color: var(--color-primary) !important;
+    border: 1px solid var(--color-primary) !important;
+    color: var(--color-text-white) !important;
     font-weight: 500 !important;
-    border-radius: var(--radius-pill) !important;
+    border-radius: var(--radius-pill);
     font-size: 0.9rem !important;
     padding: 0 24px !important;
     height: 40px !important;
-    transition: all 0.3s ease !important;
+    transition: var(--transition-base) !important;
 }
 
 .movie-actions .secondary-action-btn:hover {
-    color: var(--color-primary) !important;
-    border-color: var(--color-primary) !important;
-    background-color: white !important;
-}
-
-.movie-actions .icon-action-btn {
-    background-color: transparent !important;
-    border: none !important;
-    color: var(--color-text-subtle) !important;
-    font-size: 1.2rem !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important;
-    transition: all 0.3s ease !important;
-}
-
-.movie-actions .icon-action-btn:hover {
-    background-color: rgba(0, 0, 0, 0.06) !important;
-    color: var(--color-text-muted) !important;
+    background-color: var(--color-primary-hover) !important;
+    border-color: var(--color-primary-hover) !important;
 }
 
 @media (max-width: 768px) {
@@ -223,7 +202,7 @@
 }
 
 .back-link-btn:hover {
-    color: #4358b5 !important;
+    color: var(--color-primary-hover) !important;
     text-decoration: none !important;
 }
 
@@ -252,10 +231,10 @@
     padding: 30px;
     background: white;
     border-radius: var(--radius-lg);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-modal);
     max-width: 420px;
     width: 90%;
-    animation: modalSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: modalSlideUp var(--transition-slow) cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .generating-gif {
@@ -268,7 +247,7 @@
 .generating-title {
     font-size: 22px;
     font-weight: 600;
-    font-family: 'Krona One', sans-serif;
+    font-family: var(--font-heading);
     color: var(--color-text-strong);
     margin-bottom: 0;
 }

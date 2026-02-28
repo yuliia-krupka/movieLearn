@@ -37,7 +37,7 @@
     border-radius: var(--radius-md);
     font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: var(--transition-fast);
 }
 
 .finish-study-btn:hover {
@@ -55,7 +55,7 @@
     font-weight: 500;
     cursor: pointer;
     padding: 4px 8px;
-    transition: color 0.2s;
+    transition: color var(--transition-fast);
     z-index: 10;
 }
 
@@ -86,7 +86,7 @@
     border: none;
     color: var(--color-text-muted);
     cursor: pointer;
-    transition: color 0.2s, transform 0.2s;
+    transition: color var(--transition-fast), transform var(--transition-fast);
     font-size: 32px;
     position: absolute;
     top: 50%;
@@ -118,12 +118,12 @@
     height: 100%;
     border-radius: var(--radius-pill);
     transform-style: preserve-3d;
-    transition: transform 0.7s, box-shadow 0.3s;
+    transition: transform var(--transition-extra-slow), box-shadow var(--transition-base);
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-lg);
 }
 
 .card:hover {
@@ -154,12 +154,12 @@
 }
 
 .front {
-    background: linear-gradient(135deg, var(--color-accent), #ffbb96);
+    background: var(--gradient-accent);
     transform: rotateY(0deg) translateZ(1px);
 }
 
 .back {
-    background: linear-gradient(135deg, var(--color-primary), #7A9EFF);
+    background: var(--gradient-primary);
     transform: rotateY(180deg) translateZ(1px);
 }
 
@@ -278,11 +278,11 @@
     padding: 14px 28px;
     border-radius: var(--radius-lg);
     border: 2px solid var(--color-accent);
-    background: white;
+    background: var(--color-bg-secondary);
     color: var(--color-accent);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: var(--transition-base);
 }
 
 .actions button:hover {
@@ -295,7 +295,7 @@
 }
 
 .actions .dont-know-btn:hover {
-    background: #eef1fb;
+    background: var(--color-bg);
 }
 
 .flashcard-counter {
@@ -317,7 +317,11 @@
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.25s, transform 0.15s;
+    transition: background var(--transition-fast), transform 0.15s;
+}
+
+.transcription {
+    color: var(--color-text-secondary) !important;
 }
 
 .actions .see-results-button:hover {

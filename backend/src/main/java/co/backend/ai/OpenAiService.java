@@ -61,7 +61,7 @@ public class OpenAiService {
                         - text: The English word or phrase (MAX 70 chars).
                         - translation: Accurate Ukrainian translation (MAX 150 chars).
                         - transcription: IPA transcription enclosed in slashes (MAX 100 chars).
-                        - exampleSentence: The actual sentence from the movie where this item is used (MAX 150 chars).
+                        - exampleSentence: The actual sentence from the movie where this item is used (MAX 180 chars).
                         """,
                 movieTitle, description, scriptContent, interests, level);
 
@@ -89,7 +89,7 @@ public class OpenAiService {
                 - text: The English question or sentence with a blank (MAX 255 chars).
                 - translation: The Ukrainian translation of the word being tested (MAX 150 chars).
                 - transcription: IPA transcription of the word enclosed in slashes, e.g. /wɜːrd/ (MAX 100 chars).
-                - exampleSentence: The full correct sentence or a brief definition (MAX 150 chars).
+                - exampleSentence: The full correct sentence or a brief definition (MAX 180 chars).
                 - answers: An array of exactly 4 strings (options) (Each option MAX 100 chars).
                 - correctAnswerIndex: The integer index (0-3) of the correct answer in the answers array.
                 """, flashcardsJson);
@@ -126,7 +126,7 @@ public class OpenAiService {
                         2. NO DUPLICATES: DO NOT reuse these words: [%s].
                         3. NO FULL SENTENCES: Ensure the 'text' field contains only a word or phrase, never a full sentence.
                         4. SOPHISTICATION: If level is B2, C1, or C2, use advanced collocations and idioms from the script.
-                        5. ADHERE TO LIMITS: text (70 chars), translation (150 chars), exampleSentence (150 chars), transcription (100 chars in slashes).
+                        5. ADHERE TO LIMITS: text (70 chars), translation (150 chars), exampleSentence (180 chars), transcription (100 chars in slashes).
                         6. Return the results as a JSON array of vocabulary flashcards only.
                         """,
                 instructions, movieTitle, description, scriptContent, level, interests, itemsJson, originalTexts);

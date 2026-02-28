@@ -107,7 +107,7 @@ const ProgressDashboard: React.FC = () => {
                                                 <Tag color="blue" className="english-level-tag">
                                                     {item.englishLevel || 'A2'}
                                                 </Tag>
-                                                <Tag color="cyan">
+                                                <Tag color="blue" className="genre-tag">
                                                     Total attempts: {item.totalAttempts}
                                                 </Tag>
                                             </div>

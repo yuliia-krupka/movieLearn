@@ -1,18 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
     Row, Col, Typography, Pagination,
     Spin, Empty, Select, Space
 } from 'antd';
 import MovieCard from "./MovieCard";
-import { useGenres } from '../hooks/useGenres';
-import { useLocation } from 'react-router-dom';
+import {useGenres} from '../hooks/useGenres';
+import {useLocation} from 'react-router-dom';
 import useMessage from 'antd/es/message/useMessage';
 import './MoviesGrid.css';
 
-const { Title } = Typography;
-const { Option } = Select;
+const {Title} = Typography;
+const {Option} = Select;
 
-import { useMovies } from '../hooks/useMovies';
+import {useMovies} from '../hooks/useMovies';
 
 interface MoviesGridProps {
     apiEndpoint: string;
@@ -22,12 +22,12 @@ interface MoviesGridProps {
 }
 
 const MoviesGrid: React.FC<MoviesGridProps> = ({
-    apiEndpoint,
-    title,
-    emptyMessage = "No movies available. Please check back later!",
-    showGenreFilter = true,
-}) => {
-    const { genres, loading: genresLoading } = useGenres();
+                                                   apiEndpoint,
+                                                   title,
+                                                   emptyMessage = "No movies available. Please check back later!",
+                                                   showGenreFilter = true,
+                                               }) => {
+    const {genres, loading: genresLoading} = useGenres();
     const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const location = useLocation();
@@ -52,7 +52,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
         }
     }, [location.state, messageApi]);
 
-    const { movies, loading } = useMovies({
+    const {movies, loading} = useMovies({
         apiEndpoint,
         searchQuery,
         selectedGenres
@@ -127,7 +127,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                                     allowClear
                                     maxTagCount="responsive"
                                 >
-                                    {genres.map(({ id, name }) => (
+                                    {genres.map(({id, name}) => (
                                         <Option key={id} value={name}>{name}</Option>
                                     ))}
                                 </Select>
@@ -139,7 +139,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
 
             {isLoading ? (
                 <div className="movies-grid-loading">
-                    <Spin size="large" />
+                    <Spin size="large"/>
                 </div>
             ) : filteredMovies.length === 0 ? (
                 <div className="movies-grid-empty">
@@ -149,7 +149,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                             : selectedGenres.length > 0
                                 ? "No movies match the selected genres"
                                 : emptyMessage
-                    } />
+                    }/>
                 </div>
             ) : (
                 <>
@@ -161,7 +161,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                                     span={colSpan}
                                     className="movies-grid-col"
                                 >
-                                    <MovieCard movie={movie} />
+                                    <MovieCard movie={movie}/>
                                 </Col>
                             ))}
                         </Row>
@@ -176,6 +176,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                             showSizeChanger={false}
                             showQuickJumper={false}
                             responsive={true}
+                            hideOnSinglePage={true}
                             className="movies-grid-pagination"
                         />
                     </div>

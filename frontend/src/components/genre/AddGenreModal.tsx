@@ -1,6 +1,6 @@
 import React from 'react';
-import { Modal, Form, Input, Button, Space } from 'antd';
-import { type NewGenreData } from '../../types/movie';
+import {Modal, Form, Input, Button, Space} from 'antd';
+import {type NewGenreData} from '../../types/movie';
 
 interface AddGenreModalProps {
     visible: boolean;
@@ -10,11 +10,11 @@ interface AddGenreModalProps {
 }
 
 const AddGenreModal: React.FC<AddGenreModalProps> = ({
-    visible,
-    loading,
-    onCancel,
-    onSubmit,
-}) => {
+                                                         visible,
+                                                         loading,
+                                                         onCancel,
+                                                         onSubmit,
+                                                     }) => {
     const [form] = Form.useForm();
 
     const handleSubmit = async (values: NewGenreData) => {
@@ -43,28 +43,28 @@ const AddGenreModal: React.FC<AddGenreModalProps> = ({
                     label="Genre Name"
                     name="name"
                     rules={[
-                        { required: true, message: 'Please enter genre name' },
-                        { min: 2, message: 'Name must be at least 2 characters' },
+                        {required: true, message: 'Please enter genre name'},
+                        {min: 2, message: 'Name must be at least 2 characters'},
                         {
                             pattern: /^[A-Za-z\s-]+$/,
                             message: 'Only English letters, dashes, and spaces are allowed',
                         },
                     ]}
                 >
-                    <Input placeholder="e.g., Action, Comedy" />
+                    <Input placeholder="e.g., Action, Comedy"/>
                 </Form.Item>
 
-                <Form.Item style={{ textAlign: 'center', marginBottom: 0 }}>
+                <Form.Item style={{textAlign: 'center', marginBottom: 0}}>
                     <Space>
+                        <Button onClick={handleCancel} className="cancel-btn">
+                            Cancel
+                        </Button>
                         <Button
                             htmlType="submit"
                             className="add-genre-btn"
                             loading={loading}
                         >
                             Add Genre
-                        </Button>
-                        <Button onClick={handleCancel}>
-                            Cancel
                         </Button>
                     </Space>
                 </Form.Item>

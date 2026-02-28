@@ -66,6 +66,28 @@
     --space-10: 40px;
     --space-12: 48px;
     --space-20: 80px;
+
+    --transition-fast: 0.2s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    --transition-extra-slow: 0.7s ease;
+
+    --gradient-accent: linear-gradient(135deg, var(--color-accent), #ffbb96);
+    --gradient-primary: linear-gradient(135deg, var(--color-primary), #7A9EFF);
+    --gradient-dark-overlay: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9));
+
+    --shadow-button: 0 4px 6px -1px rgba(90, 115, 219, 0.4);
+    --shadow-card: 0 8px 12px rgba(0, 0, 0, 0.08);
+    --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.1);
+    --shadow-accent: 0 4px 12px rgba(244, 158, 76, 0.3);
+    --shadow-primary: 0 4px 12px rgba(90, 115, 219, 0.3);
+
+    --color-primary-tint: rgba(90, 115, 219, 0.06);
+    --color-accent-tint: rgba(244, 158, 76, 0.06);
+    --color-error-tint: rgba(255, 77, 79, 0.06);
+    --color-success-tint: rgba(82, 196, 26, 0.06);
+
+    --font-heading: "Krona One", sans-serif;
 }
 
 html {

@@ -26,14 +26,13 @@
     height: 40px;
     display: flex;
     align-items: center;
-    box-shadow: 0 4px 6px -1px rgba(90, 115, 219, 0.4);
-    transition: all 0.3s ease;
+    box-shadow: var(--shadow-button);
+    transition: var(--transition-base);
 }
 
 .add-movie-btn:hover {
-    background-color: var(--color-primary) !important;
-    border-color: var(--color-primary) !important;
-    opacity: 0.8;
+    background-color: var(--color-primary-hover) !important;
+    border-color: var(--color-primary-hover) !important;
 }
 
 .admin-movie-card-container {
@@ -45,7 +44,7 @@
 .admin-movie-card {
     border-radius: 0;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: var(--transition-base);
     border: none;
     background: transparent;
     cursor: pointer;
@@ -100,7 +99,7 @@
     cursor: pointer;
     padding: 10px 0;
     color: var(--color-text-secondary);
-    transition: background 0.2s;
+    transition: var(--transition-fast);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -108,15 +107,16 @@
 }
 
 .admin-action-btn:not(:last-child) {
-    border-right: 1px solid var(--color-border-light) !important;
+    border-right: 1px solid var(--color-border-darker) !important;
 }
 
 .admin-action-btn:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-primary);
 }
 
 .admin-action-btn.delete:hover {
-    background-color: var(--color-bg);
+    background-color: var(--color-bg-secondary);
     color: var(--color-error);
 }
 

@@ -19,7 +19,7 @@ public class LearningItemDto {
 
     private List<String> answers;
 
-    @Size(max = 150, message = "Example sentence cannot exceed 150 characters")
+    @Size(max = 180, message = "Example sentence cannot exceed 180 characters")
     private String exampleSentence;
 
     @Size(max = 100, message = "Transcription cannot exceed 100 characters")

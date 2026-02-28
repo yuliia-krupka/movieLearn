@@ -29,7 +29,7 @@
     flex: 1;
     min-width: 200px;
     border-radius: var(--radius-card);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .movie-stats-grid {
@@ -48,13 +48,13 @@
     height: 100%;
     border-radius: var(--radius-card);
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: var(--transition-base);
+    box-shadow: var(--shadow-sm);
 }
 
 .movie-stat-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-lg);
 }
 
 .movie-card-img {
@@ -156,7 +156,7 @@
 
 .movie-placeholder-icon {
     font-size: 48px;
-    color: #ccc;
+    color: var(--color-placeholder);
 }
 
 .flashcards-tag-active {

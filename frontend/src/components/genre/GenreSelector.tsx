@@ -106,7 +106,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                     <div className="genre-selector-label">
                         <span>Genres</span>
                         <Button
-                            className='yellow-btn add-genre-btn'
+                            className='add-genre-btn'
                             icon={<PlusOutlined/>}
                             size="small"
                             onClick={onAddGenre}

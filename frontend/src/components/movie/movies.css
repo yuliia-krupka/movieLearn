@@ -14,22 +14,32 @@
 .yellow-btn {
     background-color: var(--color-accent) !important;
     border-color: var(--color-accent) !important;
-    color: #fff !important;
+    color: var(--color-text-white) !important;
+    border-radius: var(--radius-pill);
+    align-self: center;
+    transition: all 0.3s;
+}
+
+.yellow-btn:hover {
+    background-color: var(--color-accent-hover) !important;
+    border-color: var(--color-accent-hover) !important;
+}
+
+.blue-btn {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-text-white) !important;
     border-radius: var(--radius-pill);
     align-self: center;
     transition: all 0.3s;
 }
 
 .blue-btn {
-    background-color: var(--color-primary) !important;
-    border-color: var(--color-primary) !important;
-    color: #fff !important;
-    border-radius: var(--radius-pill);
-    align-self: center;
-    transition: all 0.3s;
+    background-color: var(--color-primary-hover) !important;
+    border-color: var(--color-primary-hover) !important;
 }
 
-.ant-form-item-label>label {
+.ant-form-item-label > label {
     font-weight: 500;
     color: var(--color-text);
 }

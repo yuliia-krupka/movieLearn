@@ -5,7 +5,7 @@
     align-items: center;
     height: 64px;
     padding: 0 20px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .topbar-right {
@@ -38,7 +38,7 @@
 }
 
 .admin-dashboard-btn:hover {
-    background-color: rgba(0, 0, 0, 0.025);
+    background-color: var(--color-border-light);
     color: var(--color-primary);
 }
 

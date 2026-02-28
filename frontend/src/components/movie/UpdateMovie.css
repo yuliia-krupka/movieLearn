@@ -70,7 +70,7 @@
 
 .add-genre-btn {
     background-color: var(--color-accent);
-    color: #fff;
+    color: var(--color-text-white) !important;
     border: none;
     padding: 8px 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

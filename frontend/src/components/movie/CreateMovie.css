@@ -185,7 +185,6 @@
     color: var(--color-error);
 }
 
-/* Form Actions */
 .form-actions-right {
     display: flex;
     justify-content: flex-end;
@@ -195,30 +194,33 @@
 }
 
 .cancel-btn-light {
-    background-color: var(--color-bg-secondary) !important;
-    border-color: var(--color-bg-secondary) !important;
-    color: var(--color-text-muted) !important;
-    border-radius: var(--radius-sm) !important;
-    /* Update layout requested rounded rectangles instead of pills for buttons in this form specifically */
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-text-white) !important;
+    border-radius: var(--radius-pill) !important;
     padding: 0 24px !important;
     height: 40px !important;
     font-weight: 500 !important;
 }
 
 .cancel-btn-light:hover {
-    background-color: #e8e8e8 !important;
-    border-color: #e8e8e8 !important;
-    color: #1a1a24 !important;
+    background-color: var(--color-primary-hover) !important;
+    border-color: var(--color-primary-hover) !important;
 }
 
 .yellow-btn-rect {
     background-color: var(--color-accent) !important;
     border-color: var(--color-accent) !important;
-    color: #fff !important;
-    border-radius: var(--radius-sm) !important;
+    color: var(--color-text-white) !important;
+    border-radius: var(--radius-pill) !important;
     padding: 0 24px !important;
     height: 40px !important;
     font-weight: 500 !important;
+}
+
+.yellow-btn-rect:hover {
+    background-color: var(--color-accent-hover) !important;
+    border-color: var(--color-accent-hover) !important;
 }
 
 

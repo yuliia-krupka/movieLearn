@@ -53,7 +53,7 @@
     border-radius: var(--radius-lg);
     font-size: 1.05rem;
     font-weight: 500;
-    box-shadow: 0 4px 12px rgba(244, 158, 76, 0.3);
+    box-shadow: var(--shadow-accent);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -64,7 +64,7 @@
     box-shadow: 0 8px 16px rgba(244, 158, 76, 0.4);
     background-color: var(--color-accent-hover) !important;
     border-color: var(--color-accent-hover) !important;
-    color: #ffffff !important;
+    color: var(--color-text-white) !important;
 }
 
 .scroll-indicator {
@@ -146,7 +146,7 @@
     background: transparent;
     border: none;
     box-shadow: none;
-    transition: transform 0.3s;
+    transition: var(--transition-base);
 }
 
 .step-card:hover {
@@ -204,7 +204,7 @@
     animation: none;
     box-shadow: 0 0 30px rgba(250, 140, 22, 0.6);
     transform: scale(1.1);
-    transition: all 0.3s;
+    transition: var(--transition-base);
 }
 
 /* Specific hover for blue icon */

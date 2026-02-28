@@ -19,7 +19,7 @@ export interface EditableFlashCard extends Partial<FlashCardData> {
 
 export const WORD_LIMIT = 70;
 export const TRANSLATION_LIMIT = 150;
-export const SENTENCE_LIMIT = 150;
+export const SENTENCE_LIMIT = 180;
 export const TRANSCRIPTION_LIMIT = 100;
 
 export const useFlashCards = (learningSetIdParam: string | undefined, currentUserId: number | undefined) => {

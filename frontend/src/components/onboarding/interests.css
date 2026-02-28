@@ -41,7 +41,7 @@
 }
 
 .interest-button.selected {
-    background-color: white;
+    background-color: var(--color-text-white);
     color: var(--color-accent);
     border: 1px solid var(--color-accent);
 }

@@ -48,10 +48,17 @@
     margin: 0 auto;
     display: block;
     border-radius: var(--radius-pill);
-    background-color: var(--color-primary);
+    background-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;
     font-size: 14px !important;
-    color: white;
+    color: var(--color-text-white);
+}
+
+.blue-btn:hover {
+    background-color: var(--color-primary-hover) !important;
+    border-color: var(--color-primary-hover) !important;
+    color: var(--color-text-white) !important;
+    opacity: 0.9;
 }
 
 .yellow-btn {
@@ -59,7 +66,7 @@
     background-color: var(--color-accent);
     border-color: var(--color-accent) !important;
     font-size: 14px !important;
-    color: white;
+    color: var(--color-text-white);
 }
 
 .yellow-btn-outline {
@@ -69,16 +76,9 @@
     font-size: 14px !important;
 }
 
-.blue-btn:hover {
-    background-color: white !important;
-    color: var(--color-primary) !important;
-    opacity: 0.9;
-}
-
 .yellow-btn:hover {
-    background-color: white !important;
-    color: var(--color-accent) !important;
-    opacity: 0.9;
+    background-color: var(--color-accent-hover) !important;
+    border-color: var(--color-accent-hover) !important;
 }
 
 .yellow-btn-outline:hover {
@@ -154,7 +154,7 @@
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--transition-base);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -172,7 +172,7 @@
     background-color: var(--color-primary);
     border-color: var(--color-primary);
     color: white;
-    box-shadow: 0 2px 8px rgba(90, 115, 219, 0.3);
+    box-shadow: var(--shadow-primary);
 }
 
 
@@ -213,8 +213,8 @@
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: var(--transition-base);
+    box-shadow: var(--shadow-sm);
     border: 2px solid transparent;
     position: relative;
     z-index: 1;
@@ -241,7 +241,7 @@
 }
 
 .interest-badge-yellow:hover {
-    background-color: darkorange;
+    background-color: var(--color-accent-hover);
 }
 
 
@@ -249,11 +249,11 @@
     background-color: var(--color-accent);
     color: white;
     border-color: var(--color-accent);
-    box-shadow: 0 4px 8px rgba(244, 158, 76, 0.3);
+    box-shadow: var(--shadow-accent);
 }
 
 .interest-badge.selected:hover {
-    background-color: darkorange;
+    background-color: var(--color-accent-hover);
     animation: pulse 1.5s ease-in-out infinite alternate;
 }
 
@@ -271,17 +271,15 @@
     display: block;
     border-radius: var(--radius-pill);
     border-color: var(--color-primary) !important;
-    color: var(--color-primary) !important;
+    color: var(--color-text-white) !important;
     font-size: 14px !important;
     transition: background-color 0.3s ease, color 0.3s ease;
-    background-color: transparent;
+    background-color: var(--color-primary) !important;
 }
 
 .update-profile-btn:hover {
-    background-color: var(--color-primary) !important;
-    color: white !important;
-    box-shadow: none !important;
-    animation: none !important;
+    background-color: var(--color-primary-hover) !important;
+    color: var(--color-text-white) !important;
 }
 
 .account-loading-container {
@@ -316,7 +314,7 @@
     padding: 12px;
     border-radius: var(--radius-sm);
     margin-top: 16px;
-    border: 1px dashed #ced4da;
+    border: 1px dashed var(--color-border-light);
 }
 
 .form-actions-update {

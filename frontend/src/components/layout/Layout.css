@@ -3,7 +3,7 @@
     overflow: hidden;
 }
 
-.account-root-layout>.ant-layout {
+.account-root-layout > .ant-layout {
     height: 100vh;
     overflow: hidden;
 }
@@ -23,7 +23,7 @@
 }
 
 .content-movies {
-    height: 100%;
+    height: calc(100% - 20px);
     overflow-y: auto;
 }
 

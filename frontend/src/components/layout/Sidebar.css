@@ -1,7 +1,7 @@
 .sidebar {
     background: var(--color-bg);
     min-height: 100vh;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .sidebar-content {
@@ -28,7 +28,7 @@
     border-radius: var(--radius-pill);
     width: 60%;
     align-self: center;
-    transition: all 0.3s;
+    transition: var(--transition-base);
 }
 
 .sidebar-logout.ant-btn:hover,
