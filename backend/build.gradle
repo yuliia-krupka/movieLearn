@@ -42,6 +42,7 @@ dependencies {
 
     implementation(platform("org.springframework.ai:spring-ai-bom:1.1.2"))
     implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+    implementation 'org.springframework.retry:spring-retry'
 }
 
 tasks.named('test') {

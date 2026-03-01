@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.core.ParameterizedTypeReference;
@@ -24,6 +25,7 @@ public class OpenAiService {
     private final ChatClient chatClient;
     private final ObjectMapper objectMapper;
     private final LearningItemMapper learningItemMapper;
+    private final RetryTemplate aiRetryTemplate;
 
     private static final String SYSTEM_PROMPT = """
             You are a specialized language learning assistant. Your goal is to extract high-value vocabulary from movie scripts.
@@ -136,17 +138,22 @@ public class OpenAiService {
 
     private List<LearningItemDto> generate(String prompt, double temperature, LearningItemType type) {
         try {
-            List<GeneratedItem> items = chatClient.prompt()
-                    .system(SYSTEM_PROMPT)
-                    .user(prompt)
-                    .options(OpenAiChatOptions.builder().temperature(temperature).build())
-                    .call()
-                    .entity(new ParameterizedTypeReference<>() {
-                    });
+            List<GeneratedItem> items = aiRetryTemplate.execute(context -> {
+                if (context.getRetryCount() > 0) {
+                    log.warn("Retrying AI request, attempt #{}", context.getRetryCount() + 1);
+                }
+                return chatClient.prompt()
+                        .system(SYSTEM_PROMPT)
+                        .user(prompt)
+                        .options(OpenAiChatOptions.builder().temperature(temperature).build())
+                        .call()
+                        .entity(new ParameterizedTypeReference<>() {
+                        });
+            });
             return items == null ? List.of()
                     : items.stream().map(item -> learningItemMapper.fromGenerated(item, type)).toList();
         } catch (Exception e) {
-            log.error("Error calling OpenAI: {}", e.getMessage(), e);
+            log.error("Error calling OpenAI after retries: {}", e.getMessage(), e);
             throw new AiOperationException("AI operation failed. Please try again.", e);
         }
     }
