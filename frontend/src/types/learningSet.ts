@@ -17,6 +17,7 @@ export interface LearningSetDto {
     learningItems: LearningItemDto[];
     status: 'GENERATING' | 'REVIEW' | 'READY';
     englishLevel: string;
+    interests?: string;
 }
 
 export interface FlashCardData {

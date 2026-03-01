@@ -126,11 +126,12 @@ const MovieDetails: React.FC = () => {
                         });
                     }
 
-                    if (!learningSet) {
+                    const generatingTimer = setTimeout(() => {
                         setIsGenerating(true);
-                    }
+                    }, 3000);
 
                     const readySet = await learningSetService.startLearningForUser(Number(id));
+                    clearTimeout(generatingTimer);
                     console.log('Learning set ready:', readySet.id);
 
                     setIsUserStarted(true);
@@ -160,6 +161,15 @@ const MovieDetails: React.FC = () => {
             </MainLayout>
         );
         if (!movie) return null;
+
+        const normalizeInterests = (raw?: string | string[]): string => {
+            const str = Array.isArray(raw) ? raw.join(',') : (raw || '');
+            return str.split(/[,\s]+/).map(t => t.trim().toLowerCase()).filter(Boolean).sort().join(',');
+        };
+
+        const hasMatchingSet = learningSet != null &&
+            (!user?.englishLevel || learningSet.englishLevel === user.englishLevel) &&
+            normalizeInterests(user?.interests) === normalizeInterests(learningSet.interests);
 
         const imageSource = movie.image
             ? movie.image.startsWith('data:image')
@@ -241,10 +251,10 @@ const MovieDetails: React.FC = () => {
                                             Back to Movies
                                         </Button>
                                         <div className="movie-details-action-group">
-                                            {learningSet && (learningSet.status === 'READY' || learningSet.status === 'REVIEW') && (
+                                            {hasMatchingSet && (learningSet!.status === 'READY' || learningSet!.status === 'REVIEW') && (
                                                 <Button
                                                     className="secondary-action-btn"
-                                                    onClick={() => navigate(`/learning-sets/${learningSet.id}/update`)}
+                                                    onClick={() => navigate(`/learning-sets/${learningSet!.id}/update`)}
                                                 >
                                                     Refine Flashcards
                                                 </Button>
@@ -253,7 +263,7 @@ const MovieDetails: React.FC = () => {
                                                 className="primary-action-btn"
                                                 onClick={handleStartStudying}
                                             >
-                                                {learningSet ? 'Continue Studying' : 'Start Studying'}
+                                                {hasMatchingSet ? 'Continue Studying' : 'Start Studying'}
                                             </Button>
                                         </div>
                                     </div>

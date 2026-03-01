@@ -96,15 +96,14 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
             progressService.completeFlashcards(learningSet.id, score)
                 .catch(err => console.error('Failed to complete flashcards:', err));
 
-            const answerPromises = Array.from(results.entries()).map(([index, correct]) => {
-                const card = flashcards[index];
-                if (card) {
-                    return progressService.recordAnswer(card.id, correct);
-                }
-                return Promise.resolve();
-            });
+            const bulkAnswers = Array.from(results.entries())
+                .map(([index, correct]) => {
+                    const card = flashcards[index];
+                    return card ? {learningItemId: card.id, correct} : null;
+                })
+                .filter((a): a is { learningItemId: number, correct: boolean } => a !== null);
 
-            Promise.all(answerPromises)
+            progressService.recordAnswersBulk(bulkAnswers)
                 .then(() => progressService.getItemStatuses(learningSet.id))
                 .then(statuses => setItemStatuses(statuses))
                 .catch(err => console.error('Failed to save answers:', err));

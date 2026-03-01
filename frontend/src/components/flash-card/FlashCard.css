@@ -379,7 +379,21 @@
     }
 
     .flashcard-container {
-        padding: 10px 16px;
+        padding: 10px 8px;
+    }
+
+    .learning-set-info {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .learning-set-info h2 {
+        font-size: 0.9rem;
+    }
+
+    .back-to-movie-btn {
+        position: static;
+        font-size: 0.8rem;
     }
 
     .card-area {
@@ -388,27 +402,32 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        gap: 4px;
+    }
+
+    .nav-button {
+        position: static;
+        transform: none;
+        font-size: 24px;
+        flex-shrink: 0;
+        z-index: 10;
+        color: var(--color-text-muted);
+        background: none;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-button:hover {
+        transform: scale(1.2);
     }
 
     .nav-prev,
     .nav-next {
-        display: flex;
-        z-index: 10;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-    }
-
-    .nav-prev {
-        left: 0;
-    }
-
-    .nav-next {
-        right: 0;
+        left: auto;
+        right: auto;
     }
 
     .nav-buttons-mobile {
@@ -419,21 +438,74 @@
         display: none;
     }
 
-    .nav-button-mobile:hover {
-        color: #555;
-        transform: scale(1.2);
-        background: rgba(0, 0, 0, 0.05);
-    }
-
     .card-wrapper {
         width: 100%;
-        max-width: 400px;
+        max-width: 320px;
+        aspect-ratio: 3/4;
+    }
+
+    .card {
+        border-radius: var(--radius-md);
+    }
+
+    .front,
+    .back {
+        font-size: 1.1rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        text-align: center;
+        padding: 20px 14px 14px;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+
+    .front h2,
+    .back h2 {
+        font-size: 1.15rem;
+        max-width: 100%;
+        word-break: break-word;
+    }
+
+    .transcription {
+        font-size: 0.85rem !important;
+        margin: 4px 0 8px !important;
+        max-width: 100%;
+        letter-spacing: 0.5px;
+    }
+
+    .front p,
+    .back p {
+        font-size: 0.7rem;
+        margin-top: 6px;
+    }
+
+    .example-sentence {
+        font-size: 0.72rem;
+        padding: 0 8px;
+        margin: 6px 0;
+        line-height: 1.3;
+    }
+
+    .sound-icon-wrapper {
+        margin-top: 8px;
+    }
+
+    .sound-icon {
+        font-size: 1.1rem;
+    }
+
+    .status-badge {
+        top: 8px;
+        right: 8px;
+        padding: 3px 8px;
+        font-size: 0.7rem;
     }
 
     .actions {
         flex-direction: column;
         width: 90%;
         max-width: 300px;
+        margin-top: 16px;
     }
 
     .actions button {
@@ -441,35 +513,8 @@
         padding: 12px 20px;
     }
 
-    .front,
-    .back {
-        font-size: 1.2rem;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        text-align: center;
-    }
-
-    .front h2,
-    .back h2 {
-        font-size: 1.2rem;
-        max-width: 100%;
-    }
-
-    .transcription {
-        font-size: 1rem;
-        margin: 8px 0;
-        max-width: 100%;
-        letter-spacing: 0.5px;
-    }
-
-    .front p,
-    .back p {
-        font-size: 0.75rem;
-    }
-
-    .example-sentence {
-        font-size: 0.8rem;
-        padding: 0 12px;
-        margin: 8px 0;
+    .flashcard-counter {
+        margin-top: 10px;
+        font-size: 0.9rem;
     }
 }
