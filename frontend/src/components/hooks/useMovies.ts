@@ -1,6 +1,6 @@
 import {useState, useCallback, useEffect} from 'react';
-import axios from 'axios';
 import {message} from 'antd';
+import {movieService} from '../../services/movieService';
 
 import type {Movie} from '../../types/movie';
 
@@ -26,23 +26,18 @@ export const useMovies = ({apiEndpoint, searchQuery, selectedGenres}: UseMoviesP
         setLoading(true);
         setError(null);
         try {
-            const params = new URLSearchParams();
-
-            if (searchQuery && searchQuery.trim()) {
-                params.append('title', searchQuery.trim());
-            } else if (selectedGenres.length > 0) {
-                params.append('genre', selectedGenres.join(','));
+            let data: Movie[];
+            if (apiEndpoint && apiEndpoint !== '/api/movies') {
+                data = await movieService.fetchByEndpoint(apiEndpoint);
+            } else {
+                data = await movieService.search(searchQuery, selectedGenres);
             }
-
-            const url = params.toString() ? `${apiEndpoint}?${params.toString()}` : apiEndpoint;
-
-            const response = await axios.get<Movie[]>(url, {withCredentials: true});
-            setMovies(response.data);
+            setMovies(data);
         } catch (err) {
             console.error(err);
             let errorMsg = 'Error during loading movies, try again later.';
-            if (axios.isAxiosError(err)) {
-                errorMsg = err.response?.data?.message || err.message || errorMsg;
+            if (err instanceof Error) {
+                errorMsg = err.message || errorMsg;
             }
             setError(errorMsg);
             message.error(errorMsg);

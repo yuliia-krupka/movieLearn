@@ -11,7 +11,7 @@ import {
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
-import axios from 'axios';
+import {movieService} from '../../services/movieService';
 import {useGenres} from '../hooks/useGenres.tsx';
 import {useFileUpload} from '../hooks/useFileUpload.tsx';
 import {type MovieFormData, type NewGenreData} from '../../types/movie';
@@ -84,12 +84,9 @@ const CreateMovieForm: React.FC = () => {
     };
 
     const submitMovieData = async (formData: FormData) => {
-        const response = await axios.post('/api/movies', formData, {
-            headers: {'Content-Type': 'multipart/form-data'},
-            withCredentials: true,
-        });
+        const createdMovie = await movieService.create(formData);
         customMessage.success('Movie created successfully!');
-        return response.data;
+        return createdMovie;
     };
 
     const handleSubmit = async (values: MovieFormData): Promise<void> => {

@@ -107,7 +107,6 @@ public class LearningSetService {
 
         List<LearningItemDto> generatedItems = openAiService.generateFlashcards(
                 movie.getTitle(),
-                movie.getDescription(),
                 scriptParser.parse(movie.getScript()),
                 user.getInterests(),
                 user.getEnglishLevel() != null ? user.getEnglishLevel().name() : "B1");
@@ -370,8 +369,7 @@ public class LearningSetService {
         }
 
         List<LearningItemDto> generatedTestsDto = openAiService.generateTests(flashcards);
-        addItemsToSet(set, generatedTestsDto);
-        return generatedTestsDto;
+        return addItemsToSet(set, generatedTestsDto);
     }
 
     private LearningSet findSetById(Long id) {
@@ -389,7 +387,7 @@ public class LearningSetService {
         }
     }
 
-    private void addItemsToSet(LearningSet set, List<LearningItemDto> dtos) {
+    private List<LearningItemDto> addItemsToSet(LearningSet set, List<LearningItemDto> dtos) {
         List<LearningItem> items = dtos.stream()
                 .map(dto -> {
                     LearningItem item = learningItemMapper.toEntity(dto);
@@ -397,8 +395,10 @@ public class LearningSetService {
                     return item;
                 })
                 .toList();
-        set.getLearningItems().addAll(items);
+        List<LearningItem> savedItems = learningItemRepository.saveAll(items);
+        set.getLearningItems().addAll(savedItems);
         learningSetRepository.save(set);
+        return savedItems.stream().map(learningItemMapper::toDto).toList();
     }
 
     private List<LearningItem> getEntitiesByType(LearningSet set, LearningItemType type) {

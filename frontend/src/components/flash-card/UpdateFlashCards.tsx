@@ -12,7 +12,7 @@ import {
     TRANSLATION_LIMIT,
     SENTENCE_LIMIT,
     TRANSCRIPTION_LIMIT
-} from '../../hooks/useFlashCards';
+} from '../hooks/useFlashCards.ts';
 import {learningSetService} from '../../services/learningSetService';
 
 const UpdateFlashCards: React.FC = () => {

@@ -1,4 +1,4 @@
-import {api} from './apiClient';
+import apiClient from './apiClient';
 import type {
     ItemStatusDto,
     MovieProgress
@@ -6,63 +6,59 @@ import type {
 
 export const progressService = {
     async recordAnswer(learningItemId: number, correct: boolean): Promise<void> {
-        const params = new URLSearchParams({
-            learningItemId: String(learningItemId),
-            correct: String(correct),
-        });
-        const response = await api.post(`/user-learning-status/answer?${params}`);
-        if (!response.ok) {
-            console.error('Failed to record answer:', response.statusText);
+        try {
+            await apiClient.post(`/user-learning-status/answer`, null, {
+                params: {learningItemId, correct},
+            });
+        } catch (error) {
+            console.error('Failed to record answer:', error);
         }
     },
 
     async recordAnswersBulk(answers: { learningItemId: number, correct: boolean }[]): Promise<void> {
-        const response = await api.post(`/user-learning-status/answers/bulk`, answers);
-        if (!response.ok) {
-            console.error('Failed to record answers bulk:', response.statusText);
+        try {
+            await apiClient.post(`/user-learning-status/answers/bulk`, answers);
+        } catch (error) {
+            console.error('Failed to record answers bulk:', error);
         }
     },
 
     async getItemStatuses(learningSetId: number): Promise<ItemStatusDto[]> {
-        const response = await api.get(`/user-learning-status/set/${learningSetId}`);
-        if (!response.ok) return [];
-        const data: ItemStatusDto[] = await response.json();
-        return data.map((item) => ({
-            learningItemId: item.learningItemId,
-            status: item.status,
-            correctAnswers: item.correctAnswers,
-            totalAttempts: item.totalAttempts,
-        }));
+        try {
+            const {data} = await apiClient.get<ItemStatusDto[]>(`/user-learning-status/set/${learningSetId}`);
+            return data.map((item) => ({
+                learningItemId: item.learningItemId,
+                status: item.status,
+                correctAnswers: item.correctAnswers,
+                totalAttempts: item.totalAttempts,
+            }));
+        } catch {
+            return [];
+        }
     },
 
     async completeFlashcards(learningSetId: number, score: number): Promise<void> {
-        const params = new URLSearchParams({
-            learningSetId: String(learningSetId),
-            score: String(score),
-        });
-        const response = await api.post(`/user-learning-sets/complete-flashcards?${params}`);
-        if (!response.ok) {
-            console.error('Failed to complete flashcards:', response.statusText);
+        try {
+            await apiClient.post(`/user-learning-sets/complete-flashcards`, null, {
+                params: {learningSetId, score},
+            });
+        } catch (error) {
+            console.error('Failed to complete flashcards:', error);
         }
     },
 
     async completeTests(learningSetId: number, score: number): Promise<void> {
-        const params = new URLSearchParams({
-            learningSetId: String(learningSetId),
-            score: String(score),
-        });
-        const response = await api.post(`/user-learning-sets/complete-tests?${params}`);
-        if (!response.ok) {
-            console.error('Failed to complete tests:', response.statusText);
+        try {
+            await apiClient.post(`/user-learning-sets/complete-tests`, null, {
+                params: {learningSetId, score},
+            });
+        } catch (error) {
+            console.error('Failed to complete tests:', error);
         }
     },
 
     async getUserProgress(): Promise<MovieProgress[]> {
-        const response = await api.get(`/user-learning-sets/progress`);
-        if (!response.ok) throw new Error('Failed to get user progress');
-
-        const progressData: MovieProgress[] = await response.json();
-
+        const {data: progressData} = await apiClient.get<MovieProgress[]>(`/user-learning-sets/progress`);
         return progressData.map((progress: MovieProgress) => ({
             ...progress,
             englishLevel: progress.englishLevel || 'A2'

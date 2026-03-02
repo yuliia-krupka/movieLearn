@@ -4,6 +4,7 @@ import {PlusOutlined} from '@ant-design/icons';
 import {type Genre} from '../../types/genre';
 import GenreOptionItem from './GenreOptionItem';
 import axios from 'axios';
+import {genreService} from '../../services/genreService';
 import type useMessage from "antd/es/message/useMessage";
 import './GenreSelector.css';
 
@@ -30,10 +31,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
 
     const handleDeleteGenre = async (genreId: number, genreName: string) => {
         try {
-            const url = excludeMovieId
-                ? `/api/genres/${genreId}?excludeMovieId=${excludeMovieId}`
-                : `/api/genres/${genreId}`;
-            await axios.delete(url, {withCredentials: true});
+            await genreService.delete(genreId, excludeMovieId);
             messageApi.success(`Genre "${genreName}" deleted successfully`);
             onGenreDeleted?.();
         } catch (error: unknown) {
@@ -71,9 +69,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                 return;
             }
 
-            await axios.put(`/api/genres/${editingGenre?.id}`, {
-                name: updatedName
-            }, {withCredentials: true});
+            await genreService.update(editingGenre!.id, {name: updatedName});
 
             messageApi.success(`Genre updated successfully`);
             setEditModalVisible(false);

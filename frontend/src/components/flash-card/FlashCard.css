@@ -151,6 +151,19 @@
     font-size: 1.7rem;
     padding: 16px;
     transform-style: preserve-3d;
+    word-break: break-word;
+    overflow-y: auto;
+}
+
+.front::-webkit-scrollbar,
+.back::-webkit-scrollbar {
+    width: 6px;
+}
+
+.front::-webkit-scrollbar-thumb,
+.back::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
 }
 
 .front {
@@ -456,7 +469,7 @@
         text-align: center;
         padding: 20px 14px 14px;
         border-radius: var(--radius-md);
-        overflow: hidden;
+        overflow-y: auto;
     }
 
     .front h2,

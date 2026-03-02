@@ -21,8 +21,11 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/account")
-    public UserDto getCurrentUser(@AuthenticationPrincipal OAuth2User oauth2User) {
-        return userService.getCurrentUser(oauth2User);
+    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal OAuth2User oauth2User) {
+        if (oauth2User == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(userService.getCurrentUser(oauth2User));
     }
 
     @GetMapping
@@ -36,40 +39,63 @@ public class UserController {
             @PathVariable Long userId,
             @PathVariable String roleName,
             @AuthenticationPrincipal OAuth2User oauth2User) {
-
+        if (oauth2User == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         userService.setUserRole(userId, roleName, oauth2User);
         return ResponseEntity.ok("Role updated successfully");
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize(value = "hasRole('ADMIN')")
-    public void deleteUser(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oauth2User) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oauth2User) {
+        if (oauth2User == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         userService.deleteUser(id, oauth2User);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/movies/{movieId}")
-    public void addMovieToUser(
+    public ResponseEntity<Void> addMovieToUser(
             @PathVariable Long movieId,
             @AuthenticationPrincipal OAuth2User oauth2User) {
+        if (oauth2User == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         UserDto user = userService.getCurrentUser(oauth2User);
         userService.addMovieToUser(movieId, user.getId());
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/account/update")
-    public UserDto updateUser(@AuthenticationPrincipal OAuth2User oauth2User, @RequestBody UserDto userDto) {
-        return userService.updateUser(oauth2User, userDto);
+    public ResponseEntity<UserDto> updateUser(@AuthenticationPrincipal OAuth2User oauth2User,
+                                              @RequestBody UserDto userDto) {
+        if (oauth2User == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(userService.updateUser(oauth2User, userDto));
     }
 
     @PutMapping("/level/{level}")
-    public void setEnglishLevel(
+    public ResponseEntity<Void> setEnglishLevel(
             @AuthenticationPrincipal OAuth2User oauth2User,
             @PathVariable EnglishLevel level) {
+        if (oauth2User == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         userService.setEnglishLevel(oauth2User, level);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/interests")
-    public void setInterests(@AuthenticationPrincipal OAuth2User oauth2User, @RequestBody List<String> interests) {
+    public ResponseEntity<Void> setInterests(@AuthenticationPrincipal OAuth2User oauth2User,
+                                             @RequestBody List<String> interests) {
+        if (oauth2User == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         userService.saveOrUpdateInterests(oauth2User, interests);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/photo/{userId}")

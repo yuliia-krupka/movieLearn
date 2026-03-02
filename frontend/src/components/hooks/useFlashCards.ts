@@ -1,9 +1,9 @@
 import {useState, useEffect} from 'react';
 import {message} from 'antd';
-import {learningSetService} from '../services/learningSetService';
-import {learningItemService} from '../services/learningItemService';
-import {progressService} from '../services/progressService';
-import type {FlashCardData, LearningSetDto} from '../types/learningSet';
+import {learningSetService} from '../../services/learningSetService.ts';
+import {learningItemService} from '../../services/learningItemService.ts';
+import {progressService} from '../../services/progressService.ts';
+import type {FlashCardData, LearningSetDto} from '../../types/learningSet.ts';
 
 export interface EditableFlashCard extends Partial<FlashCardData> {
     isNew?: boolean;
@@ -17,10 +17,10 @@ export interface EditableFlashCard extends Partial<FlashCardData> {
     };
 }
 
-export const WORD_LIMIT = 70;
-export const TRANSLATION_LIMIT = 150;
-export const SENTENCE_LIMIT = 180;
-export const TRANSCRIPTION_LIMIT = 100;
+export const WORD_LIMIT = 255;
+export const TRANSLATION_LIMIT = 255;
+export const SENTENCE_LIMIT = 255;
+export const TRANSCRIPTION_LIMIT = 255;
 
 export const useFlashCards = (learningSetIdParam: string | undefined, currentUserId: number | undefined) => {
     const [learningSetId, setLearningSetId] = useState<number | null>(null);

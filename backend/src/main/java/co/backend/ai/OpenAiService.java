@@ -26,6 +26,7 @@ public class OpenAiService {
     private final ObjectMapper objectMapper;
     private final LearningItemMapper learningItemMapper;
     private final RetryTemplate aiRetryTemplate;
+    private final OpenAiValidator openAiValidator;
 
     private static final String SYSTEM_PROMPT = """
             You are a specialized language learning assistant. Your goal is to extract high-value vocabulary from movie scripts.
@@ -38,7 +39,6 @@ public class OpenAiService {
 
     public List<LearningItemDto> generateFlashcards(
             String movieTitle,
-            String description,
             String scriptContent,
             String interests,
             String level) {
@@ -47,7 +47,6 @@ public class OpenAiService {
                         Extract 10 high-quality vocabulary items (words, idioms, or collocations) from the movie "%s".
                         
                         Context:
-                        Description: %s
                         Script Excerpt: %s
                         
                         User Profile:
@@ -60,12 +59,12 @@ public class OpenAiService {
                         3. INTERESTS: Focus on items relevant to user's interests if they appear in the script.
                         
                         For each item, provide:
-                        - text: The English word or phrase (MAX 70 chars).
-                        - translation: Accurate Ukrainian translation (MAX 150 chars).
-                        - transcription: IPA transcription enclosed in slashes (MAX 100 chars).
-                        - exampleSentence: The actual sentence from the movie where this item is used (MAX 180 chars).
+                        - text: The English word or phrase (MAX 255 chars).
+                        - translation: Accurate Ukrainian translation (MAX 255 chars).
+                        - transcription: IPA transcription enclosed in slashes (MAX 150 chars).
+                        - exampleSentence: The actual sentence from the movie where this item is used (MAX 255 chars).
                         """,
-                movieTitle, description, scriptContent, interests, level);
+                movieTitle, scriptContent, interests, level);
 
         return generate(userPrompt, 0.7, LearningItemType.FLASH_CARD);
     }
@@ -89,10 +88,10 @@ public class OpenAiService {
                 
                 For each test item, provide:
                 - text: The English question or sentence with a blank (MAX 255 chars).
-                - translation: The Ukrainian translation of the word being tested (MAX 150 chars).
-                - transcription: IPA transcription of the word enclosed in slashes, e.g. /wɜːrd/ (MAX 100 chars).
-                - exampleSentence: The full correct sentence or a brief definition (MAX 180 chars).
-                - answers: An array of exactly 4 strings (options) (Each option MAX 100 chars).
+                - translation: The Ukrainian translation of the word being tested (MAX 255 chars).
+                - transcription: IPA transcription of the word enclosed in slashes, e.g. /wɜːrd/ (MAX 150 chars).
+                - exampleSentence: The full correct sentence or a brief definition (MAX 255 chars).
+                - answers: An array of exactly 4 strings (options) (Each option MAX 150 chars).
                 - correctAnswerIndex: The integer index (0-3) of the correct answer in the answers array.
                 """, flashcardsJson);
 
@@ -103,7 +102,6 @@ public class OpenAiService {
             List<LearningItemDto> originalItems,
             String instructions,
             String movieTitle,
-            String description,
             String scriptContent,
             String level,
             String interests) {
@@ -115,7 +113,6 @@ public class OpenAiService {
                         
                         Context:
                         Movie: "%s"
-                        Description: "%s"
                         Script Excerpt: %s
                         User English Level: %s
                         User Interests: %s
@@ -128,34 +125,48 @@ public class OpenAiService {
                         2. NO DUPLICATES: DO NOT reuse these words: [%s].
                         3. NO FULL SENTENCES: Ensure the 'text' field contains only a word or phrase, never a full sentence.
                         4. SOPHISTICATION: If level is B2, C1, or C2, use advanced collocations and idioms from the script.
-                        5. ADHERE TO LIMITS: text (70 chars), translation (150 chars), exampleSentence (180 chars), transcription (100 chars in slashes).
+                        5. ADHERE TO LIMITS: text (255 chars), translation (255 chars), exampleSentence (255 chars), transcription (150 chars in slashes).
                         6. Return the results as a JSON array of vocabulary flashcards only.
                         """,
-                instructions, movieTitle, description, scriptContent, level, interests, itemsJson, originalTexts);
+                instructions, movieTitle, scriptContent, level, interests, itemsJson, originalTexts);
 
         return generate(userPrompt, 1.0, LearningItemType.FLASH_CARD);
     }
 
     private List<LearningItemDto> generate(String prompt, double temperature, LearningItemType type) {
         try {
-            List<GeneratedItem> items = aiRetryTemplate.execute(context -> {
+            return aiRetryTemplate.execute(context -> {
                 if (context.getRetryCount() > 0) {
                     log.warn("Retrying AI request, attempt #{}", context.getRetryCount() + 1);
                 }
-                return chatClient.prompt()
+
+                List<GeneratedItem> items = chatClient.prompt()
                         .system(SYSTEM_PROMPT)
                         .user(prompt)
                         .options(OpenAiChatOptions.builder().temperature(temperature).build())
                         .call()
                         .entity(new ParameterizedTypeReference<>() {
                         });
+
+                if (items == null)
+                    return List.of();
+
+                List<LearningItemDto> dtos = items.stream()
+                        .map(item -> learningItemMapper.fromGenerated(item, type))
+                        .toList();
+
+                validateGeneratedItems(dtos);
+
+                return dtos;
             });
-            return items == null ? List.of()
-                    : items.stream().map(item -> learningItemMapper.fromGenerated(item, type)).toList();
         } catch (Exception e) {
             log.error("Error calling OpenAI after retries: {}", e.getMessage(), e);
             throw new AiOperationException("AI operation failed. Please try again.", e);
         }
+    }
+
+    private void validateGeneratedItems(List<LearningItemDto> dtos) {
+        openAiValidator.validateGeneratedItems(dtos);
     }
 
     private String toJson(Object obj) {

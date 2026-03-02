@@ -58,6 +58,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(AiValidationException.class)
+    public ResponseEntity<ErrorResponse> handleAiValidationException(AiValidationException ex) {
+        // Here we deliberately return a safe, generic message to the frontend,
+        // even though 'ex.getMessage()' holds the detailed internal validation reason.
+        ErrorResponse errorResponse = new ErrorResponse("AI operation failed. Please try again.");
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {

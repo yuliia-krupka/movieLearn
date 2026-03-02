@@ -29,10 +29,12 @@ public interface LearningItemMapper {
             dto.setType(LearningItemType.FLASH_CARD);
         }
 
-        if (item.getAnswers() != null) {
-            dto.setAnswers(item.getAnswers());
+        if (dto.getType() == LearningItemType.TEST) {
+            if (item.getAnswers() != null && !item.getAnswers().isEmpty()) {
+                dto.setAnswers(item.getAnswers());
+            }
+            dto.setCorrectAnswerIndex(item.getCorrectAnswerIndex());
         }
-        dto.setCorrectAnswerIndex(item.getCorrectAnswerIndex());
 
         return dto;
     }

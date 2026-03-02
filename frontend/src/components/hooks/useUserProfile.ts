@@ -1,6 +1,7 @@
 import {useState, useCallback} from 'react';
-import axios, {type AxiosError} from 'axios';
+import {type AxiosError} from 'axios';
 import {message} from 'antd';
+import {userService} from '../../services/userService';
 
 import type {User} from '../../types/auth';
 
@@ -21,8 +22,8 @@ export const useUserProfile = (): UseUserProfileReturn => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get<User>('/api/users/account', {withCredentials: true});
-            setUser(response.data);
+            const data = await userService.getProfile();
+            setUser(data);
         } catch (err) {
             const axiosError = err as AxiosError<{ message: string }>;
             const errorMessage = axiosError.response?.data?.message || 'Failed to fetch user profile';
@@ -37,7 +38,7 @@ export const useUserProfile = (): UseUserProfileReturn => {
         setLoading(true);
         setError(null);
         try {
-            await axios.put('/api/users/account/update', data, {withCredentials: true});
+            await userService.updateProfile(data);
             message.success('Profile updated successfully');
             setUser(prev => prev ? {...prev, ...data} : null);
         } catch (err) {

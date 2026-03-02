@@ -1,7 +1,8 @@
 import {useState, useCallback} from 'react';
-import axios, {type AxiosError} from 'axios';
+import {type AxiosError} from 'axios';
 import {message as antMessage} from 'antd';
 import type {MessageInstance} from 'antd/es/message/interface';
+import {userService} from '../../services/userService';
 
 import type {User, UseAdminUsersReturn} from "../../types/admin";
 
@@ -19,13 +20,8 @@ export const useAdminUsers = (messageApi?: MessageInstance): UseAdminUsersReturn
     const fetchUsers = useCallback(async (email: string = '') => {
         setLoading(true);
         try {
-            const params = email ? {email} : {};
-            const {data} = await axios.get<User[]>('/api/users', {
-                params,
-                withCredentials: true
-            });
+            const fetchedUsers = await userService.getAll(email || undefined);
 
-            const fetchedUsers = Array.isArray(data) ? data : [];
             const sorted = fetchedUsers.slice().sort((a, b) =>
                 (rolePriority[a.role?.toUpperCase()] || 99) - (rolePriority[b.role?.toUpperCase()] || 99)
             );
@@ -43,7 +39,7 @@ export const useAdminUsers = (messageApi?: MessageInstance): UseAdminUsersReturn
     const updateUserRole = useCallback(async (userId: number, newRole: string) => {
         setActionLoading(prev => ({...prev, [userId]: true}));
         try {
-            await axios.put(`/api/users/${userId}/role/${newRole}`, null, {withCredentials: true});
+            await userService.updateRole(userId, newRole);
             msg.success('User role updated successfully');
             setUsers(prevUsers => {
                 const updated = prevUsers.map(user =>
@@ -69,7 +65,7 @@ export const useAdminUsers = (messageApi?: MessageInstance): UseAdminUsersReturn
     const deleteUser = useCallback(async (userId: number) => {
         setActionLoading(prev => ({...prev, [userId]: true}));
         try {
-            await axios.delete(`/api/users/${userId}`, {withCredentials: true});
+            await userService.deleteUser(userId);
             msg.success('User deleted successfully');
             setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
         } catch (error) {
@@ -91,4 +87,3 @@ export const useAdminUsers = (messageApi?: MessageInstance): UseAdminUsersReturn
         deleteUser
     };
 };
-

@@ -6,6 +6,7 @@ import axios from "axios";
 import MainLayout from "../layout/MainLayout.tsx";
 import {useAuth} from '../auth/useAuth';
 import {learningSetService} from '../../services/learningSetService';
+import {movieService} from '../../services/movieService';
 import './MovieDetails.css';
 import './movies.css';
 import '../layout/Layout.css';
@@ -58,10 +59,8 @@ const MovieDetails: React.FC = () => {
             const fetchMovie = async () => {
                 setLoading(true);
                 try {
-                    const response = await axios.get(`/api/movies/${id}`, {
-                        withCredentials: true,
-                    });
-                    setMovie(response.data);
+                    const data = await movieService.getById(Number(id));
+                    setMovie(data);
                 } catch {
                     setErrorMsg('Error fetching movie');
                     navigate('/movies');
@@ -78,22 +77,16 @@ const MovieDetails: React.FC = () => {
                     .then(setLearningSet)
                     .catch(err => console.error('Error fetching learning set:', err));
 
-                axios.get(`/api/user-learning-sets/movie/${id}`, {withCredentials: true})
-                    .then(() => setIsUserStarted(true))
-                    .catch(err => {
-                        if (axios.isAxiosError(err) && err.response?.status === 404) {
-                            setIsUserStarted(false);
-                        } else {
-                            console.error('Error checking user progress:', err);
-                        }
-                    });
+                movieService.checkUserStarted(Number(id))
+                    .then(setIsUserStarted)
+                    .catch(err => console.error('Error checking user progress:', err));
             }
         }, [id, navigate, currentUserId, user, isAdmin]);
 
 
         const handleDelete = async () => {
             try {
-                await axios.delete(`/api/movies/${id}`, {withCredentials: true});
+                await movieService.delete(Number(id));
                 antMessage.success('Movie deleted successfully');
                 navigate('/movies');
             } catch (error) {
@@ -121,9 +114,7 @@ const MovieDetails: React.FC = () => {
                     setIsChecking(true);
 
                     if (!isUserStarted) {
-                        await axios.put(`/api/users/movies/${id}`, null, {
-                            withCredentials: true,
-                        });
+                        await movieService.addMovieToUser(Number(id));
                     }
 
                     const generatingTimer = setTimeout(() => {

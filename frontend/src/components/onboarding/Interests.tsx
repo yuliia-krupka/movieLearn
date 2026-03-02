@@ -2,8 +2,8 @@ import React, {useState} from 'react';
 import {Typography} from 'antd';
 import {useNavigate} from 'react-router-dom';
 import useMessage from 'antd/es/message/useMessage';
-import axios from 'axios';
 import {useAuth} from "../auth/useAuth.tsx";
+import {userService} from "../../services/userService";
 import './interests.css';
 import Logo from "../shared/Logo.tsx";
 
@@ -32,11 +32,7 @@ const Interests: React.FC = () => {
             return;
         }
         try {
-            await axios.put(
-                '/api/users/interests',
-                selectedInterests,
-                {withCredentials: true}
-            );
+            await userService.setInterests(selectedInterests);
 
             await checkAuthStatus();
             navigate('/home');

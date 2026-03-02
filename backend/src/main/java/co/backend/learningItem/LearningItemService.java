@@ -107,7 +107,7 @@ public class LearningItemService {
         Movie movie = set.getMovie();
 
         return openAiService.regenerateBatch(dtos, feedback, movie != null ? movie.getTitle() : "Unknown",
-                movie != null ? movie.getDescription() : "", movie != null ? scriptParser.parse(movie.getScript()) : "",
+                movie != null ? scriptParser.parse(movie.getScript()) : "",
                 set.getEnglishLevel() != null ? set.getEnglishLevel().name() : "B1",
                 set.getInterests() != null ? set.getInterests() : "");
     }

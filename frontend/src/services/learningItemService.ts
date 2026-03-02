@@ -1,4 +1,4 @@
-import {api} from './apiClient';
+import apiClient from './apiClient';
 import type {
     FlashCardData,
     TestItemData,
@@ -8,13 +8,7 @@ import type {
 
 export const learningItemService = {
     async getFlashCards(learningSetId: number): Promise<FlashCardData[]> {
-        const response = await api.get(`/learning-sets/${learningSetId}/flashcards`);
-
-        if (!response.ok) {
-            throw new Error(`Failed to get flash cards: ${response.statusText}`);
-        }
-
-        const items: ApiFlashCard[] = await response.json();
+        const {data: items} = await apiClient.get<ApiFlashCard[]>(`/learning-sets/${learningSetId}/flashcards`);
         return items.map((item) => ({
             word: item.text,
             translation: item.translation,
@@ -25,13 +19,7 @@ export const learningItemService = {
     },
 
     async getTestItems(learningSetId: number): Promise<TestItemData[]> {
-        const response = await api.get(`/learning-sets/${learningSetId}/tests`);
-
-        if (!response.ok) {
-            throw new Error(`Failed to get test items: ${response.statusText}`);
-        }
-
-        const items: ApiTestItem[] = await response.json();
+        const {data: items} = await apiClient.get<ApiTestItem[]>(`/learning-sets/${learningSetId}/tests`);
         return items.map((item) => ({
             id: item.id,
             text: item.text,
@@ -43,38 +31,28 @@ export const learningItemService = {
     },
 
     async createItem(item: Partial<ApiFlashCard> & { learningSetId: number, type: string }): Promise<ApiFlashCard> {
-        const response = await api.post(`/learning-items`, item);
-        if (!response.ok) {
-            const errorMsg = await response.json().then(d => d.message).catch(() => 'Failed to create item');
-            throw new Error(errorMsg);
-        }
-        return response.json();
+        const {data} = await apiClient.post<ApiFlashCard>(`/learning-items`, item);
+        return data;
     },
 
     async updateItem(id: number, item: Partial<ApiFlashCard> & {
         learningSetId: number,
         type: string
     }): Promise<ApiFlashCard> {
-        const response = await api.put(`/learning-items/${id}`, item);
-        if (!response.ok) {
-            const errorMsg = await response.json().then(d => d.message).catch(() => 'Failed to update item');
-            throw new Error(errorMsg);
-        }
-        return response.json();
+        const {data} = await apiClient.put<ApiFlashCard>(`/learning-items/${id}`, item);
+        return data;
     },
 
     async deleteItem(id: number): Promise<void> {
-        const response = await api.delete(`/learning-items/${id}`);
-        if (!response.ok) throw new Error('Failed to delete item');
+        await apiClient.delete(`/learning-items/${id}`);
     },
 
     async regenerate(learningSetId: number, feedback: string, itemIds: number[]): Promise<FlashCardData[]> {
-        const response = await api.post(`/learning-items/regenerate`, {learningSetId, feedback, itemIds});
-        if (!response.ok) {
-            const errorMsg = await response.json().then(d => d.message).catch(() => 'Failed to regenerate items');
-            throw new Error(errorMsg);
-        }
-        const items: ApiFlashCard[] = await response.json();
+        const {data: items} = await apiClient.post<ApiFlashCard[]>(`/learning-items/regenerate`, {
+            learningSetId,
+            feedback,
+            itemIds
+        });
         return items.map((item) => ({
             word: item.text,
             translation: item.translation,

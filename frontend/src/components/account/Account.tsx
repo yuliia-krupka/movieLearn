@@ -1,5 +1,4 @@
 import {useState} from "react";
-import axios from "axios";
 import {Avatar, Button, Card, Space, Typography, Spin, Alert} from "antd";
 import {EditOutlined} from "@ant-design/icons";
 import {useNavigate} from "react-router-dom";
@@ -8,6 +7,7 @@ import {useEffect} from "react";
 import MainLayout from "../layout/MainLayout.tsx";
 import {useUserProfile} from "../hooks/useUserProfile.ts";
 import {useAuth} from "../auth/useAuth.tsx";
+import {movieService} from '../../services/movieService';
 import './Account.css';
 import '../layout/Layout.css'
 
@@ -25,8 +25,8 @@ const Account = () => {
     }, [fetchUserProfile]);
 
     useEffect(() => {
-        axios.get('/api/movies/count', {withCredentials: true})
-            .then(res => setMoviesStarted(res.data))
+        movieService.getMoviesCount()
+            .then(count => setMoviesStarted(count))
             .catch(err => console.error("Failed to fetch movie count:", err));
     }, []);
 

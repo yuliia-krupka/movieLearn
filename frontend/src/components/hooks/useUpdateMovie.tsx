@@ -4,6 +4,7 @@ import axios from 'axios';
 import {useNavigate, useParams} from "react-router-dom";
 import {useFileUpload} from './useFileUpload';
 import {useGenres} from './useGenres';
+import {movieService} from '../../services/movieService';
 
 import type {Movie, FormValues} from '../../types/movie';
 
@@ -39,24 +40,21 @@ const useUpdateMovie = () => {
             }
 
             try {
-                const response = await axios.get<Movie>(`/api/movies/${id}`, {withCredentials: true});
+                const movieData = await movieService.getById(Number(id));
                 if (!isMounted) return;
 
-                setMovie(response.data);
+                setMovie(movieData);
 
                 form.setFieldsValue({
-                    title: response.data.title,
-                    description: response.data.description,
-                    genres: response.data.genres,
+                    title: movieData.title,
+                    description: movieData.description,
+                    genres: movieData.genres,
                 });
 
                 try {
-                    const imageResponse = await axios.get(`/api/movies/${id}/image`, {
-                        responseType: 'arraybuffer',
-                        withCredentials: true
-                    });
-                    if (imageResponse.data && imageResponse.data.byteLength > 0 && isMounted) {
-                        const blob = new Blob([imageResponse.data], {type: 'image/jpeg'});
+                    const imageData = await movieService.getImage(Number(id));
+                    if (imageData && (imageData as ArrayBuffer).byteLength > 0 && isMounted) {
+                        const blob = new Blob([imageData], {type: 'image/jpeg'});
                         const imageUrl = URL.createObjectURL(blob);
                         setCurrentImageUrl(imageUrl);
                         imageUpload.setPreviewUrl(imageUrl);
@@ -68,10 +66,9 @@ const useUpdateMovie = () => {
                 }
 
                 try {
-                    const scriptResponse = await axios.head(`/api/movies/${id}/script`, {withCredentials: true});
-                    if (scriptResponse.status === 200 && isMounted) {
-                        const contentLength = scriptResponse.headers['content-length'];
-                        const size = contentLength ? formatFileSize(parseInt(contentLength)) : 'Unknown size';
+                    const scriptInfo = await movieService.checkScript(Number(id));
+                    if (scriptInfo.status === 200 && isMounted) {
+                        const size = scriptInfo.contentLength ? formatFileSize(parseInt(scriptInfo.contentLength)) : 'Unknown size';
                         setCurrentScriptInfo({
                             name: `script_${id}.pdf`,
                             size: size
@@ -131,12 +128,7 @@ const useUpdateMovie = () => {
                 formData.append('script', new Blob([], {type: 'application/octet-stream'}));
             }
 
-            await axios.put(`/api/movies/${id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
-                withCredentials: true
-            });
+            await movieService.update(Number(id), formData);
 
             void message.success('Movie updated successfully!');
 

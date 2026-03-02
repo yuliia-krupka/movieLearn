@@ -2,7 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {Card, Typography, Row, Col, Spin} from 'antd';
 import {TeamOutlined, VideoCameraAddOutlined, ArrowRightOutlined, DashboardOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
-import axios from 'axios';
+import {movieService} from '../../services/movieService';
+import {userService} from '../../services/userService';
 import MainLayout from '../layout/MainLayout.tsx';
 import '../layout/Layout.css';
 import './AdminDashboard.css';
@@ -16,13 +17,10 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const usersRes = await axios.get('/api/users', {withCredentials: true});
-                const usersCount = Array.isArray(usersRes.data) ? usersRes.data.length : 0;
+                const users = await userService.getAll();
+                const movies = await movieService.getAll();
 
-                const moviesRes = await axios.get('/api/movies', {withCredentials: true});
-                const moviesCount = Array.isArray(moviesRes.data) ? moviesRes.data.length : 0;
-
-                setStats({users: usersCount, movies: moviesCount});
+                setStats({users: users.length, movies: movies.length});
             } catch (error) {
                 console.error('Failed to fetch dashboard stats', error);
             } finally {

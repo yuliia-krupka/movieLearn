@@ -6,6 +6,7 @@ import MainLayout from '../layout/MainLayout.tsx';
 import AdminMovieCard from './AdminMovieCard';
 import {useMovies} from '../hooks/useMovies';
 import axios from 'axios';
+import {movieService} from '../../services/movieService';
 import './AdminMoviesList.css';
 
 const AdminMoviesList: React.FC = () => {
@@ -22,7 +23,7 @@ const AdminMoviesList: React.FC = () => {
 
     const handleDelete = async (id: number) => {
         try {
-            await axios.delete(`/api/movies/${id}`, {withCredentials: true});
+            await movieService.delete(id);
             message.success('Movie deleted successfully');
             void fetchMovies();
         } catch (error) {

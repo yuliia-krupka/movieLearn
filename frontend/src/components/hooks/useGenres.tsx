@@ -1,8 +1,8 @@
 import {useState, useEffect, useCallback} from 'react';
-import axios from 'axios';
 import {type Genre} from '../../types/genre';
 import {type NewGenreData} from '../../types/movie';
 import {message} from 'antd';
+import {genreService} from '../../services/genreService';
 
 export const useGenres = () => {
     const [genres, setGenres] = useState<Genre[]>([]);
@@ -11,8 +11,8 @@ export const useGenres = () => {
     const fetchGenres = useCallback(async (): Promise<void> => {
         try {
             setLoading(true);
-            const response = await axios.get('/api/genres', {withCredentials: true});
-            setGenres(response.data);
+            const data = await genreService.getAll();
+            setGenres(data);
         } catch (err) {
             console.error('Failed to fetch genres:', err);
             void message.error('Error loading genres');
@@ -23,17 +23,9 @@ export const useGenres = () => {
 
     const addGenre = async (genreData: NewGenreData): Promise<boolean> => {
         try {
-            const response = await axios.post('/api/genres', genreData, {
-                withCredentials: true,
-                headers: {'Content-Type': 'application/json'},
-            });
+            const newGenre = await genreService.create(genreData);
 
-            const newGenre: Genre = {
-                id: response.data.id,
-                name: genreData.name,
-            };
-
-            setGenres(prev => [...prev, newGenre]);
+            setGenres(prev => [...prev, {id: newGenre.id, name: genreData.name}]);
             void message.success('Genre added successfully!');
             return true;
         } catch (err: unknown) {
@@ -43,12 +35,12 @@ export const useGenres = () => {
     };
 
     const updateGenre = async (id: number, data: { name: string }) => {
-        await axios.put(`/api/genres/${id}`, data, {withCredentials: true});
+        await genreService.update(id, data);
         await fetchGenres();
     };
 
     const deleteGenre = async (id: number) => {
-        await axios.delete(`/api/genres/${id}`, {withCredentials: true});
+        await genreService.delete(id);
         await fetchGenres();
     };
 

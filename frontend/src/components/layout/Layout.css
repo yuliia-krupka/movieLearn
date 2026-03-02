@@ -12,6 +12,7 @@
 .content-movies {
     display: flex;
     flex-direction: column;
+    flex: 1;
     padding: 20px;
     margin: 10px;
     background-color: var(--color-bg);
@@ -23,8 +24,7 @@
 }
 
 .content-movies {
-    height: calc(100% - 20px);
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 .fixed-layout {
