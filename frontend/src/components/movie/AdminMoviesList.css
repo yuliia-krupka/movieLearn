@@ -132,7 +132,7 @@
 .admin-movies-container {
     display: flex;
     flex-direction: column;
-    min-height: 100%;
+    height: 100%;
 }
 
 .admin-movies-header {
@@ -167,7 +167,7 @@
 
 .admin-movies-pagination-container {
     flex-shrink: 0;
-    padding: 16px 0;
+    padding: 12px 0 0 0;
     border-top: 1px solid var(--color-border-light);
     background-color: var(--color-bg);
     display: flex;

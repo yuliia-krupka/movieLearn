@@ -101,6 +101,7 @@ const UserList: React.FC = () => {
                                             loading={actionLoading[user.id]}
                                             onChange={(newRole) => void handleRoleChange(user.id, newRole)}
                                             size="small"
+                                            style={{minWidth: 100}}
                                         >
                                             <Option value="USER">USER</Option>
                                             <Option value="ADMIN">ADMIN</Option>

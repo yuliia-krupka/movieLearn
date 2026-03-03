@@ -119,12 +119,12 @@
 }
 
 .cancel-btn {
-    border-radius: var(--radius-xs);
+    border-radius: var(--radius-pill);
     font-weight: 500;
 }
 
 .save-btn {
-    border-radius: var(--radius-xs);
+    border-radius: var(--radius-pill);
     font-weight: 600;
     padding: 0 32px;
 }

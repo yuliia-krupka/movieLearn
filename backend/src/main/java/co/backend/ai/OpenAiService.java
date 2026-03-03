@@ -63,6 +63,7 @@ public class OpenAiService {
                         - translation: Accurate Ukrainian translation (MAX 255 chars).
                         - transcription: IPA transcription enclosed in slashes (MAX 150 chars).
                         - exampleSentence: The actual sentence from the movie where this item is used (MAX 255 chars).
+                        Do not use one word or phrase more than once in a set of flashcards!
                         """,
                 movieTitle, scriptContent, interests, level);
 

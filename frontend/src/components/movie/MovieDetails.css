@@ -47,7 +47,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    animation: movieTitleEnter var(--transition-extra-slow) ease-out forwards;
+    animation: movieTitleEnter var(--transition-extra-slow) forwards;
     opacity: 0;
 }
 

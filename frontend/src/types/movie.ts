@@ -21,3 +21,11 @@ export interface FormValues {
 export interface NewGenreData {
     name: string;
 }
+
+export interface MovieDetails {
+    id: number;
+    title: string;
+    description: string;
+    genres: string[];
+    image: string | null;
+}

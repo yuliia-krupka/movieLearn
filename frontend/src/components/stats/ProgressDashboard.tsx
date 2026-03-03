@@ -46,7 +46,7 @@ const ProgressDashboard: React.FC = () => {
         <MainLayout className="content stats-layout">
             <div className="stats-container">
                 <div className="stats-header">
-                    <h1>Your Learning Progress</h1>
+                    <h1>Your learning progress</h1>
                     <div className="overall-summary">
                         <Card className="summary-card">
                             <Statistic

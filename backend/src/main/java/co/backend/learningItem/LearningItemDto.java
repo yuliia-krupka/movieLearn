@@ -19,9 +19,8 @@ public class LearningItemDto {
     @Size(max = 255, message = "Text cannot exceed 255 characters")
     private String text;
 
-    @Size(min = 4, max = 4, message = "Tests must have exactly 4 answers")
-    private List<@NotBlank(message = "Answer cannot be blank")
-    @Size(max = 255, message = "Answer cannot exceed 255 characters") String> answers;
+    @Size(max = 4, message = "Answers cannot exceed 4 items")
+    private List<@NotBlank(message = "Answer cannot be blank") @Size(max = 255, message = "Answer cannot exceed 255 characters") String> answers;
 
     @Size(max = 255, message = "Example sentence cannot exceed 255 characters")
     private String exampleSentence;

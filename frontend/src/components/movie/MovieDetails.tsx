@@ -11,15 +11,7 @@ import './MovieDetails.css';
 import './movies.css';
 import '../layout/Layout.css';
 import type {LearningSetDto} from "../../types/learningSet.ts";
-
-
-interface MovieDetails {
-    id: number;
-    title: string;
-    description: string;
-    genres: string[];
-    image: string | null;
-}
+import {type MovieDetails} from '../../types/movie';
 
 const MovieDetails: React.FC = () => {
         const {id} = useParams<{ id: string }>();

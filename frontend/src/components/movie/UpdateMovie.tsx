@@ -25,6 +25,7 @@ import FileUploader from './FileUploader.tsx';
 import FormStepper from './FormStepper.tsx';
 import MainLayout from "../layout/MainLayout.tsx";
 import GenreSelector from "../genre/GenreSelector.tsx";
+import {ErrorHandler} from "../err/ErrorHandler.tsx";
 
 const {Title} = Typography;
 const {TextArea} = Input;
@@ -78,8 +79,9 @@ const UpdateMovieForm: React.FC = () => {
                 messageApi.success('Genre added successfully');
                 setAddGenreModalVisible(false);
             }
-        } catch {
-            messageApi.error('Failed to add genre');
+        } catch (error) {
+            const errorMsg = ErrorHandler.handleAxiosError(error, `Genre "${genreData.name}" already exists.`);
+            messageApi.error(errorMsg);
         } finally {
             setAddingGenre(false);
         }
