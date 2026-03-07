@@ -24,7 +24,7 @@
 }
 
 .content-movies {
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 .fixed-layout {
