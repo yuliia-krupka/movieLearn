@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Card} from 'antd';
 import {useNavigate} from 'react-router-dom';
+import {tmdbService, getImageUrl, type TMDBMovie} from '../../services/tmdbService';
 import './MovieCard.css';
 import './movies.css';
 
@@ -14,16 +15,21 @@ interface MovieCardProps {
 
 const MovieCard: React.FC<MovieCardProps> = React.memo(({movie}) => {
     const navigate = useNavigate();
+    const [tmdbMovie, setTmdbMovie] = useState<TMDBMovie | null>(null);
+
+    useEffect(() => {
+        if (movie.tmdbId) {
+            tmdbService.getMovieDetails(movie.tmdbId)
+                .then(setTmdbMovie)
+                .catch(console.error);
+        }
+    }, [movie.tmdbId]);
 
     const handleClick = () => {
         navigate(`/movies/${movie.id}`);
     };
 
-    const imageSource = movie.image
-        ? movie.image.startsWith('data:image')
-            ? movie.image
-            : `data:image/jpeg;base64,${movie.image}`
-        : null;
+    const imageSource = tmdbMovie ? getImageUrl(tmdbMovie.poster_path) : null;
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -31,6 +37,8 @@ const MovieCard: React.FC<MovieCardProps> = React.memo(({movie}) => {
             handleClick();
         }
     };
+
+    const descriptionText = tmdbMovie?.overview || '';
 
     return (
         <Card
@@ -59,9 +67,9 @@ const MovieCard: React.FC<MovieCardProps> = React.memo(({movie}) => {
             <Meta
                 title={movie.title}
                 description={
-                    movie.description.length > 50
-                        ? `${movie.description.substring(0, 50)}...`
-                        : movie.description
+                    descriptionText.length > 50
+                        ? `${descriptionText.substring(0, 50)}...`
+                        : descriptionText
                 }
             />
             <div className="movie-card-genres">

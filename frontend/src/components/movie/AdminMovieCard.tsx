@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Card, Modal} from 'antd';
 import {EditOutlined, DeleteOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
 import type {Movie} from '../../types/movie';
+import {tmdbService, getImageUrl, type TMDBMovie} from '../../services/tmdbService';
 import './AdminMoviesList.css';
 
 interface AdminMovieCardProps {
@@ -14,6 +15,15 @@ const {confirm} = Modal;
 
 const AdminMovieCard: React.FC<AdminMovieCardProps> = ({movie, onDelete}) => {
     const navigate = useNavigate();
+    const [tmdbMovie, setTmdbMovie] = useState<TMDBMovie | null>(null);
+
+    useEffect(() => {
+        if (movie.tmdbId) {
+            tmdbService.getMovieDetails(movie.tmdbId)
+                .then(setTmdbMovie)
+                .catch(console.error);
+        }
+    }, [movie.tmdbId]);
 
     const handleEdit = () => {
         navigate(`/admin/movies/${movie.id}/update`);
@@ -33,11 +43,7 @@ const AdminMovieCard: React.FC<AdminMovieCardProps> = ({movie, onDelete}) => {
         });
     };
 
-    const imageSource = movie.image
-        ? movie.image.startsWith('data:image')
-            ? movie.image
-            : `data:image/jpeg;base64,${movie.image}`
-        : null;
+    const imageSource = tmdbMovie ? getImageUrl(tmdbMovie.poster_path) : null;
 
     return (
         <div className="admin-movie-card-container">

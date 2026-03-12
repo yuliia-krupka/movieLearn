@@ -17,11 +17,7 @@ public class MovieDto {
     @NotBlank(message = "Name must not be blank")
     @Size(max = 100, message = "Title must not exceed 100 characters")
     private String title;
-    @NotBlank(message = "Name must not be blank")
-    @Size(max = 600, message = "Description must not exceed 600 characters")
-    private String description;
-    @Size(max = 10485760, message = "Image size must not exceed 10MB")
-    private byte[] image;
+    private Integer tmdbId;
     @Size(max = 20971520, message = "Script size must not exceed 20MB")
     private byte[] script;
     @NotEmpty(message = "Genres must be provided")

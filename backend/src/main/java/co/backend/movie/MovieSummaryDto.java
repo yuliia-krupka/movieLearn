@@ -12,7 +12,6 @@ import java.util.List;
 public class MovieSummaryDto {
     private Long id;
     private String title;
-    private String description;
-    private byte[] image;
+    private Integer tmdbId;
     private List<String> genres;
 }

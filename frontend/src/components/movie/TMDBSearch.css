@@ -1,0 +1,29 @@
+.tmdb-search-container {
+    position: relative;
+    width: 100%;
+}
+
+.tmdb-search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+.tmdb-search-item {
+    padding: 12px !important;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tmdb-search-item:hover {
+    background-color: #f5f5f5;
+}

@@ -16,7 +16,7 @@ public class MovieProgressDto {
     private Long movieId;
     private Long learningSetId;
     private String movieTitle;
-    private byte[] movieImage;
+    private Integer tmdbId;
     private Integer flashcardsScore;
     private Integer testsScore;
     private long totalWords;

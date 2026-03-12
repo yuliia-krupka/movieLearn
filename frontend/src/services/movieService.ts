@@ -4,9 +4,7 @@ import type {Movie} from '../types/movie';
 export interface MovieSummary {
     id: number;
     title: string;
-    description: string;
-    genres: string[];
-    image: string | null;
+    tmdbId: number;
 }
 
 export const movieService = {
@@ -37,29 +35,30 @@ export const movieService = {
         return data;
     },
 
-    async create(formData: FormData): Promise<Movie> {
-        const {data} = await apiClient.post<Movie>('/movies', formData, {
-            headers: {'Content-Type': 'multipart/form-data'},
-        });
+    async create(movieData: { movieData: Record<string, unknown>, script?: File | Blob }): Promise<Movie> {
+        const formData = new FormData();
+        formData.append('movieData', new Blob([JSON.stringify(movieData.movieData)], {type: 'application/json'}));
+        if (movieData.script) {
+            formData.append('script', movieData.script);
+        }
+
+        const {data} = await apiClient.post<Movie>('/movies', formData);
         return data;
     },
 
-    async update(id: number, formData: FormData): Promise<Movie> {
-        const {data} = await apiClient.put<Movie>(`/movies/${id}`, formData, {
-            headers: {'Content-Type': 'multipart/form-data'},
-        });
+    async update(id: number, movieData: { movieData: Record<string, unknown>, script?: File | Blob }): Promise<Movie> {
+        const formData = new FormData();
+        formData.append('movieData', new Blob([JSON.stringify(movieData.movieData)], {type: 'application/json'}));
+        if (movieData.script) {
+            formData.append('script', movieData.script);
+        }
+
+        const {data} = await apiClient.put<Movie>(`/movies/${id}`, formData);
         return data;
     },
 
     async delete(id: number): Promise<void> {
         await apiClient.delete(`/movies/${id}`);
-    },
-
-    async getImage(id: number): Promise<ArrayBuffer> {
-        const {data} = await apiClient.get<ArrayBuffer>(`/movies/${id}/image`, {
-            responseType: 'arraybuffer',
-        });
-        return data;
     },
 
     async checkScript(id: number): Promise<{ status: number; contentLength?: string }> {

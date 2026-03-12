@@ -14,13 +14,13 @@ const useUpdateMovie = () => {
     const [submitting, setSubmitting] = useState<boolean>(false);
     const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
     const [currentScriptInfo, setCurrentScriptInfo] = useState<{ name: string, size: string } | null>(null);
+    const [tmdbId, setTmdbId] = useState<number | null>(null);
 
     const navigate = useNavigate();
     const {id} = useParams<{ id: string }>();
     const [form] = Form.useForm();
 
     const {genres, loading: genresLoading, addGenre, deleteGenre, fetchGenres} = useGenres();
-    const imageUpload = useFileUpload('Please select an image file');
     const scriptUpload = useFileUpload('Please select a script file');
 
     const formatFileSize = (bytes: number): string => {
@@ -47,21 +47,21 @@ const useUpdateMovie = () => {
 
                 form.setFieldsValue({
                     title: movieData.title,
-                    description: movieData.description,
+                    tmdbId: movieData.tmdbId,
                     genres: movieData.genres,
                 });
 
-                try {
-                    const imageData = await movieService.getImage(Number(id));
-                    if (imageData && (imageData as ArrayBuffer).byteLength > 0 && isMounted) {
-                        const blob = new Blob([imageData], {type: 'image/jpeg'});
-                        const imageUrl = URL.createObjectURL(blob);
-                        setCurrentImageUrl(imageUrl);
-                        imageUpload.setPreviewUrl(imageUrl);
-                    }
-                } catch (error) {
-                    if (axios.isAxiosError(error) && error.response?.status !== 404) {
-                        console.error('Failed to fetch movie image:', error);
+                if (movieData.tmdbId) {
+                    setTmdbId(movieData.tmdbId);
+                    try {
+                        const tmdbService = (await import('../../services/tmdbService')).tmdbService;
+                        const getImageUrl = (await import('../../services/tmdbService')).getImageUrl;
+                        const tmdbDetails = await tmdbService.getMovieDetails(movieData.tmdbId);
+                        if (tmdbDetails && isMounted) {
+                            setCurrentImageUrl(getImageUrl(tmdbDetails.poster_path));
+                        }
+                    } catch (error) {
+                        console.error('Failed to fetch TMDB details for image:', error);
                     }
                 }
 
@@ -104,36 +104,30 @@ const useUpdateMovie = () => {
         setSubmitting(true);
 
         try {
-            const formData = new FormData();
-
             const movieData = {
                 title: values.title,
-                description: values.description,
+                tmdbId: form.getFieldValue("tmdbId") || tmdbId,
                 genres: values.genres
             };
 
-            formData.append('movieData', new Blob([JSON.stringify(movieData)], {
-                type: 'application/json'
-            }));
-
-            if (imageUpload.file) {
-                formData.append('image', imageUpload.file);
-            } else if (currentImageUrl === null) {
-                formData.append('image', new Blob([], {type: 'application/octet-stream'}));
+            interface MoviePayload {
+                movieData: Record<string, unknown>;
+                script?: File;
             }
+
+            const payload: MoviePayload = {movieData};
 
             if (scriptUpload.file) {
-                formData.append('script', scriptUpload.file);
+                payload.script = scriptUpload.file;
             } else if (currentScriptInfo === null) {
-                formData.append('script', new Blob([], {type: 'application/octet-stream'}));
+                payload.script = new File([], "empty", {type: "application/octet-stream"});
             }
 
-            await movieService.update(Number(id), formData);
+            await movieService.update(Number(id), payload);
 
             void message.success('Movie updated successfully!');
 
             form.resetFields();
-            imageUpload.handleFileRemove();
             scriptUpload.handleFileRemove();
 
             navigate(`/movies/${id}`);
@@ -155,7 +149,7 @@ const useUpdateMovie = () => {
     };
 
     const handleCancel = () => {
-        if (form.isFieldsTouched() || imageUpload.file || scriptUpload.file) {
+        if (form.isFieldsTouched() || scriptUpload.file) {
             if (window.confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
                 resetFormAndNavigate();
             }
@@ -166,31 +160,12 @@ const useUpdateMovie = () => {
 
     const resetFormAndNavigate = () => {
         form.resetFields();
-        imageUpload.handleFileRemove();
         scriptUpload.handleFileRemove();
         setCurrentImageUrl(null);
         setCurrentScriptInfo(null);
         navigate(`/movies/${id}`);
     };
 
-    const handleImageUpload = (file: File) => {
-        const isImage = file.type.startsWith('image/');
-        const isLt2M = file.size / 1024 / 1024 < 2;
-
-        if (!isImage) {
-            void message.error('You can only upload image files!');
-            return false;
-        }
-        if (!isLt2M) {
-            void message.error('Image must be smaller than 2MB!');
-            return false;
-        }
-        if (currentImageUrl) {
-            URL.revokeObjectURL(currentImageUrl);
-            setCurrentImageUrl(null);
-        }
-        return imageUpload.handleFileChange(file, true);
-    };
 
     const handleScriptUpload = (file: File) => {
         const isPdf = file.type === 'application/pdf';
@@ -220,18 +195,18 @@ const useUpdateMovie = () => {
         currentScriptInfo,
         setCurrentImageUrl,
         setCurrentScriptInfo,
+        tmdbId,
+        setTmdbId,
 
         genres,
         genresLoading,
         addGenre,
         deleteGenre,
         fetchGenres,
-        imageUpload,
         scriptUpload,
 
         handleSubmit,
         handleCancel,
-        handleImageUpload,
         handleScriptUpload,
 
         id

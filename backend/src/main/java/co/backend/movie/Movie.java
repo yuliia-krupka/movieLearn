@@ -21,13 +21,7 @@ public class Movie {
     private Long id;
     private String title;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] image;
+    private Integer tmdbId;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -35,9 +29,7 @@ public class Movie {
     private byte[] script;
 
     @ManyToMany
-    @JoinTable(name = "movie_genre",
-            joinColumns = @JoinColumn(name = "movie_id"),
-            inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    @JoinTable(name = "movie_genre", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres = new ArrayList<>();
 
     @ManyToMany(mappedBy = "movies")

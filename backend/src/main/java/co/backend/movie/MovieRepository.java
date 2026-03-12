@@ -13,6 +13,8 @@ import java.util.List;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     boolean existsByTitle(String title);
 
+    boolean existsByTmdbId(Integer tmdbId);
+
     List<Movie> findByTitleContainingIgnoreCase(String title);
 
     List<Movie> findByGenresIn(Collection<Genre> genres);

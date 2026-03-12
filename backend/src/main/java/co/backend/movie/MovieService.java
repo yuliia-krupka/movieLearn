@@ -61,10 +61,13 @@ public class MovieService {
         movieRepository.delete(movie);
     }
 
-    public MovieDto createMovie(MovieDto movieDto, MultipartFile image, MultipartFile script) {
+    public MovieDto createMovie(MovieDto movieDto, MultipartFile script) {
 
         if (movieDto.getTitle() == null || movieDto.getTitle().isBlank()) {
             throw new DuplicateEntityException("Movie title cannot be empty");
+        }
+        if (movieDto.getTmdbId() != null && movieRepository.existsByTmdbId(movieDto.getTmdbId())) {
+            throw new DuplicateEntityException("Movie with tmdbId '" + movieDto.getTmdbId() + "' already exists");
         }
         if (movieRepository.existsByTitle(movieDto.getTitle())) {
             throw new DuplicateEntityException("Movie with title '" + movieDto.getTitle() + "' already exists");
@@ -72,7 +75,7 @@ public class MovieService {
 
         Movie movie = new Movie();
         movie.setTitle(movieDto.getTitle());
-        movie.setDescription(movieDto.getDescription());
+        movie.setTmdbId(movieDto.getTmdbId());
 
         List<Genre> genreList = new ArrayList<>();
         if (movieDto.getGenres() != null) {
@@ -87,21 +90,14 @@ public class MovieService {
         }
         movie.setGenres(genreList);
 
-        setMovieFiles(movie, image, script);
+        setMovieFiles(movie, script);
 
         movie = movieRepository.save(movie);
         return movieMapper.toDto(movie);
     }
 
-    private void setMovieFiles(Movie movie, MultipartFile image, MultipartFile script) {
+    private void setMovieFiles(Movie movie, MultipartFile script) {
         try {
-            if (image != null) {
-                if (!image.isEmpty()) {
-                    movie.setImage(image.getBytes());
-                } else {
-                    movie.setImage(null);
-                }
-            }
             if (script != null) {
                 if (!script.isEmpty()) {
                     movie.setScript(script.getBytes());
@@ -114,7 +110,7 @@ public class MovieService {
         }
     }
 
-    public MovieDto updateMovie(Long id, MovieDto movieDto, MultipartFile image, MultipartFile script) {
+    public MovieDto updateMovie(Long id, MovieDto movieDto, MultipartFile script) {
         if (id == null) {
             throw new BadRequestException("Id must be provided");
         }
@@ -133,8 +129,8 @@ public class MovieService {
                 movie.setTitle(movieDto.getTitle());
             }
 
-            if (movieDto.getDescription() != null && !movieDto.getDescription().isBlank()) {
-                movie.setDescription(movieDto.getDescription());
+            if (movieDto.getTmdbId() != null) {
+                movie.setTmdbId(movieDto.getTmdbId());
             }
 
             if (movieDto.getGenres() != null) {
@@ -147,7 +143,7 @@ public class MovieService {
             }
         }
 
-        setMovieFiles(movie, image, script);
+        setMovieFiles(movie, script);
 
         movie = movieRepository.save(movie);
         return movieMapper.toDto(movie);

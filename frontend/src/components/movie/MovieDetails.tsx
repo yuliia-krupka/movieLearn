@@ -7,6 +7,7 @@ import MainLayout from "../layout/MainLayout.tsx";
 import {useAuth} from '../auth/useAuth';
 import {learningSetService} from '../../services/learningSetService';
 import {movieService} from '../../services/movieService';
+import {tmdbService, getImageUrl, type TMDBMovie} from '../../services/tmdbService';
 import './MovieDetails.css';
 import './movies.css';
 import '../layout/Layout.css';
@@ -22,6 +23,7 @@ const MovieDetails: React.FC = () => {
         const [isChecking, setIsChecking] = useState(false);
         const [learningSet, setLearningSet] = useState<LearningSetDto | null>(null);
         const [isUserStarted, setIsUserStarted] = useState(false);
+        const [tmdbMovie, setTmdbMovie] = useState<TMDBMovie | null>(null);
         const [errorMsg, setErrorMsg] = useState<string | null>(null);
         const [successMsg, setSuccessMsg] = useState<string | null>(null);
         const [message, contextHolder] = antMessage.useMessage();
@@ -53,6 +55,10 @@ const MovieDetails: React.FC = () => {
                 try {
                     const data = await movieService.getById(Number(id));
                     setMovie(data);
+                    if (data.tmdbId) {
+                        const tmdbData = await tmdbService.getMovieDetails(data.tmdbId);
+                        setTmdbMovie(tmdbData);
+                    }
                 } catch {
                     setErrorMsg('Error fetching movie');
                     navigate('/movies');
@@ -154,11 +160,9 @@ const MovieDetails: React.FC = () => {
             (!user?.englishLevel || learningSet.englishLevel === user.englishLevel) &&
             normalizeInterests(user?.interests) === normalizeInterests(learningSet.interests);
 
-        const imageSource = movie.image
-            ? movie.image.startsWith('data:image')
-                ? movie.image
-                : `data:image/jpeg;base64,${movie.image}`
-            : undefined;
+        const imageSource = tmdbMovie ? getImageUrl(tmdbMovie.poster_path) : undefined;
+
+        const descriptionText = tmdbMovie?.overview || '';
 
         return (
             <MainLayout>
@@ -219,7 +223,7 @@ const MovieDetails: React.FC = () => {
                             </div>
 
                             <div className="movie-description-main">
-                                {movie.description}
+                                {descriptionText}
                             </div>
 
                             {!isAdmin && (

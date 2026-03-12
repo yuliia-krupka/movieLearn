@@ -51,27 +51,16 @@ public class MovieController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize(value = "hasRole('ADMIN')")
     public MovieDto createMovie(@Valid @RequestPart("movieData") MovieDto movieDto,
-                                @RequestPart(value = "image", required = false) MultipartFile image,
                                 @RequestPart(value = "script", required = false) MultipartFile script) {
-        return movieService.createMovie(movieDto, image, script);
+        return movieService.createMovie(movieDto, script);
     }
 
     @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
     @PreAuthorize(value = "hasRole('ADMIN')")
     public MovieDto updateMovie(@PathVariable Long id,
                                 @Valid @RequestPart("movieData") MovieDto movieDto,
-                                @RequestPart(value = "image", required = false) MultipartFile image,
                                 @RequestPart(value = "script", required = false) MultipartFile script) {
-        return movieService.updateMovie(id, movieDto, image, script);
-    }
-
-    @GetMapping("/{id}/image")
-    public ResponseEntity<byte[]> getMovieImage(@PathVariable Long id) {
-        MovieDto movie = movieService.getMovieById(id);
-        byte[] imageData = movie.getImage();
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(imageData);
+        return movieService.updateMovie(id, movieDto, script);
     }
 
     @GetMapping("/{id}/script")

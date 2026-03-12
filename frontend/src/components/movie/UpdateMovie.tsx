@@ -9,7 +9,7 @@ import {
     Spin,
 
     Row,
-    Col, Modal
+    Col
 } from 'antd';
 import {SaveFilled, CloseOutlined, FileOutlined, DeleteOutlined} from '@ant-design/icons';
 import useMessage from 'antd/es/message/useMessage';
@@ -26,9 +26,10 @@ import FormStepper from './FormStepper.tsx';
 import MainLayout from "../layout/MainLayout.tsx";
 import GenreSelector from "../genre/GenreSelector.tsx";
 import {ErrorHandler} from "../err/ErrorHandler.tsx";
+import TMDBSearch from "./TMDBSearch.tsx";
+import {getImageUrl} from "../../services/tmdbService.ts";
 
 const {Title} = Typography;
-const {TextArea} = Input;
 
 const UpdateMovieForm: React.FC = () => {
     const [currentStep, setCurrentStep] = useState<number>(0);
@@ -41,17 +42,16 @@ const UpdateMovieForm: React.FC = () => {
         currentScriptInfo,
         setCurrentImageUrl,
         setCurrentScriptInfo,
+        setTmdbId,
 
         genres,
         genresLoading,
         addGenre,
         fetchGenres,
-        imageUpload,
         scriptUpload,
 
         handleSubmit,
         handleCancel,
-        handleImageUpload,
         handleScriptUpload,
 
         id
@@ -60,8 +60,6 @@ const UpdateMovieForm: React.FC = () => {
     const [messageApi, contextHolder] = useMessage();
     const [addGenreModalVisible, setAddGenreModalVisible] = useState<boolean>(false);
     const [addingGenre, setAddingGenre] = useState<boolean>(false);
-    const [previewOpen, setPreviewOpen] = useState(false);
-    const [previewImage, setPreviewImage] = useState('');
 
     const handleAddGenre = () => {
         setAddGenreModalVisible(true);
@@ -105,14 +103,6 @@ const UpdateMovieForm: React.FC = () => {
         }
     }, [genres, genresLoading, form]);
 
-    const handlePreview = (image?: string | null) => {
-        const previewUrl = image || imageUpload.previewUrl;
-        if (previewUrl) {
-            setPreviewImage(previewUrl);
-            setPreviewOpen(true);
-        }
-    };
-
 
     return (
         <MainLayout fullHeight>
@@ -132,7 +122,6 @@ const UpdateMovieForm: React.FC = () => {
                         onFinish={handleSubmit}
                         initialValues={{
                             title: movie?.title || '',
-                            description: movie?.description || '',
                             genres: movie?.genres || []
                         }}
                     >
@@ -161,19 +150,6 @@ const UpdateMovieForm: React.FC = () => {
                                         ]}
                                     >
                                         <Input placeholder="Enter movie title" showCount maxLength={100}/>
-                                    </Form.Item>
-
-                                    <Form.Item
-                                        name="description"
-                                        label="Description"
-                                        rules={[
-                                            {required: true, message: 'Please enter movie description'},
-                                            {min: 2, message: 'Description must be at least 2 characters'},
-                                            {max: 600, message: 'Description must be at most 600 characters'},
-                                        ]}
-                                    >
-                                        <TextArea rows={3} placeholder="Brief summary of the movie plot..."
-                                                  showCount maxLength={600}/>
                                     </Form.Item>
 
                                     <GenreSelector
@@ -208,54 +184,24 @@ const UpdateMovieForm: React.FC = () => {
 
                                 <div className="step-content" style={{display: currentStep === 1 ? 'block' : 'none'}}>
                                     <Row gutter={[24, 16]}>
-                                        <Col xs={24} md={12}>
-                                            {!currentImageUrl ? (
-                                                <FileUploader
-                                                    label="Poster"
-                                                    file={imageUpload.file}
-                                                    previewUrl={imageUpload.previewUrl}
-                                                    error={imageUpload.error}
-                                                    accept="image/*"
-                                                    onFileChange={handleImageUpload}
-                                                    onFileRemove={imageUpload.handleFileRemove}
-                                                    onPreview={() => handlePreview()}
-                                                    uploadButtonText="Upload Poster"
-                                                    description="JPG, PNG • max 10 MB"
-                                                    iconType="image"
-                                                />
-                                            ) : (
-                                                <Form.Item label="Poster" required>
-                                                    <div className="selected-file-container">
-                                                        <div
-                                                            className="selected-file-icon-wrapper image clickable-preview"
-                                                            onClick={() => handlePreview(currentImageUrl)}
-                                                            style={{padding: 2, cursor: 'pointer'}}>
-                                                            <img src={currentImageUrl} alt="Current poster" style={{
-                                                                width: '100%',
-                                                                height: '100%',
-                                                                objectFit: 'cover',
-                                                                borderRadius: 4
-                                                            }}/>
-                                                        </div>
-                                                        <div className="selected-file-info">
-                                                            <p className="selected-file-name"
-                                                               style={{margin: 0}}>Current Poster</p>
-                                                            <p className="selected-file-size"
-                                                               style={{margin: '4px 0 0 0'}}>Active</p>
-                                                        </div>
-                                                        <Button
-                                                            type="text"
-                                                            className="remove-file-icon-btn"
-                                                            icon={<DeleteOutlined className="remove-icon-inner"/>}
-                                                            onClick={() => {
-                                                                setCurrentImageUrl(null);
-                                                                imageUpload.setPreviewUrl(null);
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </Form.Item>
-                                            )}
-                                        </Col>
+                                        <Form.Item label="Relink TMDB Movie (Optional)">
+                                            <TMDBSearch onSelectMovie={(m) => {
+                                                setTmdbId(m.id);
+                                                setCurrentImageUrl(getImageUrl(m.poster_path));
+                                                form.setFieldsValue({title: m.title});
+                                                messageApi.success('TMDB Movie Selected. Remember to Save Changes!');
+                                            }}/>
+                                        </Form.Item>
+                                        {currentImageUrl && (
+                                            <div style={{marginTop: 15, marginBottom: 15}}>
+                                                <h5>Current Poster:</h5>
+                                                <img src={currentImageUrl} alt="Current poster" style={{
+                                                    width: 200,
+                                                    objectFit: 'cover',
+                                                    borderRadius: 4
+                                                }}/>
+                                            </div>
+                                        )}
 
                                         <Col xs={24} md={12}>
                                             {!currentScriptInfo ? (
@@ -351,16 +297,6 @@ const UpdateMovieForm: React.FC = () => {
                     </Form>
                 </Card>
             </div>
-
-            <Modal
-                open={previewOpen}
-                title="Poster Preview"
-                footer={null}
-                onCancel={() => setPreviewOpen(false)}
-                width={800}
-            >
-                <img alt="Poster Preview" style={{width: '100%'}} src={previewImage}/>
-            </Modal>
 
             <AddGenreModal
                 visible={addGenreModalVisible}

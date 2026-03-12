@@ -7,7 +7,7 @@ import {
     Space,
     Spin,
     Row,
-    Col, Card, Modal,
+    Col, Card,
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
@@ -18,6 +18,8 @@ import {type MovieFormData, type NewGenreData} from '../../types/movie';
 import GenreSelector from '../genre/GenreSelector.tsx';
 import FileUploader from './FileUploader.tsx';
 import AddGenreModal from '../genre/AddGenreModal.tsx';
+import TMDBSearch from './TMDBSearch.tsx';
+import type {TMDBMovie} from '../../services/tmdbService';
 import MainLayout from '../layout/MainLayout.tsx';
 import useMessage from 'antd/es/message/useMessage';
 import {ErrorHandler} from '../err/ErrorHandler.tsx';
@@ -26,19 +28,16 @@ import './movies.css';
 import './CreateMovie.css';
 
 const {Title} = Typography;
-const {TextArea} = Input;
 
 const CreateMovieForm: React.FC = () => {
     const [submitting, setSubmitting] = useState(false);
     const [isGenreModalVisible, setIsGenreModalVisible] = useState(false);
     const [addingGenre, setAddingGenre] = useState(false);
-    const [previewOpen, setPreviewOpen] = useState(false);
-    const [previewImage, setPreviewImage] = useState('');
+    const [selectedTmdbMovie, setSelectedTmdbMovie] = useState<TMDBMovie | null>(null);
 
     const [customMessage, contextHolder] = useMessage();
     const navigate = useNavigate();
     const {genres, loading, addGenre, fetchGenres} = useGenres();
-    const imageUpload = useFileUpload('Please upload a poster');
     const scriptUpload = useFileUpload('Please upload a script file');
 
     const [form] = Form.useForm();
@@ -61,30 +60,37 @@ const CreateMovieForm: React.FC = () => {
 
 
     const validateUploadedFiles = (): boolean => {
-        const imageValid = imageUpload.validateFile();
-        const scriptValid = scriptUpload.validateFile();
-        return imageValid && scriptValid;
+        if (!selectedTmdbMovie) {
+            customMessage.error("Please search and select a movie from TMDB.");
+            return false;
+        }
+        return scriptUpload.validateFile();
     };
 
-    const createFormData = (values: MovieFormData): FormData => {
-        const formData = new FormData();
+    interface MoviePayload {
+        movieData: {
+            title: string;
+            tmdbId: number | undefined;
+            genres: string[];
+        };
+        script?: File | Blob;
+    }
+
+    const createFormData = (values: MovieFormData): MoviePayload => {
         const movieData = {
             title: values.title,
-            description: values.description,
+            tmdbId: selectedTmdbMovie?.id,
             genres: values.genres,
         };
-        formData.append('movieData', new Blob([JSON.stringify(movieData)], {type: 'application/json'}));
-        if (imageUpload.file) {
-            formData.append('image', imageUpload.file);
-        }
+        const payload: MoviePayload = {movieData};
         if (scriptUpload.file) {
-            formData.append('script', scriptUpload.file);
+            payload.script = scriptUpload.file;
         }
-        return formData;
+        return payload;
     };
 
-    const submitMovieData = async (formData: FormData) => {
-        const createdMovie = await movieService.create(formData);
+    const submitMovieData = async (payload: MoviePayload) => {
+        const createdMovie = await movieService.create(payload);
         customMessage.success('Movie created successfully!');
         return createdMovie;
     };
@@ -108,12 +114,6 @@ const CreateMovieForm: React.FC = () => {
         navigate('/admin');
     };
 
-    const handlePreview = () => {
-        if (imageUpload.previewUrl) {
-            setPreviewImage(imageUpload.previewUrl);
-            setPreviewOpen(true);
-        }
-    };
 
     const renderLoadingState = () => (
         <div className="loading-container" style={{textAlign: 'center', padding: '50px'}}>
@@ -133,36 +133,28 @@ const CreateMovieForm: React.FC = () => {
                 layout="vertical"
                 onFinish={handleSubmit}
             >
+                <Form.Item label="Search Film on TMDB">
+                    <TMDBSearch onSelectMovie={(movie) => {
+                        setSelectedTmdbMovie(movie);
+                        form.setFieldsValue({title: movie.title});
+                    }}/>
+                    {selectedTmdbMovie && (
+                        <div style={{marginTop: 10, padding: 10, background: '#f5f5f5', borderRadius: 6}}>
+                            <strong>Selected:</strong> {selectedTmdbMovie.title} ({selectedTmdbMovie.release_date?.substring(0, 4)})
+                        </div>
+                    )}
+                </Form.Item>
+
                 <Form.Item
-                    label="Title"
+                    label="Title (Override if needed)"
                     name="title"
                     rules={[
                         {required: true, message: 'Please enter movie title'},
                         {min: 2, message: 'Title must be at least 2 characters'},
                         {max: 100, message: 'Title must be at most 100 characters'},
-                        {
-                            pattern: /^[A-Za-z0-9\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]*$/,
-                            message: 'Only English letters, numbers, and symbols are allowed'
-                        }
                     ]}
                 >
                     <Input placeholder="Enter movie title" showCount maxLength={100}/>
-                </Form.Item>
-
-                <Form.Item
-                    label="Description"
-                    name="description"
-                    rules={[
-                        {required: true, message: 'Please enter movie description'},
-                        {min: 2, message: 'Description must be at least 2 characters'},
-                        {max: 600, message: 'Description must be at most 600 characters'},
-                        {
-                            pattern: /^[A-Za-z0-9\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]*$/,
-                            message: 'Only English letters, numbers, and symbols are allowed'
-                        }
-                    ]}
-                >
-                    <TextArea rows={3} placeholder="Enter movie description" showCount maxLength={600}/>
                 </Form.Item>
 
                 <GenreSelector
@@ -175,19 +167,22 @@ const CreateMovieForm: React.FC = () => {
 
                 <Row gutter={[24, 16]}>
                     <Col xs={24} md={12}>
-                        <FileUploader
-                            label="Poster"
-                            file={imageUpload.file}
-                            previewUrl={imageUpload.previewUrl}
-                            error={imageUpload.error}
-                            accept="image/*"
-                            onFileChange={(file) => imageUpload.handleFileChange(file, true)}
-                            onFileRemove={imageUpload.handleFileRemove}
-                            onPreview={handlePreview}
-                            uploadButtonText="Upload Poster"
-                            description="JPG, PNG • max 10 MB"
-                            iconType="image"
-                        />
+                        {selectedTmdbMovie?.poster_path ? (
+                            <img src={`https://image.tmdb.org/t/p/w500${selectedTmdbMovie.poster_path}`} alt="poster"
+                                 style={{width: 200, borderRadius: 8}}/>
+                        ) : (
+                            <div style={{
+                                width: 200,
+                                height: 300,
+                                background: '#ccc',
+                                borderRadius: 8,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                                No Poster
+                            </div>
+                        )}
                     </Col>
 
                     <Col xs={24} md={12}>
@@ -240,15 +235,6 @@ const CreateMovieForm: React.FC = () => {
                 onCancel={() => setIsGenreModalVisible(false)}
                 onSubmit={handleAddNewGenre}
             />
-            <Modal
-                open={previewOpen}
-                title="Poster Preview"
-                footer={null}
-                onCancel={() => setPreviewOpen(false)}
-                width={800}
-            >
-                <img alt="Poster Preview" style={{width: '100%'}} src={previewImage}/>
-            </Modal>
         </MainLayout>
     );
 };

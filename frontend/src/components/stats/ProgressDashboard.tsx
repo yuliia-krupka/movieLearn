@@ -1,18 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import MainLayout from '../layout/MainLayout';
-import {progressService} from '../../services/progressService';
-import type {MovieProgress} from '../../types/learningSet';
-import {useAuth} from '../auth/useAuth';
-import {Spin, Progress, Card, Row, Col, Statistic, Tag, Empty} from 'antd';
-import {CheckCircleOutlined, TrophyOutlined, BookOutlined} from '@ant-design/icons';
+import { progressService } from '../../services/progressService';
+import type { MovieProgress } from '../../types/learningSet';
+import { useAuth } from '../auth/useAuth';
+import { Spin, Card, Statistic, Empty, Row, Col } from 'antd';
+import { CheckCircleOutlined, TrophyOutlined, BookOutlined } from '@ant-design/icons';
 import './ProgressDashboard.css';
-import {useNavigate} from 'react-router-dom';
+import StatMovieCard from './StatMovieCard';
 
 const ProgressDashboard: React.FC = () => {
-    const {currentUserId} = useAuth();
+    const { currentUserId } = useAuth();
     const [progress, setProgress] = useState<MovieProgress[]>([]);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
 
     useEffect(() => {
         if (currentUserId) {
@@ -28,7 +27,7 @@ const ProgressDashboard: React.FC = () => {
             <MainLayout className="content stats-layout">
                 <div className="stats-loading">
                     <Spin size="large" tip="Loading your movie statistics...">
-                        <div style={{padding: 50}}/>
+                        <div style={{ padding: 50 }} />
                     </Spin>
                 </div>
             </MainLayout>
@@ -52,7 +51,7 @@ const ProgressDashboard: React.FC = () => {
                             <Statistic
                                 title="Movies Started"
                                 value={progress.length}
-                                prefix={<CheckCircleOutlined/>}
+                                prefix={<CheckCircleOutlined />}
                             />
                         </Card>
                         <Card className="summary-card">
@@ -60,7 +59,7 @@ const ProgressDashboard: React.FC = () => {
                                 title="Words Learned"
                                 value={totalLearned}
                                 suffix={`/ ${totalWords}`}
-                                prefix={<TrophyOutlined/>}
+                                prefix={<TrophyOutlined />}
                             />
                         </Card>
                         <Card className="summary-card">
@@ -68,85 +67,21 @@ const ProgressDashboard: React.FC = () => {
                                 title="Avg Test Score"
                                 value={avgTestScore}
                                 suffix="%"
-                                prefix={<BookOutlined/>}
+                                prefix={<BookOutlined />}
                             />
                         </Card>
                     </div>
                 </div>
 
                 {progress.length === 0 ? (
-                    <Empty description="No movies started yet. Start watching movies to see your progress!"/>
+                    <Empty description="No movies started yet. Start watching movies to see your progress!" />
                 ) : (
                     <Row gutter={[24, 24]} className="movie-stats-grid">
                         {progress.map((item: MovieProgress) => (
                             <Col xs={24} md={progress.length === 1 ? 16 : 12} lg={progress.length === 1 ? 16 : 12}
-                                 xl={progress.length === 1 ? 12 : (progress.length === 2 ? 12 : 8)}
-                                 key={item.learningSetId}>
-                                <Card
-                                    hoverable
-                                    className="movie-stat-card"
-                                    cover={
-                                        item.movieImage ? (
-                                            <img
-                                                alt={item.movieTitle}
-                                                src={`data:image/jpeg;base64,${item.movieImage}`}
-                                                className="movie-card-img"
-                                            />
-                                        ) : (
-                                            <div className="movie-placeholder-img">
-                                                <BookOutlined className="movie-placeholder-icon"/>
-                                            </div>
-                                        )
-                                    }
-                                    onClick={() => navigate(`/movies/${item.movieId}`)}
-                                >
-                                    <div className="movie-card-content">
-                                        <div className="movie-title-section">
-                                            <h3>{item.movieTitle}</h3>
-                                            <div className="title-tags">
-                                                <Tag color="blue" className="english-level-tag">
-                                                    {item.englishLevel || 'A2'}
-                                                </Tag>
-                                                <Tag color="blue" className="genre-tag">
-                                                    Total attempts: {item.totalAttempts}
-                                                </Tag>
-                                            </div>
-                                        </div>
-
-                                        <div className="stat-section">
-                                            <div className="stat-label">
-                                                <span>Words Learned</span>
-                                                <span>{item.learnedWords}/{item.totalWords}</span>
-                                            </div>
-                                            <Progress
-                                                percent={Math.round((item.learnedWords / (item.totalWords || 1)) * 100)}
-                                                size="small"
-                                                strokeColor="#F49E4C"
-                                            />
-                                        </div>
-
-                                        <div className="stat-badges">
-                                            <div className="stat-badges-row">
-                                                <Tag className={item.flashcardsScore > 0 ? "flashcards-tag-active" : ""}
-                                                     color={item.flashcardsScore > 0 ? undefined : "orange"}
-                                                     icon={<CheckCircleOutlined/>}>
-                                                    Flashcards: {item.flashcardsScore > 0 ? `${item.flashcardsScore}%` : "Started"}
-                                                </Tag>
-                                                <Tag color={item.testsScore > 0 ? "blue" : "default"}
-                                                     icon={<TrophyOutlined/>}>
-                                                    Test: {item.testsScore > 0 ? `${item.testsScore}%` : "0%"}
-                                                </Tag>
-                                            </div>
-                                            {item.lastAttemptAt && (
-                                                <div className="last-activity">
-                                                    <span>Last attempt:</span>
-                                                    <span> {new Date(item.lastAttemptAt).toLocaleString()}</span>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                    </div>
-                                </Card>
+                                xl={progress.length === 1 ? 12 : (progress.length === 2 ? 12 : 8)}
+                                key={item.learningSetId}>
+                                <StatMovieCard item={item} />
                             </Col>
                         ))}
                     </Row>
