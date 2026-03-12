@@ -45,7 +45,7 @@ const Interests: React.FC = () => {
     return (
         <div className="container">
             {contextHolder}
-            <LogoDesign/>
+            <LogoDesign className="logo-design-responsive"/>
             <Logo level={1}/>
             <Text className="subtitle">Tell us your interests</Text>
             <div className="buttons">

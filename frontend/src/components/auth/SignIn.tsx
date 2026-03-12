@@ -1,14 +1,14 @@
-import { useRef, useEffect } from 'react';
-import { GoogleOutlined, DownOutlined, PlayCircleOutlined, ReadOutlined, CheckCircleOutlined } from "@ant-design/icons";
-import { Button, Row, Col, Card } from 'antd';
-import { useAuth } from './useAuth.tsx';
-import { useNavigate } from 'react-router-dom';
+import {useRef, useEffect} from 'react';
+import {GoogleOutlined, DownOutlined, PlayCircleOutlined, ReadOutlined, CheckCircleOutlined} from "@ant-design/icons";
+import {Button, Row, Col, Card} from 'antd';
+import {useAuth} from './useAuth.tsx';
+import {useNavigate} from 'react-router-dom';
 import Logo from "../shared/Logo.tsx";
 import "./SignIn.css";
 import LogoDesign from "../shared/LogoDesign.tsx";
 
 function SignIn() {
-    const { isAuthenticated, login, isAdmin, user } = useAuth();
+    const {isAuthenticated, login, isAdmin, user} = useAuth();
     const navigate = useNavigate();
     const infoSectionRef = useRef<HTMLDivElement>(null);
 
@@ -58,15 +58,15 @@ function SignIn() {
         <div className="signin-page">
             <div className="hero-section">
                 <div className="login-container">
-                    <LogoDesign />
-                    <Logo level={1} />
+                    <LogoDesign className="logo-design-responsive"/>
+                    <Logo level={1}/>
                     <div className="subtitle">
                         Вивчайте англійську за сценаріями улюблених фільмів!
                     </div>
 
                     <Button
                         className="google-button"
-                        icon={<GoogleOutlined />}
+                        icon={<GoogleOutlined/>}
                         size="large"
                         onClick={login}
                         aria-label="Sign in with Google"
@@ -77,33 +77,33 @@ function SignIn() {
 
                 <div className="scroll-indicator" onClick={scrollToInfo}>
                     <span className="scroll-text">Як це працює</span>
-                    <DownOutlined className="scroll-arrow" />
+                    <DownOutlined className="scroll-arrow"/>
                 </div>
             </div>
 
             <div className="info-section" ref={infoSectionRef}>
                 <h2>Вивчайте англійську за сценаріями улюблених фільмів!</h2>
-                <div className="ukrainian-badge" style={{ marginBottom: '40px' }}>
+                <div className="ukrainian-badge" style={{marginBottom: '40px'}}>
                     <span>🇺🇦</span> Створено спеціально для українців
                 </div>
                 <Row gutter={[32, 32]} justify="center" className="steps-row">
                     <Col xs={24} md={8}>
                         <Card className="step-card">
-                            <PlayCircleOutlined className="step-icon" />
+                            <PlayCircleOutlined className="step-icon"/>
                             <h3>1. Оберіть фільм</h3>
                             <p>Обирайте з нашої колекції ваших улюблених популярних фільмів та серіалів.</p>
                         </Card>
                     </Col>
                     <Col xs={24} md={8}>
                         <Card className="step-card">
-                            <ReadOutlined className="step-icon" />
+                            <ReadOutlined className="step-icon"/>
                             <h3>2. Вивчайте лексику</h3>
                             <p>Вивчайте ключові слова та фрази, взяті безпосередньо зі сценарію фільму.</p>
                         </Card>
                     </Col>
                     <Col xs={24} md={8}>
                         <Card className="step-card">
-                            <CheckCircleOutlined className="step-icon" />
+                            <CheckCircleOutlined className="step-icon"/>
                             <h3>3. Перевірте себе</h3>
                             <p>Проходьте інтерактивні тести, щоб закріпити знання та відстежувати прогрес.</p>
                         </Card>

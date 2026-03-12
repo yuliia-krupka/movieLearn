@@ -34,7 +34,20 @@
         gap: 0;
     }
 
-    .logo-blue, .logo-orange {
+    .logo-blue,
+    .logo-orange {
         display: block;
+    }
+}
+
+.logo-design-responsive {
+    width: 228px;
+    height: 153px;
+}
+
+@media (max-width: 480px) {
+    .logo-design-responsive {
+        width: 140px;
+        height: auto;
     }
 }

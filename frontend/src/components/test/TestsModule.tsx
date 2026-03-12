@@ -19,7 +19,7 @@ const TestsModule: React.FC = () => {
     const navigate = useNavigate();
     const {currentUserId, user} = useAuth();
     const {id} = useParams<{ id: string }>();
-    const movieId = location.state?.movieId || 1;
+    const movieId = location.state?.movieId;
     const learningSetId = id ? Number(id) : undefined;
     const [testItems, setTestItems] = useState<TestItemData[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -133,8 +133,9 @@ const TestsModule: React.FC = () => {
     };
 
     const handleBackToMovie = () => {
-        if (movieId) {
-            navigate(`/movies/${movieId}`);
+        const mid = movieId || learningSet?.movieId;
+        if (mid) {
+            navigate(`/movies/${mid}`);
         } else {
             navigate('/movies');
         }

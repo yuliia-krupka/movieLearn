@@ -47,7 +47,6 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
         const state = location.state as { message?: string } | null;
         if (state?.message) {
             void messageApi.success(state.message);
-            // Clear location state to prevent message from showing again on refresh
             window.history.replaceState({}, document.title);
         }
     }, [location.state, messageApi]);

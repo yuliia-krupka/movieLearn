@@ -62,7 +62,7 @@ public class OpenAiService {
                         - text: The English word or phrase (MAX 255 chars).
                         - translation: Accurate Ukrainian translation (MAX 255 chars).
                         - transcription: IPA transcription enclosed in slashes (MAX 150 chars).
-                        - exampleSentence: The actual sentence from the movie where this item is used (MAX 255 chars).
+                        - exampleSentence: Create an original example sentence inspired by the movie's context and scenario, but do NOT quote the script verbatim. Paraphrase or create a new sentence that naturally demonstrates how the word/phrase is used (MAX 255 chars).
                         Do not use one word or phrase more than once in a set of flashcards!
                         """,
                 movieTitle, scriptContent, interests, level);
@@ -72,29 +72,31 @@ public class OpenAiService {
 
     public List<LearningItemDto> generateTests(List<LearningItemDto> flashcards) {
         String flashcardsJson = toJson(flashcards);
-        String userPrompt = String.format("""
-                Based on the following flashcards, generate a language test.
-                For each flashcard, create one test question.
-                
-                VARY the question types significantly across the test items. Do NOT just ask for translations.
-                Use these types as inspiration:
-                1. Usage: "Choose the correct use of 'elaborate':"
-                2. Definition: "'Subtle' is best described as:"
-                3. Context: "Fill in the blank: 'She felt ___ after sharing her secret.'"
-                4. Synonym/Antonym: "Which of these is a synonym for 'inevitable'?"
-                
-                Each test question MUST have exactly 4 options (one correct, three incorrect).
-                
-                Flashcards: %s
-                
-                For each test item, provide:
-                - text: The English question or sentence with a blank (MAX 255 chars).
-                - translation: The Ukrainian translation of the word being tested (MAX 255 chars).
-                - transcription: IPA transcription of the word enclosed in slashes, e.g. /wɜːrd/ (MAX 150 chars).
-                - exampleSentence: The full correct sentence or a brief definition (MAX 255 chars).
-                - answers: An array of exactly 4 strings (options) (Each option MAX 150 chars).
-                - correctAnswerIndex: The integer index (0-3) of the correct answer in the answers array.
-                """, flashcardsJson);
+        String userPrompt = String.format(
+                """
+                        Based on the following flashcards, generate a language test.
+                        For each flashcard, create one test question.
+                        
+                        VARY the question types significantly across the test items. Do NOT just ask for translations.
+                        Use these types as inspiration:
+                        1. Usage: "Choose the correct use of 'elaborate':"
+                        2. Definition: "'Subtle' is best described as:"
+                        3. Context: "Fill in the blank: 'She felt ___ after sharing her secret.'"
+                        4. Synonym/Antonym: "Which of these is a synonym for 'inevitable'?"
+                        
+                        Each test question MUST have exactly 4 options (one correct, three incorrect).
+                        
+                        Flashcards: %s
+                        
+                        For each test item, provide:
+                        - text: The English question or sentence with a blank (MAX 255 chars).
+                        - translation: The Ukrainian translation of the word being tested (MAX 255 chars).
+                        - transcription: IPA transcription of the word enclosed in slashes, e.g. /wɜːrd/ (MAX 150 chars).
+                        - exampleSentence: An original example sentence inspired by the movie's context, paraphrased (not a direct quote from the script), or a brief definition (MAX 255 chars).
+                        - answers: An array of exactly 4 strings (options) (Each option MAX 150 chars).
+                        - correctAnswerIndex: The integer index (0-3) of the correct answer in the answers array.
+                        """,
+                flashcardsJson);
 
         return generate(userPrompt, 0.7, LearningItemType.TEST);
     }
@@ -127,7 +129,8 @@ public class OpenAiService {
                         3. NO FULL SENTENCES: Ensure the 'text' field contains only a word or phrase, never a full sentence.
                         4. SOPHISTICATION: If level is B2, C1, or C2, use advanced collocations and idioms from the script.
                         5. ADHERE TO LIMITS: text (255 chars), translation (255 chars), exampleSentence (255 chars), transcription (150 chars in slashes).
-                        6. Return the results as a JSON array of vocabulary flashcards only.
+                        6. PARAPHRASE: For exampleSentence, create an original sentence inspired by the movie's context. Do NOT quote the script verbatim.
+                        7. Return the results as a JSON array of vocabulary flashcards only.
                         """,
                 instructions, movieTitle, scriptContent, level, interests, itemsJson, originalTexts);
 
