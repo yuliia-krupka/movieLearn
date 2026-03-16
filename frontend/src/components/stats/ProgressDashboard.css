@@ -59,13 +59,13 @@
 }
 
 .movie-card-img {
-    height: 240px;
+    height: 180px;
     object-fit: cover;
     width: 100%;
 }
 
 .movie-placeholder-img {
-    height: 240px;
+    height: 180px;
     background: var(--color-primary-bg);
     display: flex;
     align-items: center;

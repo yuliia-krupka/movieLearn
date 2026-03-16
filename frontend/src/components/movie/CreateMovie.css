@@ -320,6 +320,38 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
+.loading-inner-spacer {
+    padding: 50px;
+}
+
+.tmdb-selected-info {
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-sm);
+}
+
+.movie-preview-image {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 8px;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.movie-preview-placeholder {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 16/9;
+    background: var(--color-bg-secondary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-subtle);
+}
+
 @media (max-width: 576px) {
     .create-movie-container {
         padding: 12px;

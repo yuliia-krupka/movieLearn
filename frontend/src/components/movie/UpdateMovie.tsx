@@ -9,7 +9,8 @@ import {
     Spin,
 
     Row,
-    Col
+    Col,
+    Image
 } from 'antd';
 import {SaveFilled, CloseOutlined, FileOutlined, DeleteOutlined} from '@ant-design/icons';
 import useMessage from 'antd/es/message/useMessage';
@@ -27,7 +28,7 @@ import MainLayout from "../layout/MainLayout.tsx";
 import GenreSelector from "../genre/GenreSelector.tsx";
 import {ErrorHandler} from "../err/ErrorHandler.tsx";
 import TMDBSearch from "./TMDBSearch.tsx";
-import {getImageUrl} from "../../services/tmdbService.ts";
+import {getMovieImageUrl} from "../../services/tmdbService.ts";
 
 const {Title} = Typography;
 
@@ -139,7 +140,7 @@ const UpdateMovieForm: React.FC = () => {
                                     steps={['Movie Info', 'Media & Files']}
                                 />
 
-                                <div className="step-content" style={{display: currentStep === 0 ? 'block' : 'none'}}>
+                                <div className={`step-content ${currentStep === 0 ? '' : 'hidden'}`}>
                                     <Form.Item
                                         name="title"
                                         label="Title"
@@ -182,26 +183,28 @@ const UpdateMovieForm: React.FC = () => {
                                     </Form.Item>
                                 </div>
 
-                                <div className="step-content" style={{display: currentStep === 1 ? 'block' : 'none'}}>
+                                <div className={`step-content ${currentStep === 1 ? '' : 'hidden'}`}>
                                     <Row gutter={[24, 16]}>
-                                        <Form.Item label="Relink TMDB Movie (Optional)">
-                                            <TMDBSearch onSelectMovie={(m) => {
-                                                setTmdbId(m.id);
-                                                setCurrentImageUrl(getImageUrl(m.poster_path));
-                                                form.setFieldsValue({title: m.title});
-                                                messageApi.success('TMDB Movie Selected. Remember to Save Changes!');
-                                            }}/>
-                                        </Form.Item>
-                                        {currentImageUrl && (
-                                            <div style={{marginTop: 15, marginBottom: 15}}>
-                                                <h5>Current Poster:</h5>
-                                                <img src={currentImageUrl} alt="Current poster" style={{
-                                                    width: 200,
-                                                    objectFit: 'cover',
-                                                    borderRadius: 4
+                                        <Col xs={24} md={12}>
+                                            <Form.Item label="Relink TMDB Movie (Optional)">
+                                                <TMDBSearch onSelectMovie={(m) => {
+                                                    setTmdbId(m.id);
+                                                    setCurrentImageUrl(getMovieImageUrl(m));
+                                                    form.setFieldsValue({title: m.title});
+                                                    messageApi.success('TMDB Movie Selected. Remember to Save Changes!');
                                                 }}/>
-                                            </div>
-                                        )}
+                                            </Form.Item>
+                                            {currentImageUrl && (
+                                                <div className="current-image-wrapper">
+                                                    <h5 className="current-image-label">Current Image:</h5>
+                                                    <Image
+                                                        src={currentImageUrl}
+                                                        alt="Current poster"
+                                                        className="current-image-preview"
+                                                    />
+                                                </div>
+                                            )}
+                                        </Col>
 
                                         <Col xs={24} md={12}>
                                             {!currentScriptInfo ? (
@@ -223,25 +226,13 @@ const UpdateMovieForm: React.FC = () => {
                                                             <FileOutlined className="selected-icon-inner"/>
                                                         </div>
                                                         <div className="selected-file-info">
-                                                            <p className="selected-file-name"
-                                                               style={{margin: 0}}>Current Script</p>
-                                                            <div style={{
-                                                                display: 'flex',
-                                                                gap: 8,
-                                                                marginTop: 4,
-                                                                alignItems: 'center'
-                                                            }}>
-                                                                <span className="selected-file-size"
-                                                                      style={{margin: 0}}>Active</span>
+                                                            <p className="selected-file-name script-info-filename">Current Script</p>
+                                                            <div className="script-info-details">
+                                                                <span className="selected-file-size script-info-status">Active</span>
                                                                 <Button
                                                                     type="link"
                                                                     size="small"
-                                                                    style={{
-                                                                        padding: 0,
-                                                                        fontSize: 13,
-                                                                        height: 'auto',
-                                                                        lineHeight: 1
-                                                                    }}
+                                                                    className="script-download-btn"
                                                                     onClick={() => {
                                                                         const link = document.createElement('a');
                                                                         link.href = `/api/movies/${id}/script`;

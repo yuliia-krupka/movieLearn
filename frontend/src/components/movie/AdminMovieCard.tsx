@@ -3,7 +3,7 @@ import {Card, Modal} from 'antd';
 import {EditOutlined, DeleteOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
 import type {Movie} from '../../types/movie';
-import {tmdbService, getImageUrl, type TMDBMovie} from '../../services/tmdbService';
+import {tmdbService, getMovieImageUrl, type TMDBMovie} from '../../services/tmdbService';
 import './AdminMoviesList.css';
 
 interface AdminMovieCardProps {
@@ -43,7 +43,7 @@ const AdminMovieCard: React.FC<AdminMovieCardProps> = ({movie, onDelete}) => {
         });
     };
 
-    const imageSource = tmdbMovie ? getImageUrl(tmdbMovie.poster_path) : null;
+    const imageSource = getMovieImageUrl(tmdbMovie);
 
     return (
         <div className="admin-movie-card-container">

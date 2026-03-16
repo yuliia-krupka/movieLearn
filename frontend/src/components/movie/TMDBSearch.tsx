@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {Input, Spin, List, Typography} from 'antd';
 import {SearchOutlined} from '@ant-design/icons';
-import {tmdbService, type TMDBMovie, getImageUrl} from '../../services/tmdbService';
+import {tmdbService, type TMDBMovie, getMovieImageUrl} from '../../services/tmdbService';
 import './TMDBSearch.css';
 
 const {Text} = Typography;
@@ -72,7 +72,7 @@ const TMDBSearch: React.FC<TMDBSearchProps> = ({onSelectMovie, initialQuery = ''
             {dropdownVisible && (
                 <div className="tmdb-search-dropdown">
                     {loading ? (
-                        <div style={{textAlign: 'center', padding: '16px'}}>
+                        <div className="tmdb-search-loading">
                             <Spin/>
                         </div>
                     ) : (
@@ -87,9 +87,9 @@ const TMDBSearch: React.FC<TMDBSearchProps> = ({onSelectMovie, initialQuery = ''
                                     <List.Item.Meta
                                         avatar={
                                             <img
-                                                src={getImageUrl(movie.poster_path)}
+                                                src={getMovieImageUrl(movie)}
                                                 alt={movie.title}
-                                                style={{width: 40, height: 60, objectFit: 'cover', borderRadius: 4}}
+                                                className="tmdb-search-avatar-img"
                                             />
                                         }
                                         title={<Text

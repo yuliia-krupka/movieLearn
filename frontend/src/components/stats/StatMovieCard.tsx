@@ -21,7 +21,9 @@ const StatMovieCard: React.FC<StatMovieCardProps> = ({item}) => {
         }
     }, [item.tmdbId]);
 
-    const imageSource = tmdbMovie ? getImageUrl(tmdbMovie.poster_path) : null;
+    const imageSource = tmdbMovie
+        ? getImageUrl(tmdbMovie.backdrop_path || tmdbMovie.poster_path)
+        : '/placeholder-movie.png';
 
     return (
         <Card

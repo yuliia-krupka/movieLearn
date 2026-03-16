@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Card} from 'antd';
 import {useNavigate} from 'react-router-dom';
-import {tmdbService, getImageUrl, type TMDBMovie} from '../../services/tmdbService';
+import {tmdbService, getMovieImageUrl, type TMDBMovie} from '../../services/tmdbService';
 import './MovieCard.css';
 import './movies.css';
 
@@ -29,7 +29,7 @@ const MovieCard: React.FC<MovieCardProps> = React.memo(({movie}) => {
         navigate(`/movies/${movie.id}`);
     };
 
-    const imageSource = tmdbMovie ? getImageUrl(tmdbMovie.poster_path) : null;
+    const imageSource = getMovieImageUrl(tmdbMovie);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -48,7 +48,6 @@ const MovieCard: React.FC<MovieCardProps> = React.memo(({movie}) => {
             onKeyDown={handleKeyDown}
             tabIndex={0}
             aria-label={`${movie.title} — ${movie.genres.slice(0, 2).join(', ')}`}
-            style={{cursor: 'pointer'}}
             cover={
                 imageSource ? (
                     <img
@@ -56,8 +55,6 @@ const MovieCard: React.FC<MovieCardProps> = React.memo(({movie}) => {
                         src={imageSource}
                         className="movie-card-cover"
                         loading="lazy"
-                        width={270}
-                        height={200}
                     />
                 ) : (
                     <div className="movie-card-placeholder"/>

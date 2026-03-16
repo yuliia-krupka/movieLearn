@@ -129,6 +129,57 @@
     padding: 0 32px;
 }
 
+.current-image-wrapper {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.current-image-label {
+    font-size: 13px;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.current-image-preview {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.script-info-filename {
+    margin: 0 !important;
+}
+
+.script-info-details {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    align-items: center;
+}
+
+.script-info-status {
+    margin: 0 !important;
+}
+
+.script-download-btn {
+    padding: 0 !important;
+    font-size: 13px !important;
+    height: auto !important;
+    line-height: 1 !important;
+}
+
+.step-content {
+    display: block;
+}
+
+.step-content.hidden {
+    display: none;
+}
+
 @media (max-width: 576px) {
     .update-movie-container {
         padding: 12px;

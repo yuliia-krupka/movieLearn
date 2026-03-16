@@ -7,7 +7,7 @@ import {
     Space,
     Spin,
     Row,
-    Col, Card,
+    Col, Card, Image
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
@@ -19,7 +19,7 @@ import GenreSelector from '../genre/GenreSelector.tsx';
 import FileUploader from './FileUploader.tsx';
 import AddGenreModal from '../genre/AddGenreModal.tsx';
 import TMDBSearch from './TMDBSearch.tsx';
-import type {TMDBMovie} from '../../services/tmdbService';
+import {type TMDBMovie, getMovieImageUrl} from '../../services/tmdbService';
 import MainLayout from '../layout/MainLayout.tsx';
 import useMessage from 'antd/es/message/useMessage';
 import {ErrorHandler} from '../err/ErrorHandler.tsx';
@@ -116,9 +116,9 @@ const CreateMovieForm: React.FC = () => {
 
 
     const renderLoadingState = () => (
-        <div className="loading-container" style={{textAlign: 'center', padding: '50px'}}>
+        <div className="loading-container">
             <Spin size="large" tip="Loading genres...">
-                <div style={{padding: 50}}/>
+                <div className="loading-inner-spacer"/>
             </Spin>
         </div>
     );
@@ -139,7 +139,7 @@ const CreateMovieForm: React.FC = () => {
                         form.setFieldsValue({title: movie.title});
                     }}/>
                     {selectedTmdbMovie && (
-                        <div style={{marginTop: 10, padding: 10, background: '#f5f5f5', borderRadius: 6}}>
+                        <div className="tmdb-selected-info">
                             <strong>Selected:</strong> {selectedTmdbMovie.title} ({selectedTmdbMovie.release_date?.substring(0, 4)})
                         </div>
                     )}
@@ -167,20 +167,15 @@ const CreateMovieForm: React.FC = () => {
 
                 <Row gutter={[24, 16]}>
                     <Col xs={24} md={12}>
-                        {selectedTmdbMovie?.poster_path ? (
-                            <img src={`https://image.tmdb.org/t/p/w500${selectedTmdbMovie.poster_path}`} alt="poster"
-                                 style={{width: 200, borderRadius: 8}}/>
+                        {selectedTmdbMovie ? (
+                            <Image
+                                src={getMovieImageUrl(selectedTmdbMovie)}
+                                alt="movie preview"
+                                className="movie-preview-image"
+                            />
                         ) : (
-                            <div style={{
-                                width: 200,
-                                height: 300,
-                                background: '#ccc',
-                                borderRadius: 8,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
-                                No Poster
+                            <div className="movie-preview-placeholder">
+                                No Preview Available
                             </div>
                         )}
                     </Col>

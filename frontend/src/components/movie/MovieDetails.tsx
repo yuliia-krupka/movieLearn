@@ -160,7 +160,9 @@ const MovieDetails: React.FC = () => {
             (!user?.englishLevel || learningSet.englishLevel === user.englishLevel) &&
             normalizeInterests(user?.interests) === normalizeInterests(learningSet.interests);
 
-        const imageSource = tmdbMovie ? getImageUrl(tmdbMovie.poster_path) : undefined;
+        const imageSource = tmdbMovie
+            ? getImageUrl(tmdbMovie.backdrop_path || tmdbMovie.poster_path, 'original')
+            : '/placeholder-movie.png';
 
         const descriptionText = tmdbMovie?.overview || '';
 
@@ -196,15 +198,11 @@ const MovieDetails: React.FC = () => {
                 )}
 
                 <div className="movie-poster-container">
-                    {imageSource ? (
-                        <img
-                            alt="movie poster"
-                            src={imageSource}
-                            className="movie-poster-fullwidth"
-                        />
-                    ) : (
-                        <div className="movie-poster-placeholder">...</div>
-                    )}
+                    <img
+                        alt="movie poster"
+                        src={imageSource}
+                        className="movie-poster-fullwidth"
+                    />
 
                     <div className="image-fade-bottom"/>
 

@@ -21,8 +21,14 @@ export interface TMDBSearchResult {
 }
 
 export const getImageUrl = (path: string | null, size: 'w500' | 'original' = 'w500') => {
-    if (!path) return '/placeholder-movie.png'; // Make sure you have a placeholder image in public folder
+    if (!path) return '/placeholder-movie.png';
     return `https://image.tmdb.org/t/p/${size}${path}`;
+};
+
+export const getMovieImageUrl = (movie: TMDBMovie | null, size: 'w500' | 'original' = 'w500') => {
+    if (!movie) return '/placeholder-movie.png';
+    const path = movie.backdrop_path || movie.poster_path;
+    return getImageUrl(path, size);
 };
 
 export const tmdbService = {

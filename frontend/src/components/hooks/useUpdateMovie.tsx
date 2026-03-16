@@ -55,10 +55,10 @@ const useUpdateMovie = () => {
                     setTmdbId(movieData.tmdbId);
                     try {
                         const tmdbService = (await import('../../services/tmdbService')).tmdbService;
-                        const getImageUrl = (await import('../../services/tmdbService')).getImageUrl;
+                        const getMovieImageUrl = (await import('../../services/tmdbService')).getMovieImageUrl;
                         const tmdbDetails = await tmdbService.getMovieDetails(movieData.tmdbId);
                         if (tmdbDetails && isMounted) {
-                            setCurrentImageUrl(getImageUrl(tmdbDetails.poster_path));
+                            setCurrentImageUrl(getMovieImageUrl(tmdbDetails));
                         }
                     } catch (error) {
                         console.error('Failed to fetch TMDB details for image:', error);

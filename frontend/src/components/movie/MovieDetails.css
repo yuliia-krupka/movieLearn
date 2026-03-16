@@ -16,7 +16,13 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
+    object-position: center 20%;
+    filter: brightness(0.7);
+    transition: filter 0.5s ease;
+}
+
+.movie-poster-fullwidth:hover {
+    filter: brightness(0.85);
 }
 
 .movie-poster-placeholder {
