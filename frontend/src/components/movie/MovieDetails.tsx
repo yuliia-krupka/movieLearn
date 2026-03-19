@@ -9,6 +9,7 @@ import {learningSetService} from '../../services/learningSetService';
 import {movieService} from '../../services/movieService';
 import {tmdbService, getImageUrl, type TMDBMovie} from '../../services/tmdbService';
 import './MovieDetails.css';
+import learningCat from '../../assets/learning-cat.png';
 import './movies.css';
 import '../layout/Layout.css';
 import type {LearningSetDto} from "../../types/learningSet.ts";
@@ -175,7 +176,7 @@ const MovieDetails: React.FC = () => {
                             {isGenerating ? (
                                 <>
                                     <img
-                                        src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM21td2NsNGkybmhyZWVzcm52N2g2bXd0d3JoY3J5Zm5jNHZtNXI4cCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/XnjBmkLXUPJQwJW4pp/giphy.gif"
+                                        src={learningCat}
                                         alt="Generating new content..."
                                         className="generating-gif"
                                     />
@@ -183,6 +184,7 @@ const MovieDetails: React.FC = () => {
                                     <p className="generating-text">
                                         Creating personalized flashcards based on the movie script.
                                     </p>
+                                    <Spin size="large" className="generating-spinner"/>
                                 </>
                             ) : (
                                 <>

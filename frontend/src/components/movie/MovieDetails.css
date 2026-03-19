@@ -266,6 +266,10 @@
     margin-bottom: 0;
 }
 
+.generating-spinner {
+    margin-top: 24px;
+}
+
 @keyframes overlayFadeIn {
     from {
         opacity: 0;

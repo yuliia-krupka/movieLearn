@@ -14,6 +14,7 @@ import {
     TRANSCRIPTION_LIMIT
 } from '../hooks/useFlashCards.ts';
 import {learningSetService} from '../../services/learningSetService';
+import learningCat from '../../assets/learning-cat.png';
 
 const UpdateFlashCards: React.FC = () => {
     const {id: routeId} = useParams<{ id: string }>();
@@ -80,7 +81,7 @@ const UpdateFlashCards: React.FC = () => {
                 <div className="generating-overlay">
                     <div className="generating-content">
                         <img
-                            src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM21td2NsNGkybmhyZWVzcm52N2g2bXd0d3JoY3J5Zm5jNHZtNXI4cCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/XnjBmkLXUPJQwJW4pp/giphy.gif"
+                            src={learningCat}
                             alt="Regenerating content..."
                             className="generating-gif"
                         />
@@ -88,6 +89,7 @@ const UpdateFlashCards: React.FC = () => {
                         <p className="generating-text">
                             Personalizing your vocabulary set based on your feedback.
                         </p>
+                        <Spin size="large" className="generating-spinner"/>
                     </div>
                 </div>
             )}

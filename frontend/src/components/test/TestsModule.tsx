@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import TestCard from './TestCard';
 import ResultsPage from '../flash-card/ResultsPage';
 import MainLayout from '../layout/MainLayout';
-import {Result, Button} from 'antd';
+import {Result, Button, Spin} from 'antd';
 import '../layout/Layout.css';
 import './Test.css';
 import '../movie/MovieDetails.css';
@@ -13,6 +13,7 @@ import type {TestItemData, LearningSetDto, ItemStatusDto} from '../../types/lear
 import {useAuth} from '../auth/useAuth';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import {shuffleAnswers} from '../../utils/testUtils';
+import learningCat from '../../assets/learning-cat.png';
 
 const TestsModule: React.FC = () => {
     const location = useLocation();
@@ -155,7 +156,7 @@ const TestsModule: React.FC = () => {
                 <div className="generating-overlay">
                     <div className="generating-content">
                         <img
-                            src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM21td2NsNGkybmhyZWVzcm52N2g2bXd0d3JoY3J5Zm5jNHZtNXI4cCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/XnjBmkLXUPJQwJW4pp/giphy.gif"
+                            src={learningCat}
                             alt="Preparing Tests..."
                             className="generating-gif"
                         />
@@ -163,6 +164,7 @@ const TestsModule: React.FC = () => {
                         <p className="generating-text">
                             This may take a moment.
                         </p>
+                        <Spin size="large" className="generating-spinner"/>
                     </div>
                 </div>
             </MainLayout>
