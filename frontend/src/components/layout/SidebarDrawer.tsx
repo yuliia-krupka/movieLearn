@@ -65,21 +65,6 @@ const SidebarDrawer: React.FC<Props> = ({open, onClose, isAdmin, messageApi}) =>
                     >
                         Log Out
                     </Button>
-                    <div className="tmdb-attribution" style={{
-                        textAlign: 'center',
-                        fontSize: '9px',
-                        color: 'rgba(0, 0, 0, 0.45)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '4px',
-                        padding: '0 10px'
-                    }}>
-                        <img
-                            src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg"
-                            alt="TMDB Logo" style={{height: '10px', opacity: 0.8}}/>
-                        <span>This product uses the TMDB API but is not endorsed or certified by TMDB.</span>
-                    </div>
                 </div>
             </div>
         </Drawer>

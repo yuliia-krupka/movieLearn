@@ -1,5 +1,12 @@
-import type { MenuProps } from "antd";
-import { BarChartOutlined, HomeOutlined, UserOutlined, VideoCameraOutlined, DashboardOutlined } from "@ant-design/icons";
+import type {MenuProps} from "antd";
+import {
+    BarChartOutlined,
+    HomeOutlined,
+    UserOutlined,
+    VideoCameraOutlined,
+    DashboardOutlined,
+    InfoCircleOutlined
+} from "@ant-design/icons";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -25,33 +32,39 @@ export const getMenuItems = (
     return [
         (!isAdmin ? {
             key: "/home",
-            icon: <HomeOutlined />,
+            icon: <HomeOutlined/>,
             label: "Home",
             onClick: () => handleClick("/home"),
         } : null),
         {
             key: "/movies",
-            icon: <VideoCameraOutlined />,
+            icon: <VideoCameraOutlined/>,
             label: "Movies List",
             onClick: () => handleClick("/movies"),
         },
         (isAdmin ? {
             key: "/admin",
-            icon: <DashboardOutlined />,
+            icon: <DashboardOutlined/>,
             label: "Admin Panel",
             onClick: () => handleClick("/admin"),
         } : null),
         {
             key: "/account",
-            icon: <UserOutlined />,
+            icon: <UserOutlined/>,
             label: "Account",
             onClick: () => handleClick("/account"),
         },
         (!isAdmin ? {
             key: "/statistics",
-            icon: <BarChartOutlined />,
+            icon: <BarChartOutlined/>,
             label: "Statistics",
             onClick: () => handleClick("/statistics"),
         } : null),
+        {
+            key: "/about",
+            icon: <InfoCircleOutlined/>,
+            label: "About",
+            onClick: () => handleClick("/about"),
+        },
     ].filter(Boolean) as MenuItem[];
 };

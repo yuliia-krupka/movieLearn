@@ -1,0 +1,95 @@
+.about-page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: var(--space-10) var(--space-6);
+}
+
+.about-header {
+    text-align: center;
+    margin-bottom: var(--space-10);
+}
+
+.about-header h1 {
+    font-size: 2rem;
+    margin-bottom: var(--space-2);
+}
+
+.about-header .app-title-movie {
+    color: var(--color-primary);
+}
+
+.about-header .app-title-learn {
+    color: var(--color-accent);
+}
+
+.about-header p {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.about-section {
+    background: var(--color-bg);
+    border-radius: var(--radius-card);
+    padding: var(--space-8);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-6);
+}
+
+.about-section h2 {
+    font-size: 1.15rem;
+    margin-bottom: var(--space-4);
+    color: var(--color-text-strong);
+}
+
+.about-section p {
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-3);
+}
+
+.about-section p:last-child {
+    margin-bottom: 0;
+}
+
+.tmdb-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-5);
+}
+
+.tmdb-logo {
+    height: 24px;
+    opacity: 0.9;
+}
+
+.tmdb-section .tmdb-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.tmdb-section .tmdb-text p {
+    margin: 0;
+}
+
+.tmdb-disclaimer {
+    font-style: italic;
+    color: var(--color-text-subtle) !important;
+    font-size: 0.9rem;
+}
+
+.tmdb-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-primary);
+    font-weight: 500;
+    transition: var(--transition-fast);
+}
+
+.tmdb-link:hover {
+    color: var(--color-primary-hover);
+}

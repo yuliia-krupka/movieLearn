@@ -23,6 +23,7 @@ const AccessDenied = React.lazy(() => import("./components/err/AccessDenied.tsx"
 const UpdateFlashCards = React.lazy(() => import("./components/flash-card/UpdateFlashCards.tsx"));
 const AdminMoviesList = React.lazy(() => import("./components/movie/AdminMoviesList.tsx"));
 const ProgressDashboard = React.lazy(() => import("./components/stats/ProgressDashboard.tsx"));
+const About = React.lazy(() => import("./components/about/About.tsx"));
 
 const SuspenseFallback = (
     <div style={{padding: '40px', maxWidth: '800px', margin: '0 auto'}}>
@@ -168,6 +169,14 @@ function App() {
                                 element={
                                     <ProtectedRoute requireAuth={true} requireUser={true} requireOnboarding={true}>
                                         <ProgressDashboard/>
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/about"
+                                element={
+                                    <ProtectedRoute requireAuth={true}>
+                                        <About/>
                                     </ProtectedRoute>
                                 }
                             />
