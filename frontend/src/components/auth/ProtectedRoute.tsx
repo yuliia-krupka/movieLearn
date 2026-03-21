@@ -47,5 +47,14 @@ export const ProtectedRoute = ({
         );
     }
 
+    const isUnauthenticated = requireAuth && !isAuthenticated;
+    const isNotAdmin = requireAdmin && !isAdmin;
+    const isNotUser = requireUser && isAdmin;
+    const isMissingOnboarding = requireOnboarding && isAuthenticated && user && !isAdmin && (!user.englishLevel || !user.interests || user.interests.length === 0);
+
+    if (isUnauthenticated || isNotAdmin || isNotUser || isMissingOnboarding) {
+        return null;
+    }
+
     return <>{children}</>;
 };
