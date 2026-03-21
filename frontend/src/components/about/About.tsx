@@ -1,8 +1,9 @@
 import React from 'react';
-import {LinkOutlined} from '@ant-design/icons';
+import {LinkOutlined, MailOutlined} from '@ant-design/icons';
 import MainLayout from '../layout/MainLayout';
 import './About.css';
 import Logo from "../shared/Logo.tsx";
+import LogoDesign from "../shared/LogoDesign.tsx";
 
 const TMDB_LOGO_URL =
     'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_long_2-9665a76b1ae401a510ec1e0ca40ddcb3b0cfe45f1d51b77a308fea0845885648.svg';
@@ -12,8 +13,8 @@ const About: React.FC = () => {
         <MainLayout>
             <div className="about-page">
                 <div className="about-header">
+                    <LogoDesign className="about-logo-design"/>
                     <Logo level={1}/>
-                    <p>Learn English from the scripts of your favorite movies!</p>
                 </div>
 
                 <div className="about-section">
@@ -24,9 +25,8 @@ const About: React.FC = () => {
                         personalized flash cards and tests based on movie dialogues.
                     </p>
                     <p>
-                        The application currently uses manually created scripts of movies that are in the public domain
-                        in both the
-                        United States and Ukraine (for educational purposes only).
+                        The application currently uses manually created scripts of movies that are in the public
+                        domain, <b>(for educational purposes only)</b>.
                     </p>
                 </div>
 
@@ -56,6 +56,28 @@ const About: React.FC = () => {
                                 TMDB API Terms of Use <LinkOutlined/>
                             </a>.
                         </p>
+                    </div>
+                </div>
+
+                <div className="about-section">
+                    <h2>University Project</h2>
+                    <p>
+                        MovieLearn is a diploma project developed at
+                        Vasyl Stefanyk Carpathian National University (CNU), Ivano-Frankivsk, Ukraine.
+                        The project was created as part of a bachelor's degree program in Software Engineering.
+                    </p>
+                </div>
+
+                <div className="about-section">
+                    <h2>Contact</h2>
+                    <p>If you have any questions, suggestions, or feedback, feel free to reach out:</p>
+                    <div className="contact-list">
+                        <a href="mailto:yuliavikakrupka@gmail.com" className="contact-item">
+                            <MailOutlined/> yuliavikakrupka@gmail.com
+                        </a>
+                        <a href="mailto:yuliia.krupka.22@pnu.edu.ua" className="contact-item">
+                            <MailOutlined/> yuliia.krupka.22@pnu.edu.ua
+                        </a>
                     </div>
                 </div>
             </div>

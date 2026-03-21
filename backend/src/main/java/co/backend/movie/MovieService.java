@@ -77,6 +77,13 @@ public class MovieService {
         movie.setTitle(movieDto.getTitle());
         movie.setTmdbId(movieDto.getTmdbId());
 
+        if (movieDto.getPosterPath() != null) {
+            movie.setPosterPath(movieDto.getPosterPath());
+        }
+        if (movieDto.getOverview() != null) {
+            movie.setOverview(movieDto.getOverview());
+        }
+
         List<Genre> genreList = new ArrayList<>();
         if (movieDto.getGenres() != null) {
             for (String genreName : movieDto.getGenres()) {
@@ -131,6 +138,12 @@ public class MovieService {
 
             if (movieDto.getTmdbId() != null) {
                 movie.setTmdbId(movieDto.getTmdbId());
+            }
+            if (movieDto.getPosterPath() != null) {
+                movie.setPosterPath(movieDto.getPosterPath());
+            }
+            if (movieDto.getOverview() != null) {
+                movie.setOverview(movieDto.getOverview());
             }
 
             if (movieDto.getGenres() != null) {

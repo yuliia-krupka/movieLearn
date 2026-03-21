@@ -7,7 +7,6 @@ import {
     Card,
     Space,
     Spin,
-
     Row,
     Col,
     Image
@@ -44,6 +43,8 @@ const UpdateMovieForm: React.FC = () => {
         setCurrentImageUrl,
         setCurrentScriptInfo,
         setTmdbId,
+        setTmdbPosterPath,
+        setTmdbOverview,
 
         genres,
         genresLoading,
@@ -75,12 +76,12 @@ const UpdateMovieForm: React.FC = () => {
                 form.setFieldsValue({
                     genres: [...currentGenres, genreData.name]
                 });
-                messageApi.success('Genre added successfully');
+                void messageApi.success('Genre added successfully');
                 setAddGenreModalVisible(false);
             }
         } catch (error) {
             const errorMsg = ErrorHandler.handleAxiosError(error, `Genre "${genreData.name}" already exists.`);
-            messageApi.error(errorMsg);
+            void messageApi.error(errorMsg);
         } finally {
             setAddingGenre(false);
         }
@@ -189,9 +190,11 @@ const UpdateMovieForm: React.FC = () => {
                                             <Form.Item label="Relink TMDB Movie (Optional)">
                                                 <TMDBSearch onSelectMovie={(m) => {
                                                     setTmdbId(m.id);
+                                                    setTmdbPosterPath(m.backdrop_path || m.poster_path);
+                                                    setTmdbOverview(m.overview);
                                                     setCurrentImageUrl(getMovieImageUrl(m));
                                                     form.setFieldsValue({title: m.title});
-                                                    messageApi.success('TMDB Movie Selected. Remember to Save Changes!');
+                                                    void messageApi.success('TMDB Movie Selected. Remember to Save Changes!');
                                                 }}/>
                                             </Form.Item>
                                             {currentImageUrl && (
@@ -226,9 +229,11 @@ const UpdateMovieForm: React.FC = () => {
                                                             <FileOutlined className="selected-icon-inner"/>
                                                         </div>
                                                         <div className="selected-file-info">
-                                                            <p className="selected-file-name script-info-filename">Current Script</p>
+                                                            <p className="selected-file-name script-info-filename">Current
+                                                                Script</p>
                                                             <div className="script-info-details">
-                                                                <span className="selected-file-size script-info-status">Active</span>
+                                                                <span
+                                                                    className="selected-file-size script-info-status">Active</span>
                                                                 <Button
                                                                     type="link"
                                                                     size="small"

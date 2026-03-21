@@ -23,6 +23,12 @@ public class Movie {
 
     private Integer tmdbId;
 
+    @Column(name = "poster_path")
+    private String posterPath;
+
+    @Column(columnDefinition = "TEXT")
+    private String overview;
+
     @Lob
     @Basic(fetch = FetchType.LAZY)
     @Column(columnDefinition = "LONGBLOB")

@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Card} from 'antd';
 import {useNavigate} from 'react-router-dom';
-import {tmdbService, getMovieImageUrl, type TMDBMovie} from '../../services/tmdbService';
+import {getImageUrl} from '../../services/tmdbService';
 import './MovieCard.css';
 import './movies.css';
 
@@ -15,21 +15,12 @@ interface MovieCardProps {
 
 const MovieCard: React.FC<MovieCardProps> = React.memo(({movie}) => {
     const navigate = useNavigate();
-    const [tmdbMovie, setTmdbMovie] = useState<TMDBMovie | null>(null);
-
-    useEffect(() => {
-        if (movie.tmdbId) {
-            tmdbService.getMovieDetails(movie.tmdbId)
-                .then(setTmdbMovie)
-                .catch(console.error);
-        }
-    }, [movie.tmdbId]);
 
     const handleClick = () => {
         navigate(`/movies/${movie.id}`);
     };
 
-    const imageSource = getMovieImageUrl(tmdbMovie);
+    const imageSource = getImageUrl(movie.posterPath || null);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -38,7 +29,7 @@ const MovieCard: React.FC<MovieCardProps> = React.memo(({movie}) => {
         }
     };
 
-    const descriptionText = tmdbMovie?.overview || '';
+    const descriptionText = movie.overview || '';
 
     return (
         <Card

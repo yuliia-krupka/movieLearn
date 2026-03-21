@@ -12,6 +12,7 @@ import {progressService} from '../../services/progressService';
 import type {TestItemData, LearningSetDto, ItemStatusDto} from '../../types/learningSet';
 import {useAuth} from '../auth/useAuth';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import {ErrorHandler} from '../err/ErrorHandler';
 import {shuffleAnswers} from '../../utils/testUtils';
 import learningCat from '../../assets/learning-cat.png';
 
@@ -78,7 +79,8 @@ const TestsModule: React.FC = () => {
 
                 setTestItems(shuffledItems);
             } catch (err: unknown) {
-                setError(err instanceof Error ? err.message : 'Failed to load test');
+                const message = ErrorHandler.handleAxiosError(err, 'Failed to generate tests. Please try again.');
+                setError(message);
             } finally {
                 setLoading(false);
             }

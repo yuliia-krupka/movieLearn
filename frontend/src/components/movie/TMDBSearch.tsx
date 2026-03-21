@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import {Input, Spin, List, Typography} from 'antd';
 import {SearchOutlined} from '@ant-design/icons';
 import {tmdbService, type TMDBMovie, getMovieImageUrl} from '../../services/tmdbService';
+import {useDebounce} from '../hooks/useDebounce';
 import './TMDBSearch.css';
 
 const {Text} = Typography;
@@ -31,22 +32,39 @@ const TMDBSearch: React.FC<TMDBSearchProps> = ({onSelectMovie, initialQuery = ''
         };
     }, []);
 
+    const debouncedQuery = useDebounce(query, 500);
+
     useEffect(() => {
-        const delaySearch = setTimeout(async () => {
-            if (query.length > 2) {
+        let isMounted = true;
+
+        const performSearch = async () => {
+            if (debouncedQuery.length > 2) {
                 setLoading(true);
-                const searchResults = await tmdbService.searchMovies(query);
-                setResults(searchResults);
-                setDropdownVisible(true);
-                setLoading(false);
+                try {
+                    const searchResults = await tmdbService.searchMovies(debouncedQuery);
+                    if (isMounted) {
+                        setResults(searchResults);
+                        setDropdownVisible(true);
+                        setLoading(false);
+                    }
+                } catch (error) {
+                    if (isMounted) {
+                        setLoading(false);
+                        console.error("TMDB Search Error:", error);
+                    }
+                }
             } else {
                 setResults([]);
                 setDropdownVisible(false);
             }
-        }, 500);
+        };
 
-        return () => clearTimeout(delaySearch);
-    }, [query]);
+        void performSearch();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [debouncedQuery]);
 
     const handleSelect = (movie: TMDBMovie) => {
         onSelectMovie(movie);

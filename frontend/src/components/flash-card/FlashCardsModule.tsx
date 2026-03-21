@@ -10,6 +10,7 @@ import {progressService} from '../../services/progressService';
 import type {FlashCardData, ItemStatusDto, LearningSetDto} from '../../types/learningSet';
 import {useAuth} from '../auth/useAuth';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import {ErrorHandler} from '../err/ErrorHandler';
 
 interface FlashCardsModuleProps {
     movieId?: number;
@@ -58,7 +59,8 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                     setError('User not authenticated');
                 }
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'Failed to load flashcards');
+                const message = ErrorHandler.handleAxiosError(err, 'Failed to generate flashcards. Please try again.');
+                setError(message);
             } finally {
                 setLoading(false);
             }

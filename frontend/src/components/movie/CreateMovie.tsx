@@ -47,12 +47,12 @@ const CreateMovieForm: React.FC = () => {
         try {
             const success = await addGenre(values);
             if (success) {
-                customMessage.success('Genre added successfully!');
+                void customMessage.success('Genre added successfully!');
                 setIsGenreModalVisible(false);
             }
         } catch (error) {
             const message = ErrorHandler.handleAxiosError(error, `Genre "${values.name}" already exists.`);
-            customMessage.error(message);
+            void customMessage.error(message);
         } finally {
             setAddingGenre(false);
         }
@@ -61,7 +61,7 @@ const CreateMovieForm: React.FC = () => {
 
     const validateUploadedFiles = (): boolean => {
         if (!selectedTmdbMovie) {
-            customMessage.error("Please search and select a movie from TMDB.");
+            void customMessage.error("Please search and select a movie from TMDB.");
             return false;
         }
         return scriptUpload.validateFile();
@@ -71,6 +71,8 @@ const CreateMovieForm: React.FC = () => {
         movieData: {
             title: string;
             tmdbId: number | undefined;
+            posterPath: string | null | undefined;
+            overview: string | undefined;
             genres: string[];
         };
         script?: File | Blob;
@@ -80,6 +82,8 @@ const CreateMovieForm: React.FC = () => {
         const movieData = {
             title: values.title,
             tmdbId: selectedTmdbMovie?.id,
+            posterPath: selectedTmdbMovie?.backdrop_path || selectedTmdbMovie?.poster_path,
+            overview: selectedTmdbMovie?.overview,
             genres: values.genres,
         };
         const payload: MoviePayload = {movieData};
@@ -91,7 +95,7 @@ const CreateMovieForm: React.FC = () => {
 
     const submitMovieData = async (payload: MoviePayload) => {
         const createdMovie = await movieService.create(payload);
-        customMessage.success('Movie created successfully!');
+        void customMessage.success('Movie created successfully!');
         return createdMovie;
     };
 
@@ -104,7 +108,7 @@ const CreateMovieForm: React.FC = () => {
             navigate(`/movies/${createdMovie.id}`);
         } catch (error) {
             const message = ErrorHandler.handleAxiosError(error, 'A movie with this title already exists.');
-            customMessage.error(message);
+            void customMessage.error(message);
         } finally {
             setSubmitting(false);
         }

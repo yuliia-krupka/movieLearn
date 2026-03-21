@@ -15,6 +15,8 @@ const useUpdateMovie = () => {
     const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
     const [currentScriptInfo, setCurrentScriptInfo] = useState<{ name: string, size: string } | null>(null);
     const [tmdbId, setTmdbId] = useState<number | null>(null);
+    const [tmdbPosterPath, setTmdbPosterPath] = useState<string | null>(null);
+    const [tmdbOverview, setTmdbOverview] = useState<string | null>(null);
 
     const navigate = useNavigate();
     const {id} = useParams<{ id: string }>();
@@ -53,6 +55,8 @@ const useUpdateMovie = () => {
 
                 if (movieData.tmdbId) {
                     setTmdbId(movieData.tmdbId);
+                    setTmdbPosterPath(movieData.posterPath || null);
+                    setTmdbOverview(movieData.overview || null);
                     try {
                         const tmdbService = (await import('../../services/tmdbService')).tmdbService;
                         const getMovieImageUrl = (await import('../../services/tmdbService')).getMovieImageUrl;
@@ -107,6 +111,8 @@ const useUpdateMovie = () => {
             const movieData = {
                 title: values.title,
                 tmdbId: form.getFieldValue("tmdbId") || tmdbId,
+                posterPath: tmdbPosterPath,
+                overview: tmdbOverview,
                 genres: values.genres
             };
 
@@ -197,6 +203,10 @@ const useUpdateMovie = () => {
         setCurrentScriptInfo,
         tmdbId,
         setTmdbId,
+        tmdbPosterPath,
+        setTmdbPosterPath,
+        tmdbOverview,
+        setTmdbOverview,
 
         genres,
         genresLoading,

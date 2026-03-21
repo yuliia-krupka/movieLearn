@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Button, Pagination, Spin, Row, Col, message} from 'antd';
+import {Button, Pagination, Spin, Row, Col} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
 import MainLayout from '../layout/MainLayout.tsx';
@@ -7,11 +7,13 @@ import AdminMovieCard from './AdminMovieCard';
 import {useMovies} from '../hooks/useMovies';
 import axios from 'axios';
 import {movieService} from '../../services/movieService';
+import useMessage from 'antd/es/message/useMessage';
 import './AdminMoviesList.css';
 
 const AdminMoviesList: React.FC = () => {
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
+    const [messageApi, contextHolder] = useMessage();
 
     const emptyGenres = React.useMemo(() => [], []);
 
@@ -24,7 +26,7 @@ const AdminMoviesList: React.FC = () => {
     const handleDelete = async (id: number) => {
         try {
             await movieService.delete(id);
-            message.success('Movie deleted successfully');
+            void messageApi.success('Movie deleted successfully');
             void fetchMovies();
         } catch (error) {
             console.error('Error deleting movie:', error);
@@ -38,7 +40,7 @@ const AdminMoviesList: React.FC = () => {
                     errorMsg = (responseData as { message: string }).message;
                 }
             }
-            message.error(errorMsg);
+            void messageApi.error(errorMsg);
         }
     };
 
@@ -48,6 +50,7 @@ const AdminMoviesList: React.FC = () => {
 
     return (
         <MainLayout className="content-movies admin-movies-layout">
+            {contextHolder}
             <div className="admin-movies-container">
                 <div className="admin-movies-header">
                     <div>
@@ -90,6 +93,7 @@ const AdminMoviesList: React.FC = () => {
                                     pageSize={pageSize}
                                     onChange={setCurrentPage}
                                     showSizeChanger={false}
+                                    hideOnSinglePage={true}
                                     style={{margin: 0}}
                                 />
                             </div>

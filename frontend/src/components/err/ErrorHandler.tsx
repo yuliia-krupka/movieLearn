@@ -9,13 +9,17 @@ export class ErrorHandler {
         return status === 409 || message.toLowerCase().includes('already exists');
     }
 
-    static getErrorMessage(error: AxiosError<ErrorResponse>, duplicateMessage: string): string {
-        if (this.isDuplicateError(error)) {
+    static getErrorMessage(error: AxiosError<ErrorResponse | string>, duplicateMessage: string): string {
+        if (this.isDuplicateError(error as AxiosError<ErrorResponse>)) {
             return duplicateMessage;
+        }
+        const status = error.response?.status;
+        if (status === 500) {
+            return 'An unexpected error occurred. Please try again.';
         }
         const data = error.response?.data;
         if (data && typeof data === 'object' && 'message' in data) {
-            return (data as { message: string }).message || 'An unexpected error occurred.';
+            return (data as ErrorResponse).message || 'An unexpected error occurred. Please try again.';
         }
         if (typeof data === 'string') {
             return data;
@@ -24,7 +28,7 @@ export class ErrorHandler {
     }
 
     static handleAxiosError(error: unknown, duplicateMessage: string): string {
-        const axiosError = error as AxiosError<ErrorResponse>;
+        const axiosError = error as AxiosError<ErrorResponse | string>;
 
         if (axiosError.response) {
             return this.getErrorMessage(axiosError, duplicateMessage);

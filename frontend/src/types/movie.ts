@@ -2,18 +2,27 @@ export interface Movie {
     id: number;
     title: string;
     tmdbId: number;
+    posterPath?: string;
+    backdropPath?: string;
+    overview?: string;
     genres: string[];
 }
 
 export interface MovieFormData {
     title: string;
     tmdbId: number;
+    posterPath?: string;
+    backdropPath?: string;
+    overview?: string;
     genres: string[];
 }
 
 export interface FormValues {
     title: string;
     tmdbId: number;
+    posterPath?: string;
+    backdropPath?: string;
+    overview?: string;
     genres: string[];
 }
 
@@ -25,5 +34,8 @@ export interface MovieDetails {
     id: number;
     title: string;
     tmdbId: number;
+    posterPath?: string;
+    backdropPath?: string;
+    overview?: string;
     genres: string[];
 }
