@@ -6,7 +6,7 @@ build/
 !**/src/test/**/build/
 
 .env
-
+deploy.sh
 ### STS ###
 .apt_generated
 .classpath

@@ -1,7 +1,8 @@
 import {useNavigate} from 'react-router-dom';
-import {message} from 'antd';
+import {message, Spin} from 'antd';
 import {useEffect, type ReactNode} from 'react';
 import {useAuth} from "./useAuth.tsx";
+import "./ProtectedRoute.css";
 
 export const ProtectedRoute = ({
                                    children,
@@ -39,7 +40,11 @@ export const ProtectedRoute = ({
     }, [isAuthenticated, isAdmin, isLoading, requireAuth, requireAdmin, requireUser, requireOnboarding, user, navigate]);
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="protected-route-loader">
+                <Spin size="large"/>
+            </div>
+        );
     }
 
     return <>{children}</>;

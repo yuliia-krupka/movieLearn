@@ -29,5 +29,9 @@
 # Logs
 *.log
 
+# CDK
+**/cdk.out/
+
+deploy.sh
 # Misc
 *.xml

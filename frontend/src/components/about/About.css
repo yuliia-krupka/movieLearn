@@ -1,3 +1,8 @@
+.about-page,
+.about-page * {
+    box-sizing: border-box;
+}
+
 .about-page {
     max-width: 900px;
     margin: 0 auto;
@@ -5,6 +10,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-6);
+    width: 100%;
 }
 
 .about-header {
@@ -12,9 +18,11 @@
     text-align: center;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .about-page {
         grid-template-columns: 1fr;
+        padding: var(--space-6) var(--space-4);
+        gap: var(--space-4);
     }
 }
 
@@ -24,7 +32,8 @@
 }
 
 .about-logo-design {
-    width: 140px;
+    max-width: 140px;
+    width: 100%;
     height: auto;
     margin-bottom: var(--space-2);
 }
@@ -48,6 +57,17 @@
     border-radius: var(--radius-card);
     padding: var(--space-8);
     box-shadow: var(--shadow-sm);
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .about-section {
+        padding: var(--space-5) var(--space-4);
+    }
+
+    .about-header h1 {
+        font-size: 1.5rem;
+    }
 }
 
 .about-section h2 {
@@ -76,8 +96,10 @@
 }
 
 .tmdb-logo {
+    max-width: 100%;
     height: 24px;
     opacity: 0.9;
+    object-fit: contain;
 }
 
 .tmdb-section .tmdb-text {
@@ -115,6 +137,7 @@
     flex-direction: column;
     gap: var(--space-3);
     margin-top: var(--space-3);
+    width: 100%;
 }
 
 .contact-item {
@@ -124,6 +147,9 @@
     color: var(--color-primary);
     font-weight: 500;
     transition: var(--transition-fast);
+    overflow-wrap: break-word;
+    word-break: break-all;
+    max-width: 100%;
 }
 
 .contact-item:hover {

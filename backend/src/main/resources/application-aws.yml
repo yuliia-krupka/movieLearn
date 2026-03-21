@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            redirect-uri: ${FRONTEND_URL}/login/oauth2/code/google
+
+frontend:
+  url: ${FRONTEND_URL}
+
+cors:
+  allowed-origins: ${FRONTEND_URL}
+
+logging:
+  level:
+    co.backend: INFO
