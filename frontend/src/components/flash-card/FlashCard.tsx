@@ -98,8 +98,14 @@ const FlashCard: React.FC<FlashCardProps> = ({
             </div>
 
             <div className="card-area">
-                {hasPrevious && <button className="nav-button nav-prev" onClick={handlePrevious}
-                                        aria-label="Previous card">&#10094;</button>}
+                <button
+                    className={`nav-button nav-prev ${!hasPrevious ? 'nav-button-disabled' : ''}`}
+                    onClick={handlePrevious}
+                    aria-label="Previous card"
+                    disabled={!hasPrevious}
+                >
+                    &#10094;
+                </button>
 
                 <div
                     className="card-wrapper"
@@ -142,8 +148,14 @@ const FlashCard: React.FC<FlashCardProps> = ({
                     </div>
                 </div>
 
-                {hasNext && <button className="nav-button nav-next" onClick={handleNext}
-                                    aria-label="Next card">&#10095;</button>}
+                <button
+                    className={`nav-button nav-next ${!hasNext ? 'nav-button-disabled' : ''}`}
+                    onClick={handleNext}
+                    aria-label="Next card"
+                    disabled={!hasNext}
+                >
+                    &#10095;
+                </button>
             </div>
 
             <div className="actions">
