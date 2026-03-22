@@ -61,10 +61,6 @@ export class Backend extends Construct {
             },
             taskSubnets: {subnetType: ec2.SubnetType.PUBLIC},
             taskImageOptions: {
-                // image: ecs.ContainerImage.fromAsset('../backend', {
-                //           platform: ecr_assets.Platform.LINUX_ARM64,
-                //
-                //    }),
                 image: ecs.ContainerImage.fromEcrRepository(props.repository, props.imageTag ?? 'latest'),
                 containerPort: 8080,
                 environment: {

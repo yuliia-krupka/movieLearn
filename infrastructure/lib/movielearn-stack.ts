@@ -1,10 +1,12 @@
 import * as cdk from 'aws-cdk-lib';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import {Construct} from 'constructs';
 import {Network} from './constructs/network';
 import {Database} from './constructs/database';
 import {Backend} from './constructs/backend';
 import {Frontend} from './constructs/frontend';
+import {Bastion} from './constructs/bastion';
 
 export class MovieLearnStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -18,6 +20,13 @@ export class MovieLearnStack extends cdk.Stack {
         const database = new Database(this, 'Database', {
             vpc: network.vpc,
         });
+
+        const bastion = new Bastion(this, 'Bastion', {
+            vpc: network.vpc,
+        });
+
+        // Allow bastion to reach RDS on MySQL port
+        database.instance.connections.allowFrom(bastion.host, ec2.Port.tcp(3306), 'Allow MySQL from Bastion');
 
         const imageTag = process.env.IMAGE_TAG ?? 'latest';
 
@@ -50,6 +59,9 @@ export class MovieLearnStack extends cdk.Stack {
         });
         new cdk.CfnOutput(this, 'EcrRepositoryUri', {
             value: repository.repositoryUri,
+        });
+        new cdk.CfnOutput(this, 'BastionInstanceId', {
+            value: bastion.host.instanceId,
         });
     }
 }
