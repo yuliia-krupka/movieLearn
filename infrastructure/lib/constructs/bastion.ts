@@ -13,10 +13,11 @@ export class Bastion extends Construct {
 
         // BastionHostLinux automatically attaches AmazonSSMManagedInstanceCore,
         // enabling SSM Session Manager access without any open inbound ports or SSH keys.
+        // Default instance type is t3.nano (x86) — broad AZ availability
         this.host = new ec2.BastionHostLinux(this, 'Host', {
             vpc: props.vpc,
             subnetSelection: {subnetType: ec2.SubnetType.PUBLIC},
-            instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.NANO),
+            // instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.NANO),
         });
     }
 }

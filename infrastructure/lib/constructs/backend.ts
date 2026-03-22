@@ -90,6 +90,7 @@ export class Backend extends Construct {
             timeout: cdk.Duration.seconds(5),
         });
         this.fargateService.targetGroup.setAttribute('deregistration_delay.timeout_seconds', '30');
+        this.fargateService.loadBalancer.setAttribute('idle_timeout.timeout_seconds', '120');
 
         // Allow ECS tasks to access RDS
         props.database.connections.allowFrom(this.fargateService.service, ec2.Port.tcp(3306), 'Allow MySQL from Fargate');
