@@ -5,18 +5,12 @@
     margin: 10px;
     background-color: var(--color-bg);
     border-radius: var(--radius-sm);
-    overflow: hidden;
     flex: 1;
     min-height: 0;
 }
 
 .results-content.ant-layout-content {
-    overflow: hidden;
-}
-
-.results-content ~ *,
-.results-content {
-    overflow: hidden;
+    overflow: visible;
 }
 
 .account-root-layout:has(.results-content) {
@@ -32,9 +26,7 @@
 .results-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
     padding: 0 24px;
-    overflow: hidden;
     width: 100%;
 }
 
@@ -343,5 +335,13 @@
 
     .results-title-refine-btn {
         align-self: flex-start;
+    }
+
+    /* Natural scrolling for mobile */
+    .results-container,
+    .results-list {
+        height: auto !important;
+        overflow: visible !important;
+        flex: none !important;
     }
 }

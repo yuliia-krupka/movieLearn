@@ -45,6 +45,8 @@ const TopBar: React.FC = () => {
                         size="small"
                         src={user ? `/api/users/photo/${user.id}` : undefined}
                         className="topbar-avatar"
+                        onClick={() => navigate("/account")}
+                        style={{cursor: 'pointer'}}
                     >
                         {!user?.photo && (user?.name?.[0] || '?')}
                     </Avatar>

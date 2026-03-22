@@ -47,6 +47,11 @@ const SidebarDrawer: React.FC<Props> = ({open, onClose, isAdmin, messageApi}) =>
                             src={user?.photo ? `/api/users/photo/${user.id}` : undefined}
                             icon={!user?.photo && <UserOutlined/>}
                             className="sidebar-avatar"
+                            onClick={() => {
+                                navigate("/account");
+                                onClose();
+                            }}
+                            style={{cursor: 'pointer'}}
                         />
                     </div>
 

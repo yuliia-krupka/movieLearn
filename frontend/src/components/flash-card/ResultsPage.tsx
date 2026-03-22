@@ -57,7 +57,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
     const statusMap = new Map(itemStatuses.map(s => [s.learningItemId, s.status]));
 
     return (
-        <MainLayout className="results-content" contentStyle={{height: 'calc(100vh - 64px)', overflow: 'hidden'}}>
+        <MainLayout className="results-content">
             <div className="results-container">
                 <div className="results-header">
                     {onBackToMovie && (
