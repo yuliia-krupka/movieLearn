@@ -28,6 +28,7 @@ const About: React.FC = () => {
                         The application currently uses manually created scripts of movies that are in the public
                         domain, <b>(for educational purposes only)</b>.
                     </p>
+                    <p>If you have any other information please contact us.</p>
                 </div>
 
                 <div className="about-section tmdb-section">
