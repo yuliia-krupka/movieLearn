@@ -14,6 +14,8 @@ public interface UserLearningSetRepository extends JpaRepository<UserLearningSet
 
     Optional<UserLearningSet> findByUserIdAndLearningSetMovieId(Long userId, Long movieId);
 
+    void deleteByUserIdAndLearningSetMovieId(Long userId, Long movieId);
+
     @Query("SELECT uls FROM UserLearningSet uls " +
             "JOIN FETCH uls.learningSet ls " +
             "LEFT JOIN FETCH ls.movie " +

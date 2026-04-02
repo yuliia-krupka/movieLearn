@@ -1,5 +1,6 @@
 package co.backend.userLearningSet;
 
+import co.backend.exceptions.NotFoundException;
 import co.backend.learningSet.LearningSetRepository;
 import co.backend.user.UserRepository;
 import co.backend.userLearningItemStatus.UserLearningItemStatus;
@@ -39,12 +40,19 @@ public class UserLearningSetService {
     private UserLearningSet getOrCreateEntity(Long userId, Long learningSetId) {
         return userLearningSetRepository.findByUserIdAndLearningSetId(userId, learningSetId)
                 .orElseGet(() -> {
+                    LearningSet learningSet = learningSetRepository.findById(learningSetId)
+                            .orElseThrow(() -> new NotFoundException("Learning set not found"));
+
+                    if (learningSet.getMovie() != null) {
+                        Long movieId = learningSet.getMovie().getId();
+                        userLearningSetRepository.deleteByUserIdAndLearningSetMovieId(userId, movieId);
+                        log.debug("Cleaned up old UserLearningSet records for userId={}, movieId={}", userId, movieId);
+                    }
+
                     UserLearningSet uls = new UserLearningSet();
                     uls.setUser(userRepository.findById(userId)
-                            .orElseThrow(() -> new RuntimeException("User not found")));
-                    uls.setLearningSet(learningSetRepository.findById(learningSetId)
-                            .orElseThrow(() -> new RuntimeException(
-                                    "Learning set not found")));
+                            .orElseThrow(() -> new NotFoundException("User not found")));
+                    uls.setLearningSet(learningSet);
                     uls.setFlashcardsScore(0);
                     uls.setTestsScore(0);
                     return userLearningSetRepository.save(uls);
