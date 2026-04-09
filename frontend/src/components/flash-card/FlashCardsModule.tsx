@@ -59,7 +59,10 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                     setError('User not authenticated');
                 }
             } catch (err) {
-                const message = ErrorHandler.handleAxiosError(err, 'Failed to generate flashcards. Please try again.');
+                const isForbidden = ErrorHandler.isForbiddenError(err);
+                const message = isForbidden
+                    ? 'Access Denied: You do not have permission to access this learning set.'
+                    : ErrorHandler.handleAxiosError(err, 'Failed to generate flashcards. Please try again.');
                 setError(message);
             } finally {
                 setLoading(false);

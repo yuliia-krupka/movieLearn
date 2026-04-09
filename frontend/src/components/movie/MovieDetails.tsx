@@ -14,6 +14,7 @@ import './movies.css';
 import '../layout/Layout.css';
 import type {LearningSetDto} from "../../types/learningSet.ts";
 import {type MovieDetails} from '../../types/movie';
+import {ErrorHandler} from '../err/ErrorHandler.tsx';
 
 const MovieDetails: React.FC = () => {
         const {id} = useParams<{ id: string }>();
@@ -58,9 +59,13 @@ const MovieDetails: React.FC = () => {
                         const tmdbData = await tmdbService.getMovieDetails(data.tmdbId);
                         setTmdbMovie(tmdbData);
                     }
-                } catch {
+                } catch (err: unknown) {
+                    if (ErrorHandler.isForbiddenError(err)) {
+                        navigate('/access-denied', {replace: true});
+                        return;
+                    }
                     setErrorMsg('Error fetching movie');
-                    navigate('/movies');
+                    navigate('/home');
                 } finally {
                     setLoading(false);
                 }
@@ -79,7 +84,7 @@ const MovieDetails: React.FC = () => {
         const handleDeleteConfirm = () => {
             Modal.confirm({
                 title: 'Delete Movie',
-                icon: <ExclamationCircleOutlined />,
+                icon: <ExclamationCircleOutlined/>,
                 content: `Are you sure you want to permanently delete "${movie?.title}" and all associated flashcards?`,
                 okText: 'Yes, Delete',
                 okType: 'danger',
@@ -256,7 +261,7 @@ const MovieDetails: React.FC = () => {
                                             <Button danger type="primary" shape="circle" size="large"
                                                     icon={<DeleteOutlined/>}
                                                     title="Delete Movie"
-                                                    onClick={handleDeleteConfirm} />
+                                                    onClick={handleDeleteConfirm}/>
                                         )}
                                     </div>
                                 </div>

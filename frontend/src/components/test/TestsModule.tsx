@@ -79,7 +79,10 @@ const TestsModule: React.FC = () => {
 
                 setTestItems(shuffledItems);
             } catch (err: unknown) {
-                const message = ErrorHandler.handleAxiosError(err, 'Failed to generate tests. Please try again.');
+                const isForbidden = ErrorHandler.isForbiddenError(err);
+                const message = isForbidden
+                    ? 'Access Denied: You do not have permission to access this test.'
+                    : ErrorHandler.handleAxiosError(err, 'Failed to generate tests. Please try again.');
                 setError(message);
             } finally {
                 setLoading(false);

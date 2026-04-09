@@ -9,11 +9,19 @@ export class ErrorHandler {
         return status === 409 || message.toLowerCase().includes('already exists');
     }
 
+    static isForbiddenError(error: unknown): boolean {
+        const axiosError = error as AxiosError;
+        return axiosError.response?.status === 403;
+    }
+
     static getErrorMessage(error: AxiosError<ErrorResponse | string>, duplicateMessage: string): string {
         if (this.isDuplicateError(error as AxiosError<ErrorResponse>)) {
             return duplicateMessage;
         }
         const status = error.response?.status;
+        if (status === 403) {
+            return 'Access Denied: You do not have permission to access this resource.';
+        }
         if (status === 500) {
             return 'An unexpected error occurred. Please try again.';
         }

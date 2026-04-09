@@ -1,5 +1,7 @@
 import {useState, useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {message} from 'antd';
+import {ErrorHandler} from '../err/ErrorHandler.tsx';
 import {learningSetService} from '../../services/learningSetService.ts';
 import {learningItemService} from '../../services/learningItemService.ts';
 import {progressService} from '../../services/progressService.ts';
@@ -23,6 +25,7 @@ export const SENTENCE_LIMIT = 255;
 export const TRANSCRIPTION_LIMIT = 255;
 
 export const useFlashCards = (learningSetIdParam: string | undefined, currentUserId: number | undefined) => {
+    const navigate = useNavigate();
     const [learningSetId, setLearningSetId] = useState<number | null>(null);
     const [learningSet, setLearningSet] = useState<LearningSetDto | null>(null);
     const [flashcards, setFlashcards] = useState<EditableFlashCard[]>([]);
@@ -60,7 +63,12 @@ export const useFlashCards = (learningSetIdParam: string | undefined, currentUse
                 }
             } catch (error) {
                 console.error('Failed to load learning set:', error);
-                message.error('Failed to load flashcards');
+                if (ErrorHandler.isForbiddenError(error)) {
+                    navigate('/access-denied', {replace: true});
+                    return;
+                }
+                const msg = ErrorHandler.handleAxiosError(error, 'Failed to load flashcards');
+                message.error(msg);
             } finally {
                 setLoading(false);
             }
