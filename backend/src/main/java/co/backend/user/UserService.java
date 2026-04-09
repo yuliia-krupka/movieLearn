@@ -2,8 +2,6 @@ package co.backend.user;
 
 import co.backend.exceptions.*;
 import co.backend.learningSet.LearningSetRepository;
-import co.backend.movie.Movie;
-import co.backend.movie.MovieRepository;
 import co.backend.userLearningItemStatus.UserLearningItemStatusRepository;
 import co.backend.userLearningSet.UserLearningSetRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final MovieRepository movieRepository;
     private final UserMapper userMapper;
     private final LearningSetRepository learningSetRepository;
     private final UserLearningSetRepository userLearningSetRepository;
@@ -177,18 +174,6 @@ public class UserService {
 
         targetUser.setRole(role);
         userRepository.save(targetUser);
-    }
-
-    public void addMovieToUser(Long movieId, Long userId) {
-        Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(() -> new NotFoundException("Movie with id " + movieId + " not found"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
-        if (user.getMovies().contains(movie)) {
-            return;
-        }
-        user.getMovies().add(movie);
-        userRepository.save(user);
     }
 
     private byte[] downloadImage(String imageUrl) {

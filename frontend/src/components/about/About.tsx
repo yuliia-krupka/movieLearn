@@ -22,13 +22,23 @@ const About: React.FC = () => {
                     <p>
                         MovieLearn is a non-commercial, educational application designed to help users improve their
                         English language skills by studying vocabulary from movie scripts. Users can generate
-                        personalized flash cards and tests based on movie dialogues.
-                    </p>
-                    <p>
-                        The application currently uses manually created scripts of movies that are in the public
-                        domain, <b>(for educational purposes only)</b>.
+                        personalized flash cards and tests based on their own uploaded movie dialogues.
                     </p>
                     <p>If you have any other information please contact us.</p>
+                </div>
+
+                <div className="about-section">
+                    <h2>User Uploaded Content</h2>
+                    <p>
+                        This platform operates on a user-centric model where individuals upload their own scripts
+                        for processing. By using this service and uploading content, users explicitly confirm they
+                        have the right to use the provided materials for educational purposes.
+                    </p>
+                    <p>
+                        All generated learning sets and uploaded movie scripts are private and tied exclusively to the
+                        user who created them, ensuring personal data boundaries. We process this data solely to provide
+                        the learning functionality.
+                    </p>
                 </div>
 
                 <div className="about-section tmdb-section">

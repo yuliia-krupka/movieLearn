@@ -3,7 +3,7 @@ import {
     BarChartOutlined,
     HomeOutlined,
     UserOutlined,
-    VideoCameraOutlined,
+    PlusCircleOutlined,
     DashboardOutlined,
     InfoCircleOutlined
 } from "@ant-design/icons";
@@ -13,7 +13,6 @@ type MenuItem = Required<MenuProps>["items"][number];
 export const getMenuItems = (
     navigate: (path: string) => void,
     isAdmin: boolean,
-    message: (msg: string) => void,
     closeDrawer?: () => void
 ): MenuItem[] => {
     const navigateAndClose = (path: string) => {
@@ -22,10 +21,6 @@ export const getMenuItems = (
     };
 
     const handleClick = (key: string) => {
-        if (key === "/new-movie" && !isAdmin) {
-            message("Access denied: Admins only");
-            return;
-        }
         navigateAndClose(key);
     };
 
@@ -36,12 +31,12 @@ export const getMenuItems = (
             label: "Home",
             onClick: () => handleClick("/home"),
         } : null),
-        {
-            key: "/movies",
-            icon: <VideoCameraOutlined/>,
-            label: "Movies List",
-            onClick: () => handleClick("/movies"),
-        },
+        (!isAdmin ? {
+            key: "/movies/new",
+            icon: <PlusCircleOutlined/>,
+            label: "Add Movie",
+            onClick: () => handleClick("/movies/new"),
+        } : null),
         (isAdmin ? {
             key: "/admin",
             icon: <DashboardOutlined/>,

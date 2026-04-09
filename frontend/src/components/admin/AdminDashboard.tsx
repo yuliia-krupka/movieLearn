@@ -73,7 +73,7 @@ const AdminDashboard: React.FC = () => {
                             </div>
                             <div className="stat-title">Total Movies</div>
                             <div className="stat-value">{stats.movies}</div>
-                            <div className="stat-description">Add and manage movies</div>
+                            <div className="stat-description">Manage movies</div>
                         </Card>
                     </Col>
                 </Row>

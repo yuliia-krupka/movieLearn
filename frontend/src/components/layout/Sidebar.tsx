@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Layout, Menu, Button, Grid, message as antMessage, Typography} from "antd";
+import {Layout, Menu, Button, Grid, Typography} from "antd";
 import {
     LogoutOutlined,
     MenuOutlined,
@@ -20,14 +20,13 @@ const Sidebar: React.FC = () => {
     const location = useLocation();
     const [drawerVisible, setDrawerVisible] = useState(false);
     const screens = useBreakpoint();
-    const [messageApi, contextHolder] = antMessage.useMessage();
     const {isAdmin, logout} = useAuth();
 
     const handleLogout = () => {
         logout();
     };
 
-    const items = getMenuItems(navigate, isAdmin, (msg: string) => messageApi.error(msg));
+    const items = getMenuItems(navigate, isAdmin);
 
     if (!screens.md) {
         return (
@@ -43,16 +42,13 @@ const Sidebar: React.FC = () => {
                     open={drawerVisible}
                     onClose={() => setDrawerVisible(false)}
                     isAdmin={isAdmin}
-                    messageApi={messageApi}
                 />
-                {contextHolder}
             </>
         );
     }
 
     return (
         <Sider className="sidebar" width={200}>
-            {contextHolder}
             <div className="sidebar-content">
                 <div className="sidebar-container">
                     <Title level={4} className="sidebar-title">

@@ -92,7 +92,7 @@ public class OpenAiService {
                         - text: The English question or sentence with a blank (MAX 255 chars).
                         - translation: The Ukrainian translation of the word being tested (MAX 255 chars).
                         - transcription: IPA transcription of the word enclosed in slashes, e.g. /wɜːrd/ (MAX 150 chars).
-                        - exampleSentence: An original example sentence inspired by the movie's context, paraphrased (not a direct quote from the script), or a brief definition (MAX 255 chars).
+                        - exampleSentence: An original example sentence or a brief definition that clearly illustrates the meaning of the word/phrase being tested. DO NOT use direct quotes from any script (MAX 255 chars).
                         - answers: An array of exactly 4 strings (options) (Each option MAX 150 chars).
                         - correctAnswerIndex: The integer index (0-3) of the correct answer in the answers array.
                         """,
@@ -165,7 +165,7 @@ public class OpenAiService {
             });
         } catch (Exception e) {
             log.error("Error calling OpenAI after retries: {}", e.getMessage(), e);
-            throw new AiOperationException("AI operation failed. Please try again.", e);
+            throw new AiOperationException("Something went wrong, try again", e);
         }
     }
 

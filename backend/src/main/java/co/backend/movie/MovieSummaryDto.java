@@ -16,4 +16,6 @@ public class MovieSummaryDto {
     private String posterPath;
     private String overview;
     private List<String> genres;
+    private Long creatorId;
+    private String userEnglishLevel;
 }

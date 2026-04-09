@@ -24,4 +24,6 @@ public interface LearningSetRepository extends JpaRepository<LearningSet, Long> 
     void deleteByCreatorId(Long creatorId);
 
     void deleteByMovieIdAndCreatorId(Long movieId, Long creatorId);
+
+    void deleteByMovieId(Long movieId);
 }

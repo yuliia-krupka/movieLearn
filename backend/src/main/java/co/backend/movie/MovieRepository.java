@@ -15,12 +15,13 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     boolean existsByTmdbId(Integer tmdbId);
 
+    boolean existsByTmdbIdAndCreatorId(Integer tmdbId, Long creatorId);
+
     List<Movie> findByTitleContainingIgnoreCase(String title);
 
     List<Movie> findByGenresIn(Collection<Genre> genres);
 
     List<Movie> findAllByGenres_Id(Long id);
 
-    @Query("SELECT COUNT(ls) > 0 FROM LearningSet ls WHERE ls.movie.id = :movieId")
-    boolean hasAnyLearningSets(@Param("movieId") Long movieId);
+    List<Movie> findByCreatorId(Long creatorId);
 }

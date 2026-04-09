@@ -6,6 +6,8 @@ export interface Movie {
     backdropPath?: string;
     overview?: string;
     genres: string[];
+    creatorId?: number;
+    userEnglishLevel?: string;
 }
 
 export interface MovieFormData {
@@ -38,4 +40,6 @@ export interface MovieDetails {
     backdropPath?: string;
     overview?: string;
     genres: string[];
+    creatorId?: number;
+    userEnglishLevel?: string;
 }

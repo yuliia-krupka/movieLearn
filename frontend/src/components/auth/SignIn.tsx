@@ -61,7 +61,7 @@ function SignIn() {
                     <LogoDesign className="logo-design-responsive"/>
                     <Logo level={1}/>
                     <div className="subtitle">
-                        Вивчайте англійську за сценаріями улюблених фільмів!
+                        Learn English through your favorite movie scripts!
                     </div>
 
                     <Button
@@ -76,36 +76,36 @@ function SignIn() {
                 </div>
 
                 <div className="scroll-indicator" onClick={scrollToInfo}>
-                    <span className="scroll-text">Як це працює</span>
+                    <span className="scroll-text">How it works</span>
                     <DownOutlined className="scroll-arrow"/>
                 </div>
             </div>
 
             <div className="info-section" ref={infoSectionRef}>
-                <h2>Вивчайте англійську за сценаріями улюблених фільмів!</h2>
+                <h2>Learn English through your favorite movie scripts!</h2>
                 <div className="ukrainian-badge" style={{marginBottom: '40px'}}>
-                    <span>🇺🇦</span> Створено спеціально для українців
+                    <span>🇺🇦</span> Built specifically for Ukrainians
                 </div>
                 <Row gutter={[32, 32]} justify="center" className="steps-row">
                     <Col xs={24} md={8}>
                         <Card className="step-card">
                             <PlayCircleOutlined className="step-icon"/>
-                            <h3>1. Оберіть фільм</h3>
-                            <p>Обирайте з нашої колекції ваших улюблених популярних фільмів та серіалів.</p>
+                            <h3>1. Add movie</h3>
+                            <p>Choose a movie and upload its script to the system.</p>
                         </Card>
                     </Col>
                     <Col xs={24} md={8}>
                         <Card className="step-card">
                             <ReadOutlined className="step-icon"/>
-                            <h3>2. Вивчайте лексику</h3>
-                            <p>Вивчайте ключові слова та фрази, взяті безпосередньо зі сценарію фільму.</p>
+                            <h3>2. Learn vocabulary</h3>
+                            <p>Study key words and phrases taken directly from the movie script.</p>
                         </Card>
                     </Col>
                     <Col xs={24} md={8}>
                         <Card className="step-card">
                             <CheckCircleOutlined className="step-icon"/>
-                            <h3>3. Перевірте себе</h3>
-                            <p>Проходьте інтерактивні тести, щоб закріпити знання та відстежувати прогрес.</p>
+                            <h3>3. Test yourself</h3>
+                            <p>Complete interactive quizzes to reinforce your knowledge and track your progress.</p>
                         </Card>
                     </Col>
                 </Row>

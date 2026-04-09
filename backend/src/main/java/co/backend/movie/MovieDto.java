@@ -14,14 +14,13 @@ import java.util.List;
 @NoArgsConstructor
 public class MovieDto {
     private Long id;
+    private Long creatorId;
     @NotBlank(message = "Name must not be blank")
     @Size(max = 100, message = "Title must not exceed 100 characters")
     private String title;
     private Integer tmdbId;
     private String posterPath;
     private String overview;
-    @Size(max = 20971520, message = "Script size must not exceed 20MB")
-    private byte[] script;
     @NotEmpty(message = "Genres must be provided")
     private List<String> genres;
 }

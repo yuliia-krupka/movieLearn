@@ -4,22 +4,22 @@ import {
     Input,
     Button,
     Typography,
-    Space,
-    Spin,
     Row,
-    Col, Card, Image
+    Col, Card, Image, Checkbox,
+    Spin, Space
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
 import {movieService} from '../../services/movieService';
 import {useGenres} from '../hooks/useGenres.tsx';
 import {useFileUpload} from '../hooks/useFileUpload.tsx';
+import {useAuth} from '../auth/useAuth.tsx';
 import {type MovieFormData, type NewGenreData} from '../../types/movie';
 import GenreSelector from '../genre/GenreSelector.tsx';
 import FileUploader from './FileUploader.tsx';
 import AddGenreModal from '../genre/AddGenreModal.tsx';
 import TMDBSearch from './TMDBSearch.tsx';
-import {type TMDBMovie, getMovieImageUrl} from '../../services/tmdbService';
+import {type TMDBMovie, getMovieImageUrl, tmdbGenreIdToName} from '../../services/tmdbService';
 import MainLayout from '../layout/MainLayout.tsx';
 import useMessage from 'antd/es/message/useMessage';
 import {ErrorHandler} from '../err/ErrorHandler.tsx';
@@ -37,6 +37,7 @@ const CreateMovieForm: React.FC = () => {
 
     const [customMessage, contextHolder] = useMessage();
     const navigate = useNavigate();
+    const {isAdmin} = useAuth();
     const {genres, loading, addGenre, fetchGenres} = useGenres();
     const scriptUpload = useFileUpload('Please upload a script file');
 
@@ -115,7 +116,11 @@ const CreateMovieForm: React.FC = () => {
     };
 
     const handleCancel = (): void => {
-        navigate('/admin');
+        if (isAdmin) {
+            navigate('/admin/movies');
+        } else {
+            navigate('/home');
+        }
     };
 
 
@@ -140,7 +145,10 @@ const CreateMovieForm: React.FC = () => {
                 <Form.Item label="Search Film on TMDB">
                     <TMDBSearch onSelectMovie={(movie) => {
                         setSelectedTmdbMovie(movie);
-                        form.setFieldsValue({title: movie.title});
+                        form.setFieldsValue({
+                            title: movie.title,
+                            genres: movie.genre_ids?.map(id => tmdbGenreIdToName[id]).filter(Boolean) ?? []
+                        });
                     }}/>
                     {selectedTmdbMovie && (
                         <div className="tmdb-selected-info">
@@ -198,6 +206,23 @@ const CreateMovieForm: React.FC = () => {
                         />
                     </Col>
                 </Row>
+
+                <Form.Item
+                    name="agreement"
+                    valuePropName="checked"
+                    rules={[
+                        {
+                            validator: (_, value) =>
+                                value ? Promise.resolve() : Promise.reject(new Error('You must agree to the data rules')),
+                        },
+                    ]}
+                >
+                    <Checkbox>
+                        I confirm that I have the right to upload this script and I agree that the data will be
+                        processed
+                        to generate personalized learning sets.
+                    </Checkbox>
+                </Form.Item>
 
                 <Form.Item className="form-actions-right">
                     <Space size="middle">

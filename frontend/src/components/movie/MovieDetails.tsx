@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {Button, Row, Col, Spin, message as antMessage} from 'antd';
-import {ArrowLeftOutlined, EditOutlined, DeleteOutlined} from '@ant-design/icons';
+import {Button, Row, Col, Spin, message as antMessage, Modal} from 'antd';
+import {ArrowLeftOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import axios from "axios";
 import MainLayout from "../layout/MainLayout.tsx";
 import {useAuth} from '../auth/useAuth';
@@ -21,9 +21,7 @@ const MovieDetails: React.FC = () => {
         const [movie, setMovie] = useState<MovieDetails | null>(null);
         const [loading, setLoading] = useState(false);
         const [isGenerating, setIsGenerating] = useState(false);
-        const [isChecking, setIsChecking] = useState(false);
         const [learningSet, setLearningSet] = useState<LearningSetDto | null>(null);
-        const [isUserStarted, setIsUserStarted] = useState(false);
         const [tmdbMovie, setTmdbMovie] = useState<TMDBMovie | null>(null);
         const [errorMsg, setErrorMsg] = useState<string | null>(null);
         const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -75,73 +73,64 @@ const MovieDetails: React.FC = () => {
                 learningSetService.getLatestByUserAndMovie(Number(id), user?.englishLevel, interestsStr)
                     .then(setLearningSet)
                     .catch(err => console.error('Error fetching learning set:', err));
-
-                movieService.checkUserStarted(Number(id))
-                    .then(setIsUserStarted)
-                    .catch(err => console.error('Error checking user progress:', err));
             }
         }, [id, navigate, currentUserId, user, isAdmin]);
 
+        const handleDeleteConfirm = () => {
+            Modal.confirm({
+                title: 'Delete Movie',
+                icon: <ExclamationCircleOutlined />,
+                content: `Are you sure you want to permanently delete "${movie?.title}" and all associated flashcards?`,
+                okText: 'Yes, Delete',
+                okType: 'danger',
+                cancelText: 'Cancel',
+                onOk: async () => {
+                    try {
+                        await movieService.delete(Number(id));
+                        antMessage.success('Movie deleted successfully');
+                        navigate(isAdmin ? '/admin/movies' : '/home');
+                    } catch (error) {
+                        console.error('Error deleting movie:', error);
+                        let errMsg = 'Error deleting movie';
 
-        const handleDelete = async () => {
-            try {
-                await movieService.delete(Number(id));
-                antMessage.success('Movie deleted successfully');
-                navigate('/movies');
-            } catch (error) {
-                console.error('Error deleting movie:', error);
-                let errorMsg = 'Error deleting movie';
-
-                if (axios.isAxiosError(error)) {
-                    const responseData = error.response?.data;
-                    if (typeof responseData === 'string') {
-                        errorMsg = responseData;
-                    } else if (responseData && typeof responseData === 'object' && 'message' in responseData) {
-                        errorMsg = (responseData as { message: string }).message;
+                        if (axios.isAxiosError(error)) {
+                            const responseData = error.response?.data;
+                            if (typeof responseData === 'string') {
+                                errMsg = responseData;
+                            } else if (responseData && typeof responseData === 'object' && 'message' in responseData) {
+                                errMsg = (responseData as { message: string }).message;
+                            }
+                        }
+                        setErrorMsg(errMsg);
                     }
                 }
-                setErrorMsg(errorMsg);
-            }
+            });
         };
 
         const handleStartStudying = async () => {
-                if (!currentUserId) {
-                    void message.error('You must be logged in to start studying');
-                    return;
-                }
-                try {
-                    setIsChecking(true);
-
-                    if (!isUserStarted) {
-                        await movieService.addMovieToUser(Number(id));
-                    }
-
-                    const generatingTimer = setTimeout(() => {
-                        setIsGenerating(true);
-                    }, 3000);
-
-                    const readySet = await learningSetService.startLearningForUser(Number(id));
-                    clearTimeout(generatingTimer);
-                    console.log('Learning set ready:', readySet.id);
-
-                    setIsUserStarted(true);
-
-                    if (readySet.status === 'REVIEW') {
-                        navigate(`/learning-sets/${readySet.id}/update`);
-                    } else {
-                        navigate(`/learning-sets/${readySet.id}/flashcards`);
-                    }
-                } catch
-                    (e: unknown) {
-                    console.error('Error in handleStartStudying:', e);
-                    const errorMessage = e instanceof Error ? e.message : 'Could not start studying';
-                    void message.error(errorMessage);
-                } finally {
-                    setIsGenerating(false);
-                    setIsChecking(false);
-                }
+            if (!currentUserId) {
+                void message.error('You must be logged in to start studying');
+                return;
             }
-        ;
+            try {
+                setIsGenerating(true);
+
+                const readySet = await learningSetService.startLearningForUser(Number(id));
+                console.log('Learning set ready:', readySet.id);
+
+                if (readySet.status === 'REVIEW') {
+                    navigate(`/learning-sets/${readySet.id}/update`);
+                } else {
+                    navigate(`/learning-sets/${readySet.id}/flashcards`);
+                }
+            } catch (e: unknown) {
+                console.error('Error in handleStartStudying:', e);
+                const errorMessage = e instanceof Error ? e.message : 'Could not start studying';
+                void message.error(errorMessage);
+            } finally {
+                setIsGenerating(false);
+            }
+        };
 
         if (loading) return (
             <MainLayout className="content">
@@ -170,31 +159,19 @@ const MovieDetails: React.FC = () => {
         return (
             <MainLayout>
                 {contextHolder}
-                {(isGenerating || isChecking) && (
+                {isGenerating && (
                     <div className="generating-overlay">
                         <div className="generating-content">
-                            {isGenerating ? (
-                                <>
-                                    <img
-                                        src={learningCat}
-                                        alt="Generating new content..."
-                                        className="generating-gif"
-                                    />
-                                    <h2 className="generating-title">Generating Magic...</h2>
-                                    <p className="generating-text">
-                                        Creating personalized flashcards based on the movie script.
-                                    </p>
-                                    <Spin size="large" className="generating-spinner"/>
-                                </>
-                            ) : (
-                                <>
-                                    <Spin size="large"/>
-                                    <h2 className="generating-title">Checking...</h2>
-                                    <p className="generating-text">
-                                        Looking for existing learning sets...
-                                    </p>
-                                </>
-                            )}
+                            <img
+                                src={learningCat}
+                                alt="Generating new content..."
+                                className="generating-gif"
+                            />
+                            <h2 className="generating-title">Generating Magic...</h2>
+                            <p className="generating-text">
+                                Creating personalized flashcards based on the movie script.
+                            </p>
+                            <Spin size="large" className="generating-spinner"/>
                         </div>
                     </div>
                 )}
@@ -226,19 +203,30 @@ const MovieDetails: React.FC = () => {
                                 {descriptionText}
                             </div>
 
-                            {!isAdmin && (
-                                <div className="user-actions-container">
-                                    <div className="movie-actions">
-                                        <Button
-                                            type="link"
-                                            className="back-link-btn movie-details-back-btn"
-                                            icon={<ArrowLeftOutlined/>}
-                                            onClick={() => navigate('/movies')}
-                                        >
-                                            Back to Movies
-                                        </Button>
+                            <div className="user-actions-container">
+                                <div className="movie-actions">
+                                    <Button
+                                        type="link"
+                                        className="back-link-btn movie-details-back-btn"
+                                        icon={<ArrowLeftOutlined/>}
+                                        onClick={() => navigate(isAdmin ? '/admin/movies' : '/home')}
+                                    >
+                                        Back to {isAdmin ? 'List' : 'Home'}
+                                    </Button>
+
+                                    {(!isAdmin) && (
                                         <div className="movie-details-action-group">
-                                            {hasMatchingSet && (learningSet!.status === 'READY' || learningSet!.status === 'REVIEW') && (
+                                            {learningSet && learningSet.status === 'READY' && (
+                                                <>
+                                                    <Button
+                                                        className="secondary-action-btn"
+                                                        onClick={() => navigate(`/learning-sets/${learningSet.id}/update`)}
+                                                    >
+                                                        View Flashcards
+                                                    </Button>
+                                                </>
+                                            )}
+                                            {hasMatchingSet && learningSet!.status === 'REVIEW' && (
                                                 <Button
                                                     className="secondary-action-btn"
                                                     onClick={() => navigate(`/learning-sets/${learningSet!.id}/update`)}
@@ -249,37 +237,30 @@ const MovieDetails: React.FC = () => {
                                             <Button
                                                 className="primary-action-btn"
                                                 onClick={handleStartStudying}
+                                                disabled={learningSet?.status === 'READY'}
                                             >
                                                 {hasMatchingSet ? 'Continue Studying' : 'Start Studying'}
                                             </Button>
                                         </div>
+                                    )}
+
+                                    <div className="movie-details-action-group">
+                                        {isAdmin && (
+                                            <Button className="yellow-btn"
+                                                    icon={<EditOutlined/>}
+                                                    onClick={() => navigate(`/admin/movies/${id}/update`)}>
+                                                Edit
+                                            </Button>
+                                        )}
+                                        {(isAdmin || movie.creatorId === currentUserId) && (
+                                            <Button danger type="primary" shape="circle" size="large"
+                                                    icon={<DeleteOutlined/>}
+                                                    title="Delete Movie"
+                                                    onClick={handleDeleteConfirm} />
+                                        )}
                                     </div>
                                 </div>
-                            )}
-                            {isAdmin && (
-                                <div className="admin-actions-container">
-                                    <div className="movie-actions">
-                                        <Button className="yellow-btn"
-                                                icon={<EditOutlined/>}
-                                                onClick={() => navigate(`/admin/movies/${id}/update`)}>
-                                            Edit
-                                        </Button>
-                                        <Button className="yellow-btn"
-                                                icon={<DeleteOutlined/>}
-                                                onClick={handleDelete}>
-                                            Delete
-                                        </Button>
-                                    </div>
-                                    <Button
-                                        type="link"
-                                        className="back-link-btn"
-                                        icon={<ArrowLeftOutlined/>}
-                                        onClick={() => navigate('/admin/movies')}
-                                    >
-                                        Back to List
-                                    </Button>
-                                </div>
-                            )}
+                            </div>
                         </div>
                     </Col>
                 </Row>

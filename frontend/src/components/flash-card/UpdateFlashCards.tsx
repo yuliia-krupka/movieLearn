@@ -1,7 +1,7 @@
 import React from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
-import {CloseOutlined, CheckOutlined, PlusOutlined, CaretRightOutlined, SoundOutlined} from '@ant-design/icons';
+import {CloseOutlined, CheckOutlined, PlusOutlined, CaretRightOutlined, SoundOutlined, InfoCircleOutlined} from '@ant-design/icons';
 import {Spin} from 'antd';
 import {useAuth} from '../auth/useAuth';
 import './UpdateFlashCards.css';
@@ -51,7 +51,7 @@ const UpdateFlashCards: React.FC = () => {
                 navigate(`/learning-sets/${learningSet.id}/flashcards`);
             }
         } else {
-            navigate('/movies');
+            navigate('/home');
         }
     };
 
@@ -59,7 +59,7 @@ const UpdateFlashCards: React.FC = () => {
         if (learningSet?.id) {
             navigate(`/learning-sets/${learningSet.id}/tests`);
         } else {
-            navigate('/movies');
+            navigate('/home');
         }
     };
 
@@ -95,7 +95,12 @@ const UpdateFlashCards: React.FC = () => {
             )}
 
             <div className="study-dashboard-card">
-                <div className="dashboard-title">Start Learning</div>
+                <div className="dashboard-title">
+                    {learningSet?.status === 'READY' ? 'Your Flashcards' : 'Start Learning'}
+                    {learningSet?.englishLevel && (
+                        <span className="level-badge" style={{marginLeft: '10px'}}>{learningSet.englishLevel}</span>
+                    )}
+                </div>
                 <div className="dashboard-subtitle">Master your vocabulary with flashcards and tests</div>
 
                 <div className="dashboard-actions">
@@ -127,49 +132,58 @@ const UpdateFlashCards: React.FC = () => {
                 <div className="info-message">
                     Tip: Clicking 'I know' during flashcard review marks the word as learned and unlocks tests.
                 </div>
-            </div>
 
-            <div className="custom-request-card">
-                <div
-                    className="custom-request-title"
-                    onClick={() => setIsRefineExpanded(!isRefineExpanded)}
-                >
-                    Refine Flashcards
-                    <CaretRightOutlined
-                        className={`refine-toggle-icon ${isRefineExpanded ? 'expanded' : ''}`}
-                    />
-                </div>
-
-                {isRefineExpanded && (
-                    <div className="refine-content">
-                        <div className="custom-request-subtitle">
-                            Select words you don't like and describe how to improve them (e.g., "Too easy", "Make it
-                            more
-                            formal").
-                        </div>
-
-                        <label className="request-label">Feedback for Regeneration</label>
-                        <textarea
-                            className="request-textarea"
-                            placeholder="Feedback for selected cards..."
-                            value={feedback}
-                            onChange={(e) => setFeedback(e.target.value)}
-                            disabled={selectedCardIds.length === 0}
-                        />
-
-                        <div className="action-buttons">
-                            <button
-                                className="generate-btn"
-                                onClick={handleRegenerate}
-                                disabled={regenerating || selectedCardIds.length === 0}
-                                title={""}
-                            >
-                                {regenerating ? 'Regenerating...' : `Regenerate Selected (${selectedCardIds.length})`}
-                            </button>
-                        </div>
+                {learningSet?.status !== 'READY' && (
+                    <div className="warning-message">
+                        <InfoCircleOutlined/>
+                        Увага: після підтвердження флещ карток сценарій не буде збережено і флеш-картки не можна буде згенерувати заново.
                     </div>
                 )}
             </div>
+
+            {learningSet?.status !== 'READY' && (
+                <div className="custom-request-card">
+                    <div
+                        className="custom-request-title"
+                        onClick={() => setIsRefineExpanded(!isRefineExpanded)}
+                    >
+                        Refine Flashcards
+                        <CaretRightOutlined
+                            className={`refine-toggle-icon ${isRefineExpanded ? 'expanded' : ''}`}
+                        />
+                    </div>
+
+                    {isRefineExpanded && (
+                        <div className="refine-content">
+                            <div className="custom-request-subtitle">
+                                Select words you don't like and describe how to improve them (e.g., "Too easy", "Make it
+                                more
+                                formal").
+                            </div>
+
+                            <label className="request-label">Feedback for Regeneration</label>
+                            <textarea
+                                className="request-textarea"
+                                placeholder="Feedback for selected cards..."
+                                value={feedback}
+                                onChange={(e) => setFeedback(e.target.value)}
+                                disabled={selectedCardIds.length === 0}
+                            />
+
+                            <div className="action-buttons">
+                                <button
+                                    className="generate-btn"
+                                    onClick={handleRegenerate}
+                                    disabled={regenerating || selectedCardIds.length === 0}
+                                    title={""}
+                                >
+                                    {regenerating ? 'Regenerating...' : `Regenerate Selected (${selectedCardIds.length})`}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
 
             <div className="suggested-words-header">
                 <div>
@@ -181,17 +195,19 @@ const UpdateFlashCards: React.FC = () => {
                     </div>
                 </div>
                 <div className="add-word-container">
-                    {flashcards.length >= 20 && (
+                    {learningSet?.status !== 'READY' && flashcards.length >= 20 && (
                         <span className="limit-warning-text">Max limit of 20 cards reached.</span>
                     )}
-                    <button
-                        className="add-custom-btn"
-                        onClick={handleAddCustomCard}
-                        disabled={flashcards.length >= 20}
-                        title={flashcards.length >= 20 ? "Maximum limit of 20 flashcards reached." : ""}
-                    >
-                        <PlusOutlined/> Add Custom Word
-                    </button>
+                    {learningSet?.status !== 'READY' && (
+                        <button
+                            className="add-custom-btn"
+                            onClick={handleAddCustomCard}
+                            disabled={flashcards.length >= 20}
+                            title={flashcards.length >= 20 ? "Maximum limit of 20 flashcards reached." : ""}
+                        >
+                            <PlusOutlined/> Add Custom Word
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -287,7 +303,11 @@ const UpdateFlashCards: React.FC = () => {
                                     </div>
                                 </>
                             ) : (
-                                <div className="word-content-display" onClick={() => toggleEdit(card)}>
+                                <div
+                                    className="word-content-display"
+                                    onClick={() => learningSet?.status !== 'READY' && toggleEdit(card)}
+                                    style={learningSet?.status === 'READY' ? {cursor: 'default'} : {}}
+                                >
                                     <div className="word-text"
                                          style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                                         {card.word}
@@ -312,7 +332,7 @@ const UpdateFlashCards: React.FC = () => {
                             )}
                         </div>
 
-                        {!card.isEditing && (
+                        {!card.isEditing && learningSet?.status !== 'READY' && (
                             <div className="item-actions">
                                 <button
                                     className={`word-status-btn reject ${card.id && selectedCardIds.includes(card.id) ? 'active' : ''}`}

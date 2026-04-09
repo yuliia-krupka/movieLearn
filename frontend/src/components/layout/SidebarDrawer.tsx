@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Drawer, Menu, Typography, message as antMessage, Avatar} from "antd";
+import {Button, Drawer, Menu, Typography, Avatar} from "antd";
 import {
     LogoutOutlined,
     UserOutlined
@@ -14,15 +14,14 @@ type Props = {
     open: boolean;
     onClose: () => void;
     isAdmin: boolean;
-    messageApi: ReturnType<typeof antMessage.useMessage>[0];
 };
 
-const SidebarDrawer: React.FC<Props> = ({open, onClose, isAdmin, messageApi}) => {
+const SidebarDrawer: React.FC<Props> = ({open, onClose, isAdmin}) => {
     const navigate = useNavigate();
     const location = useLocation();
     const {user, logout} = useAuth();
 
-    const items = getMenuItems(navigate, isAdmin, (msg: string) => messageApi.error(msg), onClose);
+    const items = getMenuItems(navigate, isAdmin, onClose);
 
     const handleLogout = () => {
         logout();

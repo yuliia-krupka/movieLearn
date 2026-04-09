@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -53,57 +52,26 @@ public class LearningSetService {
 
         log.debug("User level: {}, interests: {}", user.getEnglishLevel(), user.getInterests());
 
-        Optional<LearningSetDto> reusedSet = findReusedSet(movie, user);
-        return reusedSet.orElseGet(() -> generateNewSet(movie, user));
+        Optional<LearningSet> existingSet = learningSetRepository
+                .findTopByMovieIdAndCreatorIdOrderByDateDesc(movieId, userId);
 
-    }
-
-    private Optional<LearningSetDto> findReusedSet(Movie movie, User user) {
-        if (user.getEnglishLevel() != null) {
-            log.info("Looking for user's existing set with same level...");
-            Optional<LearningSetDto> existingSet = getLatestByUserAndMovieWithLevel(user.getId(), movie.getId(),
-                    user.getEnglishLevel());
-            if (existingSet.isPresent()) {
-                String userInterests = user.getInterests();
-                String existingInterests = existingSet.get().getInterests();
-
-                boolean interestsMatch = interestsMatch(userInterests, existingInterests);
-
-                log.debug("User interests: '{}', Existing interests: '{}', Match: {}", userInterests, existingInterests,
-                        interestsMatch);
-
-                if (interestsMatch) {
-                    log.info("[BACKEND] Found matching user set, reusing: {}", existingSet.get().getId());
-                    return existingSet;
-                } else {
-                    log.info("User has set with same level but different interests, will see if a shared one exists");
-                }
-            } else {
-                log.info("No existing user set found with same level");
-            }
+        if (existingSet.isPresent()) {
+            LearningSet existing = existingSet.get();
+            log.info("[BACKEND] Found existing user set, reusing: {}", existing.getId());
+            return learningSetMapper.toDto(existing);
         }
 
-        if (user.getEnglishLevel() != null && user.getInterests() != null) {
-            log.info("Looking for suitable shared set...");
-            Optional<LearningSet> suitableSet = findSuitableSetEntity(movie.getId(), user.getEnglishLevel(),
-                    user.getInterests());
-            if (suitableSet.isPresent()) {
-                log.info("[BACKEND] Found suitable shared set, cloning for user: {}", suitableSet.get().getId());
-                learningSetRepository.deleteByMovieIdAndCreatorId(movie.getId(), user.getId());
-                LearningSet clonedSet = cloneSetForUser(suitableSet.get(), user.getId());
-                return Optional.of(learningSetMapper.toDto(clonedSet));
-            } else {
-                log.info("No suitable shared set found");
-            }
-        }
-
-        return Optional.empty();
+        return generateNewSet(movie, user);
     }
 
     private LearningSetDto generateNewSet(Movie movie, User user) {
         log.info("[BACKEND] Generating new learning set...");
 
         learningSetRepository.deleteByMovieIdAndCreatorId(movie.getId(), user.getId());
+
+        if (movie.getScript() == null || movie.getScript().length == 0) {
+            throw new BadRequestException("Movie script was deleted after approval. Please re-add the movie to change language level or interests.");
+        }
 
         List<LearningItemDto> generatedItems = openAiService.generateFlashcards(
                 movie.getTitle(),
@@ -155,99 +123,6 @@ public class LearningSetService {
                 .map(learningSetMapper::toDto);
     }
 
-    public Optional<LearningSet> findSuitableSetEntity(Long movieId, EnglishLevel level,
-                                                       String interests) {
-        log.info("[BACKEND] findSuitableSetEntity called - movieId: {}, level: {}, interests: {}", movieId, level,
-                interests);
-
-        Optional<LearningSet> exactMatch = learningSetRepository
-                .findTopByMovieIdAndEnglishLevelAndInterestsOrderByDateDesc(movieId, level, interests);
-
-        if (exactMatch.isPresent()) {
-            log.info("[BACKEND] Found exact match: {}", exactMatch.get().getId());
-            return exactMatch;
-        }
-
-        List<LearningSet> candidateSets = learningSetRepository
-                .findByMovieIdAndEnglishLevelOrderByDateDesc(movieId, level);
-
-        log.info("[BACKEND] Found {} candidate sets with level {}", candidateSets.size(), level);
-
-        for (LearningSet candidate : candidateSets) {
-            log.debug("[BACKEND] Checking candidate set {} with level {}", candidate.getId(),
-                    candidate.getEnglishLevel());
-            if (candidate.getEnglishLevel() != null && candidate.getEnglishLevel().equals(level)) {
-                if (interestsMatch(interests, candidate.getInterests())) {
-                    log.info("[BACKEND] Found flexible match: user interests='{}' vs existing='{}'", interests,
-                            candidate.getInterests());
-                    return Optional.of(candidate);
-                }
-            } else {
-                log.debug("[BACKEND] Level mismatch - expected: {}, actual: {}", level, candidate.getEnglishLevel());
-            }
-        }
-
-        log.info("[BACKEND] No suitable set found");
-        return Optional.empty();
-    }
-
-    private LearningSet cloneSetForUser(LearningSet originalSet, Long newUserId) {
-        LearningSet newSet = new LearningSet();
-        newSet.setMovie(originalSet.getMovie());
-        newSet.setDate(LocalDateTime.now());
-        newSet.setName(originalSet.getName());
-        newSet.setCreatorId(newUserId);
-        newSet.setStatus(LearningSetStatus.REVIEW);
-        newSet.setEnglishLevel(originalSet.getEnglishLevel());
-        newSet.setInterests(originalSet.getInterests());
-
-        LearningSet savedSet = learningSetRepository.save(newSet);
-
-        List<LearningItem> clonedItems = originalSet.getLearningItems().stream()
-                .map(item -> {
-                    LearningItem newItem = new LearningItem();
-                    newItem.setType(item.getType());
-                    newItem.setText(item.getText());
-                    newItem.setTranslation(item.getTranslation());
-                    newItem.setExampleSentence(item.getExampleSentence());
-                    newItem.setTranscription(item.getTranscription());
-                    newItem.setCorrectAnswerIndex(item.getCorrectAnswerIndex());
-                    newItem.setLearningSet(savedSet);
-                    if (item.getAnswers() != null) {
-                        newItem.setAnswers(new ArrayList<>(item.getAnswers()));
-                    }
-                    return newItem;
-                })
-                .toList();
-
-        savedSet.setLearningItems(new ArrayList<>(clonedItems));
-        learningSetRepository.save(savedSet);
-
-        userLearningSetService.getOrCreate(newUserId, savedSet.getId());
-        return savedSet;
-    }
-
-    private boolean interestsMatch(String userInterests, String existingInterests) {
-        if (userInterests == null && existingInterests == null)
-            return true;
-        if (userInterests == null || existingInterests == null)
-            return false;
-
-        String[] userInterestsArray = userInterests.toLowerCase().split("[,\\s]+");
-        String[] existingInterestsArray = existingInterests.toLowerCase().split("[,\\s]+");
-
-        Set<String> userSet = Arrays.stream(userInterestsArray)
-                .map(String::trim)
-                .filter(trim -> !trim.isEmpty())
-                .collect(Collectors.toSet());
-
-        Set<String> existingSet = Arrays.stream(existingInterestsArray)
-                .map(String::trim)
-                .filter(trim -> !trim.isEmpty())
-                .collect(Collectors.toSet());
-
-        return userSet.equals(existingSet);
-    }
 
     public LearningSetDto getOrCreateByMovieId(Long movieId) {
         LearningSetDto potentialSet = getLatestByMovieId(movieId).orElse(null);
@@ -276,6 +151,15 @@ public class LearningSetService {
         LearningSet set = findSetById(id);
         set.setStatus(status);
         learningSetRepository.save(set);
+
+        if (status == LearningSetStatus.READY && set.getMovie() != null) {
+            Movie movie = set.getMovie();
+            if (movie.getScript() != null) {
+                log.info("[BACKEND] Approving set {} — deleting script for movie {}", id, movie.getId());
+                movie.setScript(null);
+                movieRepository.save(movie);
+            }
+        }
     }
 
     public List<LearningItemDto> getFlashCardsByLearningSetId(Long learningSetId, Long userId) {

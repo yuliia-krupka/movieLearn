@@ -446,6 +446,21 @@
     font-style: italic;
 }
 
+.warning-message {
+    margin-top: 16px;
+    color: #faad14;
+    font-size: 0.85rem;
+    text-align: center;
+    background: #fffbe6;
+    border: 1px solid #ffe58f;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
 .dashboard-actions {
     display: flex;
     justify-content: center;

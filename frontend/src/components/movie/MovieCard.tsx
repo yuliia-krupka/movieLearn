@@ -40,16 +40,23 @@ const MovieCard: React.FC<MovieCardProps> = React.memo(({movie}) => {
             tabIndex={0}
             aria-label={`${movie.title} — ${movie.genres.slice(0, 2).join(', ')}`}
             cover={
-                imageSource ? (
-                    <img
-                        alt={`${movie.title} cover`}
-                        src={imageSource}
-                        className="movie-card-cover"
-                        loading="lazy"
-                    />
-                ) : (
-                    <div className="movie-card-placeholder"/>
-                )
+                <div style={{position: 'relative'}}>
+                    {imageSource ? (
+                        <img
+                            alt={`${movie.title} cover`}
+                            src={imageSource}
+                            className="movie-card-cover"
+                            loading="lazy"
+                        />
+                    ) : (
+                        <div className="movie-card-placeholder"/>
+                    )}
+                    {movie.userEnglishLevel && (
+                        <div className="movie-card-level-badge">
+                            {movie.userEnglishLevel}
+                        </div>
+                    )}
+                </div>
             }
         >
             <Meta

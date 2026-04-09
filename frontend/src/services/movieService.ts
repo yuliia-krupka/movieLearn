@@ -46,14 +46,8 @@ export const movieService = {
         return data;
     },
 
-    async update(id: number, movieData: { movieData: Record<string, unknown>, script?: File | Blob }): Promise<Movie> {
-        const formData = new FormData();
-        formData.append('movieData', new Blob([JSON.stringify(movieData.movieData)], {type: 'application/json'}));
-        if (movieData.script) {
-            formData.append('script', movieData.script);
-        }
-
-        const {data} = await apiClient.put<Movie>(`/movies/${id}`, formData);
+    async update(id: number, movieData: Record<string, unknown>): Promise<Movie> {
+        const {data} = await apiClient.put<Movie>(`/movies/${id}`, movieData);
         return data;
     },
 
@@ -61,21 +55,9 @@ export const movieService = {
         await apiClient.delete(`/movies/${id}`);
     },
 
-    async checkScript(id: number): Promise<{ status: number; contentLength?: string }> {
-        const response = await apiClient.head(`/movies/${id}/script`);
-        return {
-            status: response.status,
-            contentLength: response.headers['content-length'],
-        };
-    },
-
     async getMoviesCount(): Promise<number> {
         const {data} = await apiClient.get<number>('/movies/count');
         return data;
-    },
-
-    async addMovieToUser(movieId: number): Promise<void> {
-        await apiClient.put(`/users/movies/${movieId}`, null);
     },
 
     async checkUserStarted(movieId: number): Promise<boolean> {

@@ -4,16 +4,15 @@ import {Skeleton} from "antd";
 import {AuthProvider} from "./components/auth/AuthProvider.tsx";
 import {ProtectedRoute} from "./components/auth/ProtectedRoute.tsx";
 import ErrorBoundary from "./components/err/ErrorBoundary.tsx";
+import Home from "./components/movie/Home.tsx";
 
 const SignIn = React.lazy(() => import("./components/auth/SignIn.tsx"));
 const Account = React.lazy(() => import("./components/account/Account.tsx"));
 const EnglishLevel = React.lazy(() => import("./components/onboarding/EnglishLevel.tsx"));
 const Interests = React.lazy(() => import("./components/onboarding/Interests.tsx"));
 const UpdateAccount = React.lazy(() => import("./components/account/UpdateAccount.tsx"));
-const MoviesList = React.lazy(() => import("./components/movie/MoviesList.tsx"));
 const NewMovieForm = React.lazy(() => import("./components/movie/CreateMovie.tsx"));
 const Movie = React.lazy(() => import("./components/movie/MovieDetails.tsx"));
-const Home = React.lazy(() => import("./components/movie/Home.tsx"));
 const UpdateMovie = React.lazy(() => import("./components/movie/UpdateMovie.tsx"));
 const UsersAdminPanel = React.lazy(() => import("./components/admin/UsersAdminPanel.tsx"));
 const FlashCardsModule = React.lazy(() => import("./components/flash-card/FlashCardsModule.tsx"));
@@ -76,14 +75,6 @@ function App() {
                                 }
                             />
                             <Route
-                                path="/movies"
-                                element={
-                                    <ProtectedRoute requireAuth={true} requireOnboarding={true}>
-                                        <MoviesList/>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
                                 path="/home"
                                 element={
                                     <ProtectedRoute requireAuth={true} requireUser={true} requireOnboarding={true}>
@@ -117,9 +108,9 @@ function App() {
                                 }
                             />
                             <Route
-                                path="/admin/movies/new"
+                                path="/movies/new"
                                 element={
-                                    <ProtectedRoute requireAdmin requireAuth={true}>
+                                    <ProtectedRoute requireAuth={true} requireUser={true} requireOnboarding={true}>
                                         <NewMovieForm/>
                                     </ProtectedRoute>
                                 }

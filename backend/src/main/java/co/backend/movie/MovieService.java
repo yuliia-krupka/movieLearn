@@ -1,11 +1,12 @@
 package co.backend.movie;
 
-import co.backend.exceptions.*;
+import co.backend.exceptions.BadRequestException;
+import co.backend.exceptions.DuplicateEntityException;
+import co.backend.exceptions.FileUploadException;
+import co.backend.exceptions.ForbiddenException;
+import co.backend.exceptions.NotFoundException;
 import co.backend.genre.Genre;
 import co.backend.genre.GenreRepository;
-import co.backend.user.User;
-import co.backend.user.UserRepository;
-import co.backend.userLearningSet.UserLearningSetRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +24,12 @@ import java.util.stream.Collectors;
 public class MovieService {
     private final MovieRepository movieRepository;
     private final GenreRepository genreRepository;
-    private final UserRepository userRepository;
     private final MovieMapper movieMapper;
-    private final UserLearningSetRepository userLearningSetRepository;
+    private final co.backend.learningSet.LearningSetRepository learningSetRepository;
 
     public List<MovieSummaryDto> getAllMovies() {
         return movieRepository.findAll().stream()
-                .map(movieMapper::toSummaryDto)
+                .map(movie -> mapToSummaryWithLevel(movie, movie.getCreatorId()))
                 .collect(Collectors.toList());
     }
 
@@ -42,40 +42,36 @@ public class MovieService {
         return movieMapper.toDto(movie);
     }
 
-    public void deleteMovie(Long id) {
+    public void deleteMovie(Long id, Long requestingUserId, boolean isAdmin) {
         if (id == null) {
             throw new BadRequestException("Id must be provided");
         }
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Movie with id " + id + " not found"));
 
-        if (movieRepository.hasAnyLearningSets(id)) {
-            throw new DeleteException("Movie has associated learning sets. Can not be deleted!");
+        if (!isAdmin && !Objects.equals(movie.getCreatorId(), requestingUserId)) {
+            throw new ForbiddenException("You do not have permission to delete this movie.");
         }
 
-        for (User user : movie.getUsers()) {
-            user.getMovies().remove(movie);
-            userRepository.save(user);
-        }
+        learningSetRepository.deleteByMovieId(id);
 
         movieRepository.delete(movie);
     }
 
-    public MovieDto createMovie(MovieDto movieDto, MultipartFile script) {
+    public MovieDto createMovie(MovieDto movieDto, MultipartFile script, Long creatorId) {
 
         if (movieDto.getTitle() == null || movieDto.getTitle().isBlank()) {
-            throw new DuplicateEntityException("Movie title cannot be empty");
+            throw new BadRequestException("Movie title cannot be empty");
         }
-        if (movieDto.getTmdbId() != null && movieRepository.existsByTmdbId(movieDto.getTmdbId())) {
-            throw new DuplicateEntityException("Movie with tmdbId '" + movieDto.getTmdbId() + "' already exists");
-        }
-        if (movieRepository.existsByTitle(movieDto.getTitle())) {
-            throw new DuplicateEntityException("Movie with title '" + movieDto.getTitle() + "' already exists");
+
+        if (movieDto.getTmdbId() != null && movieRepository.existsByTmdbIdAndCreatorId(movieDto.getTmdbId(), creatorId)) {
+            throw new DuplicateEntityException("You have already added this movie.");
         }
 
         Movie movie = new Movie();
         movie.setTitle(movieDto.getTitle());
         movie.setTmdbId(movieDto.getTmdbId());
+        movie.setCreatorId(creatorId);
 
         if (movieDto.getPosterPath() != null) {
             movie.setPosterPath(movieDto.getPosterPath());
@@ -87,12 +83,14 @@ public class MovieService {
         List<Genre> genreList = new ArrayList<>();
         if (movieDto.getGenres() != null) {
             for (String genreName : movieDto.getGenres()) {
-                Genre genre = genreRepository.findByName(genreName.trim());
-                if (genre != null) {
-                    genreList.add(genre);
-                } else {
-                    throw new NotFoundException("Genre with name '" + genreName + "' not found");
+                String trimmed = genreName.trim();
+                Genre genre = genreRepository.findByName(trimmed);
+                if (genre == null) {
+                    genre = new Genre();
+                    genre.setName(trimmed);
+                    genre = genreRepository.save(genre);
                 }
+                genreList.add(genre);
             }
         }
         movie.setGenres(genreList);
@@ -117,26 +115,27 @@ public class MovieService {
         }
     }
 
-    public MovieDto updateMovie(Long id, MovieDto movieDto, MultipartFile script) {
+    public MovieDto updateMovie(Long id, MovieDto movieDto, Long requestingUserId, boolean isAdmin) {
         if (id == null) {
             throw new BadRequestException("Id must be provided");
         }
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Movie not found with id: " + id));
 
-        if (movieDto != null) {
-            if (movieDto.getTitle() != null &&
-                    !movieDto.getTitle().isBlank() &&
-                    !movieDto.getTitle().equals(movie.getTitle()) &&
-                    movieRepository.existsByTitle(movieDto.getTitle())) {
-                throw new DuplicateEntityException("Movie with name '" + movieDto.getTitle() + "' already exists");
-            }
+        if (!isAdmin && !Objects.equals(movie.getCreatorId(), requestingUserId)) {
+            throw new ForbiddenException("You do not have permission to edit this movie.");
+        }
 
+        if (movieDto != null) {
             if (movieDto.getTitle() != null && !movieDto.getTitle().isBlank()) {
                 movie.setTitle(movieDto.getTitle());
             }
 
             if (movieDto.getTmdbId() != null) {
+                if (!movieDto.getTmdbId().equals(movie.getTmdbId()) &&
+                        movieRepository.existsByTmdbIdAndCreatorId(movieDto.getTmdbId(), requestingUserId)) {
+                    throw new DuplicateEntityException("You have already added this movie.");
+                }
                 movie.setTmdbId(movieDto.getTmdbId());
             }
             if (movieDto.getPosterPath() != null) {
@@ -147,16 +146,20 @@ public class MovieService {
             }
 
             if (movieDto.getGenres() != null) {
-                List<Genre> genreList = movieDto.getGenres().stream()
-                        .map(String::trim)
-                        .map(genreRepository::findByName)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList());
+                List<Genre> genreList = new ArrayList<>();
+                for (String genreName : movieDto.getGenres()) {
+                    String trimmed = genreName.trim();
+                    Genre genre = genreRepository.findByName(trimmed);
+                    if (genre == null) {
+                        genre = new Genre();
+                        genre.setName(trimmed);
+                        genre = genreRepository.save(genre);
+                    }
+                    genreList.add(genre);
+                }
                 movie.setGenres(genreList);
             }
         }
-
-        setMovieFiles(movie, script);
 
         movie = movieRepository.save(movie);
         return movieMapper.toDto(movie);
@@ -171,32 +174,34 @@ public class MovieService {
         List<Movie> movies = movieRepository.findByGenresIn(genres);
 
         return movies.stream()
-                .map(movieMapper::toSummaryDto)
+                .map(movie -> mapToSummaryWithLevel(movie, movie.getCreatorId()))
                 .collect(Collectors.toList());
     }
 
     public List<MovieSummaryDto> getMoviesByTitle(String title) {
         List<Movie> movies = movieRepository.findByTitleContainingIgnoreCase(title);
         return movies.stream()
-                .map(movieMapper::toSummaryDto)
+                .map(movie -> mapToSummaryWithLevel(movie, movie.getCreatorId()))
                 .collect(Collectors.toList());
     }
 
     public List<MovieSummaryDto> getMoviesByUser(Long userId) {
-        return userLearningSetRepository.findAllByUserIdWithLearningSetAndMovie(userId).stream()
-                .map(uls -> uls.getLearningSet().getMovie())
-                .filter(Objects::nonNull)
-                .distinct()
-                .map(movieMapper::toSummaryDto)
+        return movieRepository.findByCreatorId(userId).stream()
+                .map(movie -> mapToSummaryWithLevel(movie, userId))
                 .collect(Collectors.toList());
     }
 
+    private MovieSummaryDto mapToSummaryWithLevel(Movie movie, Long userId) {
+        MovieSummaryDto dto = movieMapper.toSummaryDto(movie);
+        if (userId != null) {
+            learningSetRepository.findTopByMovieIdAndCreatorIdOrderByDateDesc(movie.getId(), userId)
+                    .ifPresent(set -> dto.setUserEnglishLevel(set.getEnglishLevel() != null ? set.getEnglishLevel().name() : null));
+        }
+        return dto;
+    }
+
     public int getMoviesCountByUserId(Long userId) {
-        return (int) userLearningSetRepository.findAllByUserIdWithLearningSetAndMovie(userId).stream()
-                .map(uls -> uls.getLearningSet().getMovie())
-                .filter(Objects::nonNull)
-                .distinct()
-                .count();
+        return movieRepository.findByCreatorId(userId).size();
     }
 
 }

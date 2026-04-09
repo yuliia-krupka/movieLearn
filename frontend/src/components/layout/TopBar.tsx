@@ -1,6 +1,6 @@
 import React from "react";
 import {Layout, Avatar, Typography, Input, message as antMessage} from "antd";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useLocation} from "react-router-dom";
 import "./TopBar.css";
 import {useAuth} from "../auth/useAuth";
 
@@ -10,19 +10,23 @@ const {Search} = Input;
 
 const TopBar: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const {user} = useAuth();
-    const [message, contextHolder] = antMessage.useMessage();
+    const [messageApi, contextHolder] = antMessage.useMessage();
 
     const onSearch = async (value: string) => {
+        const isAdminPath = location.pathname.startsWith('/admin');
+        const targetPath = isAdminPath ? "/admin/movies" : "/home";
+
         if (!value.trim()) {
-            navigate("/movies");
+            navigate(targetPath);
             return;
         }
 
         try {
-            navigate(`/movies?search=${encodeURIComponent(value)}`);
+            navigate(`${targetPath}?search=${encodeURIComponent(value)}`);
         } catch (error) {
-            message.error("Error during searching");
+            messageApi.error("Error during searching");
             console.error("Error during searching:", error);
         }
     };

@@ -62,12 +62,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AiParsingException.class)
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public ResponseEntity<ErrorResponse> handleAiParsingException(AiParsingException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ErrorResponse(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ErrorResponse("Something went wrong, try again"));
     }
 
     @ExceptionHandler(AiOperationException.class)
     public ResponseEntity<ErrorResponse> handleAiOperationException(AiOperationException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse("Something went wrong, try again");
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAiValidationException(AiValidationException ex) {
         // Here we deliberately return a safe, generic message to the frontend,
         // even though 'ex.getMessage()' holds the detailed internal validation reason.
-        ErrorResponse errorResponse = new ErrorResponse("AI operation failed. Please try again.");
+        ErrorResponse errorResponse = new ErrorResponse("Something went wrong, try again");
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 

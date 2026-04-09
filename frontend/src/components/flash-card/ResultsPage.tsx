@@ -91,7 +91,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
                     "{learningSetName}"
                     {onGoToRefine && (
                         <button className="results-title-refine-btn" onClick={onGoToRefine}>
-                            Refine Flashcards
+                            View Flashcards
                         </button>
                     )}
                 </p>

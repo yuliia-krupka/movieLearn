@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
-import {Button, Pagination, Spin, Row, Col} from 'antd';
-import {PlusOutlined} from '@ant-design/icons';
-import {useNavigate} from 'react-router-dom';
+import {Pagination, Spin, Row, Col} from 'antd';
+import {useLocation} from 'react-router-dom';
 import MainLayout from '../layout/MainLayout.tsx';
 import AdminMovieCard from './AdminMovieCard';
 import {useMovies} from '../hooks/useMovies';
@@ -11,17 +10,34 @@ import useMessage from 'antd/es/message/useMessage';
 import './AdminMoviesList.css';
 
 const AdminMoviesList: React.FC = () => {
-    const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const [messageApi, contextHolder] = useMessage();
 
+    const location = useLocation();
+
     const emptyGenres = React.useMemo(() => [], []);
+
+    const searchQuery = React.useMemo(() => {
+        const params = new URLSearchParams(location.search);
+        return params.get('search') || '';
+    }, [location.search]);
 
     const {movies, loading, fetchMovies} = useMovies({
         apiEndpoint: '/api/movies',
         searchQuery: '',
         selectedGenres: emptyGenres
     });
+
+    const filteredMovies = React.useMemo(() => {
+        if (!searchQuery) return movies;
+        return movies.filter(movie =>
+            movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [movies, searchQuery]);
+
+    React.useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
 
     const handleDelete = async (id: number) => {
         try {
@@ -46,7 +62,7 @@ const AdminMoviesList: React.FC = () => {
 
 
     const pageSize = 8;
-    const paginatedMovies = movies.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    const paginatedMovies = filteredMovies.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     return (
         <MainLayout className="content-movies admin-movies-layout">
@@ -55,17 +71,7 @@ const AdminMoviesList: React.FC = () => {
                 <div className="admin-movies-header">
                     <div>
                         <div className="admin-movies-title">Movies List (Admin)</div>
-                        <div className="admin-movies-subtitle">You can manage all available movies here!</div>
-                    </div>
-                    <div className="admin-movies-actions">
-                        <Button
-                            type="primary"
-                            icon={<PlusOutlined/>}
-                            className="add-movie-btn"
-                            onClick={() => navigate('/admin/movies/new')}
-                        >
-                            Add new movie
-                        </Button>
+                        <div className="admin-movies-subtitle">View and manage all movies added by users.</div>
                     </div>
                 </div>
 
@@ -85,11 +91,11 @@ const AdminMoviesList: React.FC = () => {
                                 ))}
                             </Row>
                         </div>
-                        {movies.length > 0 && (
+                        {filteredMovies.length > 0 && (
                             <div className="admin-movies-pagination-container">
                                 <Pagination
                                     current={currentPage}
-                                    total={movies.length}
+                                    total={filteredMovies.length}
                                     pageSize={pageSize}
                                     onChange={setCurrentPage}
                                     showSizeChanger={false}

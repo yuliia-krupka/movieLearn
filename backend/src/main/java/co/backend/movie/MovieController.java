@@ -4,9 +4,6 @@ import co.backend.user.User;
 import co.backend.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
@@ -42,35 +39,31 @@ public class MovieController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize(value = "hasRole('ADMIN')")
-    public void deleteMovie(@PathVariable Long id) {
-        movieService.deleteMovie(id);
+    public void deleteMovie(@PathVariable Long id,
+                            @AuthenticationPrincipal OAuth2User principal) {
+        User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
+        boolean isAdmin = user.getRole() != null && user.getRole().name().equals("ADMIN");
+        movieService.deleteMovie(id, user.getId(), isAdmin);
     }
 
     @PostMapping(consumes = {"multipart/form-data"})
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize(value = "hasRole('ADMIN')")
     public MovieDto createMovie(@Valid @RequestPart("movieData") MovieDto movieDto,
-                                @RequestPart(value = "script", required = false) MultipartFile script) {
-        return movieService.createMovie(movieDto, script);
+                                @RequestPart(value = "script", required = false) MultipartFile script,
+                                @AuthenticationPrincipal OAuth2User principal) {
+        User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
+        return movieService.createMovie(movieDto, script, user.getId());
     }
 
-    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
-    @PreAuthorize(value = "hasRole('ADMIN')")
+    @PutMapping("/{id}")
     public MovieDto updateMovie(@PathVariable Long id,
-                                @Valid @RequestPart("movieData") MovieDto movieDto,
-                                @RequestPart(value = "script", required = false) MultipartFile script) {
-        return movieService.updateMovie(id, movieDto, script);
+                                @Valid @RequestBody MovieDto movieDto,
+                                @AuthenticationPrincipal OAuth2User principal) {
+        User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
+        boolean isAdmin = user.getRole() != null && user.getRole().name().equals("ADMIN");
+        return movieService.updateMovie(id, movieDto, user.getId(), isAdmin);
     }
 
-    @GetMapping("/{id}/script")
-    public ResponseEntity<byte[]> getMovieScript(@PathVariable Long id) {
-        MovieDto movie = movieService.getMovieById(id);
-        byte[] scriptData = movie.getScript();
-        return ResponseEntity.ok()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(scriptData);
-    }
 
     @GetMapping("/count")
     public int getMoviesCountByUserId(@AuthenticationPrincipal OAuth2User principal) {

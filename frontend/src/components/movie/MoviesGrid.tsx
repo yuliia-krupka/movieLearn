@@ -83,14 +83,20 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
     }
 
 
-    const filteredMovies = useMemo(() =>
-        searchQuery ? movies : (
-            selectedGenres.length === 0
-                ? movies
-                : movies.filter(movie =>
-                    selectedGenres.some(genre => movie.genres.includes(genre))
-                )
-        ), [movies, searchQuery, selectedGenres]);
+    const filteredMovies = useMemo(() => {
+        let result = movies;
+        if (searchQuery) {
+            result = result.filter(movie =>
+                movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+        if (selectedGenres.length > 0) {
+            result = result.filter(movie =>
+                selectedGenres.some(genre => movie.genres.includes(genre))
+            );
+        }
+        return result;
+    }, [movies, searchQuery, selectedGenres]);
 
     const currentMovies = useMemo(() =>
         filteredMovies.slice(

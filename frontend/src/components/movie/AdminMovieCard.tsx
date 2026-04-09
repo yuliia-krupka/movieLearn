@@ -43,23 +43,30 @@ const AdminMovieCard: React.FC<AdminMovieCardProps> = ({movie, onDelete}) => {
                 variant="borderless"
                 onClick={() => navigate(`/movies/${movie.id}`)}
                 cover={
-                    imageSource ? (
-                        <img
-                            alt={movie.title}
-                            src={imageSource}
-                        />
-                    ) : (
-                        <div style={{
-                            backgroundColor: '#f3f4f6',
-                            aspectRatio: '2/3',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#9ca3af'
-                        }}>
-                            No Image
-                        </div>
-                    )
+                    <div style={{position: 'relative'}}>
+                        {imageSource ? (
+                            <img
+                                alt={movie.title}
+                                src={imageSource}
+                            />
+                        ) : (
+                            <div style={{
+                                backgroundColor: '#f3f4f6',
+                                aspectRatio: '2/3',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#9ca3af'
+                            }}>
+                                No Image
+                            </div>
+                        )}
+                        {movie.userEnglishLevel && (
+                            <div className="movie-card-level-badge">
+                                {movie.userEnglishLevel}
+                            </div>
+                        )}
+                    </div>
                 }
             >
                 <div className="admin-movie-info">
@@ -67,6 +74,11 @@ const AdminMovieCard: React.FC<AdminMovieCardProps> = ({movie, onDelete}) => {
                     <div className="admin-movie-genre">
                         {movie.genres && movie.genres.length > 0 ? movie.genres.join(', ') : 'No genre'}
                     </div>
+                    {movie.creatorId && (
+                        <div className="admin-movie-creator">
+                            Creator ID: {movie.creatorId}
+                        </div>
+                    )}
                 </div>
             </Card>
             <div className="admin-card-actions">

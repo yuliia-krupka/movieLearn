@@ -56,18 +56,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/movies/{movieId}")
-    public ResponseEntity<Void> addMovieToUser(
-            @PathVariable Long movieId,
-            @AuthenticationPrincipal OAuth2User oauth2User) {
-        if (oauth2User == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        UserDto user = userService.getCurrentUser(oauth2User);
-        userService.addMovieToUser(movieId, user.getId());
-        return ResponseEntity.ok().build();
-    }
-
     @PutMapping("/account/update")
     public ResponseEntity<UserDto> updateUser(@AuthenticationPrincipal OAuth2User oauth2User,
                                               @RequestBody UserDto userDto) {

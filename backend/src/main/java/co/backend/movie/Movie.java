@@ -21,6 +21,13 @@ public class Movie {
     private Long id;
     private String title;
 
+    @Column(name = "creator_id")
+    private Long creatorId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creator_id", insertable = false, updatable = false)
+    private User creator;
+
     private Integer tmdbId;
 
     @Column(name = "poster_path")
@@ -37,8 +44,5 @@ public class Movie {
     @ManyToMany
     @JoinTable(name = "movie_genre", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "movies")
-    private List<User> users = new ArrayList<>();
 
 }
