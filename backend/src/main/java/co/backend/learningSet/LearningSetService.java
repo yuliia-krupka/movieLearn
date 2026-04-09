@@ -143,12 +143,15 @@ public class LearningSetService {
         return potentialSet;
     }
 
-    public LearningSetDto getById(Long id) {
-        return learningSetMapper.toDto(findSetById(id));
+    public LearningSetDto getById(Long id, Long userId) {
+        LearningSet set = findSetById(id);
+        validateOwnership(set, userId);
+        return learningSetMapper.toDto(set);
     }
 
-    public void updateStatus(Long id, LearningSetStatus status) {
+    public void updateStatus(Long id, LearningSetStatus status, Long userId) {
         LearningSet set = findSetById(id);
+        validateOwnership(set, userId);
         set.setStatus(status);
         learningSetRepository.save(set);
 

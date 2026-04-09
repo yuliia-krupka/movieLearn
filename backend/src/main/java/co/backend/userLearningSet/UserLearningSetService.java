@@ -1,6 +1,7 @@
 package co.backend.userLearningSet;
 
 import co.backend.exceptions.NotFoundException;
+import co.backend.exceptions.ForbiddenException;
 import co.backend.learningSet.LearningSetRepository;
 import co.backend.user.UserRepository;
 import co.backend.userLearningItemStatus.UserLearningItemStatus;
@@ -42,6 +43,10 @@ public class UserLearningSetService {
                 .orElseGet(() -> {
                     LearningSet learningSet = learningSetRepository.findById(learningSetId)
                             .orElseThrow(() -> new NotFoundException("Learning set not found"));
+
+                    if (learningSet.getCreatorId() != null && !learningSet.getCreatorId().equals(userId)) {
+                        throw new ForbiddenException("You do not have permission to use this learning set.");
+                    }
 
                     if (learningSet.getMovie() != null) {
                         Long movieId = learningSet.getMovie().getId();

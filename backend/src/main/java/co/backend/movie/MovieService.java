@@ -33,12 +33,17 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-    public MovieDto getMovieById(Long id) {
+    public MovieDto getMovieById(Long id, Long requestingUserId, boolean isAdmin) {
         if (id == null) {
             throw new BadRequestException("Id must be provided");
         }
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Movie with id " + id + " not found"));
+
+        if (!isAdmin && !Objects.equals(movie.getCreatorId(), requestingUserId)) {
+            throw new ForbiddenException("You do not have permission to view this movie.");
+        }
+
         return movieMapper.toDto(movie);
     }
 

@@ -1,6 +1,7 @@
 package co.backend.userLearningItemStatus;
 
 import co.backend.exceptions.NotFoundException;
+import co.backend.exceptions.ForbiddenException;
 import co.backend.learningItem.LearningItemRepository;
 import co.backend.user.UserRepository;
 import co.backend.userLearningItemStatus.dto.AnswerDto;
@@ -40,6 +41,11 @@ public class UserLearningItemStatusService {
                             .orElseThrow(() -> new NotFoundException("User not found")));
                     var learningItem = learningItemRepository.findById(learningItemId)
                             .orElseThrow(() -> new NotFoundException("Learning item not found"));
+
+                    if (learningItem.getLearningSet().getCreatorId() != null && !learningItem.getLearningSet().getCreatorId().equals(userId)) {
+                        throw new ForbiddenException("You do not have permission to access items in this learning set.");
+                    }
+
                     newStatus.setLearningItem(learningItem);
                     newStatus.setLearningSet(learningItem.getLearningSet());
                     newStatus.setCorrectAnswers(0);

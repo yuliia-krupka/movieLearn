@@ -33,8 +33,10 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public MovieDto getMovieById(@PathVariable Long id) {
-        return movieService.getMovieById(id);
+    public MovieDto getMovieById(@PathVariable Long id, @AuthenticationPrincipal OAuth2User principal) {
+        User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
+        boolean isAdmin = user.getRole() != null && user.getRole().name().equals("ADMIN");
+        return movieService.getMovieById(id, user.getId(), isAdmin);
     }
 
     @DeleteMapping("/{id}")

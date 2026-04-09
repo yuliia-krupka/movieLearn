@@ -24,8 +24,9 @@ public class LearningSetController {
     private final UserService userService;
 
     @GetMapping("/{id}")
-    public LearningSetDto getById(@PathVariable Long id) {
-        return learningSetService.getById(id);
+    public LearningSetDto getById(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oauth2User) {
+        Long userId = userService.getCurrentUser(oauth2User).getId();
+        return learningSetService.getById(id, userId);
     }
 
     @GetMapping("/movie/{movieId}")
@@ -55,8 +56,9 @@ public class LearningSetController {
     }
 
     @PostMapping("/{setId}/approve")
-    public void approveSet(@PathVariable Long setId) {
-        learningSetService.updateStatus(setId, LearningSetStatus.READY);
+    public void approveSet(@PathVariable Long setId, @AuthenticationPrincipal OAuth2User oauth2User) {
+        Long userId = userService.getCurrentUser(oauth2User).getId();
+        learningSetService.updateStatus(setId, LearningSetStatus.READY, userId);
     }
 
     @GetMapping("/movie/{movieId}/latest")
