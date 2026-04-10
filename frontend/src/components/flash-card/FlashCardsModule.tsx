@@ -223,7 +223,6 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                     <button className="back-to-movie-btn" onClick={handleBackToMovie}>
                         ← Back to Movie
                     </button>
-                    <h2>{learningSet.name}</h2>
                 </div>
             )}
 
