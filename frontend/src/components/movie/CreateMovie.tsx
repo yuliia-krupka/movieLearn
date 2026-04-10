@@ -216,6 +216,7 @@ const CreateMovieForm: React.FC = () => {
                                 value ? Promise.resolve() : Promise.reject(new Error('You must agree to the data rules')),
                         },
                     ]}
+                    className="checkbox-agreement"
                 >
                     <Checkbox>
                         I confirm that I have the right to upload this script and I agree that the data will be

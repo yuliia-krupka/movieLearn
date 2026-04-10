@@ -1,7 +1,14 @@
 import React from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
-import {CloseOutlined, CheckOutlined, PlusOutlined, CaretRightOutlined, SoundOutlined, InfoCircleOutlined} from '@ant-design/icons';
+import {
+    CloseOutlined,
+    CheckOutlined,
+    PlusOutlined,
+    CaretRightOutlined,
+    SoundOutlined,
+    ExclamationCircleOutlined
+} from '@ant-design/icons';
 import {Spin} from 'antd';
 import {useAuth} from '../auth/useAuth';
 import './UpdateFlashCards.css';
@@ -134,9 +141,9 @@ const UpdateFlashCards: React.FC = () => {
                 </div>
 
                 {learningSet?.status !== 'READY' && (
-                    <div className="warning-message">
-                        <InfoCircleOutlined/>
-                        Увага: після підтвердження флещ карток сценарій не буде збережено і флеш-картки не можна буде згенерувати заново.
+                    <div className="warning-message prominent-warning">
+                        <ExclamationCircleOutlined/>
+                        <span><strong>Important:</strong> Once you approve these flashcards, the movie script will be permanently deleted and you won't be able to regenerate the flashcards again.</span>
                     </div>
                 )}
             </div>

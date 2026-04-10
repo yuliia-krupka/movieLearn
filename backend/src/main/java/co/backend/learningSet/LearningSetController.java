@@ -1,7 +1,6 @@
 package co.backend.learningSet;
 
 import co.backend.learningItem.LearningItemDto;
-import co.backend.user.EnglishLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +28,6 @@ public class LearningSetController {
         return learningSetService.getById(id, userId);
     }
 
-    @GetMapping("/movie/{movieId}")
-    public LearningSetDto getOrCreateByMovie(@PathVariable Long movieId) {
-        return learningSetService.getOrCreateByMovieId(movieId);
-    }
 
     @GetMapping("/{id}/flashcards")
     public List<LearningItemDto> getFlashCards(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oauth2User) {
@@ -64,44 +59,18 @@ public class LearningSetController {
     @GetMapping("/movie/{movieId}/latest")
     public Optional<LearningSetDto> getLatestByUserAndMovie(
             @PathVariable Long movieId,
-            @AuthenticationPrincipal OAuth2User oauth2User,
-            @RequestParam(required = false) EnglishLevel level,
-            @RequestParam(required = false) String interests) {
+            @AuthenticationPrincipal OAuth2User oauth2User) {
         Long userId = userService.getCurrentUser(oauth2User).getId();
 
-        log.info("getLatestByUserAndMovie called - movieId: {}, userId: {}, level: {}, interests: {}",
-                movieId, userId, level, interests);
+        log.info("getLatestByUserAndMovie called - movieId: {}, userId: {}", movieId, userId);
 
-        if (level != null) {
-            log.info("Looking for user-specific set for userId: {}, movieId: {} with level {}...", userId, movieId,
-                    level);
-            Optional<LearningSetDto> userSet = learningSetService.getLatestByUserAndMovieWithLevel(userId, movieId,
-                    level);
-            if (userSet.isPresent()) {
-                log.info("Found user-specific set: {}", userSet.get().getId());
-                return userSet;
-            } else {
-                log.info("No user-specific set found for userId: {}, movieId: {} with level {}", userId, movieId,
-                        level);
-            }
-        }
-
-        if (level == null) {
-            log.info("No level specified, looking for any user set for userId: {}, movieId: {}", userId, movieId);
-            Optional<LearningSetDto> anyUserSet = learningSetService.getLatestByUserAndMovie(userId, movieId);
-            if (anyUserSet.isPresent()) {
-                log.info("Found any user set: {}", anyUserSet.get().getId());
-                return anyUserSet;
-            } else {
-                log.info("No user set found at all for userId: {}, movieId: {} - will need to generate", userId,
-                        movieId);
-            }
+        Optional<LearningSetDto> userSet = learningSetService.getLatestByUserAndMovie(userId, movieId);
+        if (userSet.isPresent()) {
+            log.info("Found user set: {}", userSet.get().getId());
+            return userSet;
         } else {
-            log.info(
-                    "Level {} specified but no matching set found for userId: {}, movieId: {} - will need to generate new set",
-                    level, userId, movieId);
+            log.info("No user set found for userId: {}, movieId: {} - will need to generate", userId, movieId);
+            return Optional.empty();
         }
-
-        return Optional.empty();
     }
 }

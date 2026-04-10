@@ -74,8 +74,7 @@ const MovieDetails: React.FC = () => {
             fetchMovie().catch(console.error);
 
             if (currentUserId && !isAdmin) {
-                const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
-                learningSetService.getLatestByUserAndMovie(Number(id), user?.englishLevel, interestsStr)
+                learningSetService.getLatestByUserAndMovie(Number(id))
                     .then(setLearningSet)
                     .catch(err => console.error('Error fetching learning set:', err));
             }
@@ -130,7 +129,7 @@ const MovieDetails: React.FC = () => {
                 }
             } catch (e: unknown) {
                 console.error('Error in handleStartStudying:', e);
-                const errorMessage = e instanceof Error ? e.message : 'Could not start studying';
+                const errorMessage = ErrorHandler.handleAxiosError(e, 'Could not start studying');
                 void message.error(errorMessage);
             } finally {
                 setIsGenerating(false);
@@ -146,14 +145,7 @@ const MovieDetails: React.FC = () => {
         );
         if (!movie) return null;
 
-        const normalizeInterests = (raw?: string | string[]): string => {
-            const str = Array.isArray(raw) ? raw.join(',') : (raw || '');
-            return str.split(/[,\s]+/).map(t => t.trim().toLowerCase()).filter(Boolean).sort().join(',');
-        };
-
-        const hasMatchingSet = learningSet != null &&
-            (!user?.englishLevel || learningSet.englishLevel === user.englishLevel) &&
-            normalizeInterests(user?.interests) === normalizeInterests(learningSet.interests);
+        const hasMatchingSet = learningSet != null;
 
         const imageSource = tmdbMovie
             ? getImageUrl(tmdbMovie.backdrop_path || tmdbMovie.poster_path, 'original')
@@ -242,7 +234,7 @@ const MovieDetails: React.FC = () => {
                                             <Button
                                                 className="primary-action-btn"
                                                 onClick={handleStartStudying}
-                                                disabled={learningSet?.status === 'READY'}
+                                                disabled={learningSet?.status === 'REVIEW'}
                                             >
                                                 {hasMatchingSet ? 'Continue Studying' : 'Start Studying'}
                                             </Button>

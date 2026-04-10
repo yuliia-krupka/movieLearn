@@ -34,7 +34,6 @@ public class LearningSetService {
     private final LearningSetMapper learningSetMapper;
     private final LearningItemMapper learningItemMapper;
     private final LearningItemRepository learningItemRepository;
-    private final TestDataProvider testDataProvider;
     private final OpenAiService openAiService;
     private final ScriptParser scriptParser;
     private final MovieRepository movieRepository;
@@ -101,47 +100,12 @@ public class LearningSetService {
         return set;
     }
 
-    public LearningSetDto generateForMovie(Long movieId) {
-        LearningSet set = testDataProvider.createTestLearningSet(movieId);
-        LearningSet saved = learningSetRepository.save(set);
-        return learningSetMapper.toDto(saved);
-    }
-
-    public Optional<LearningSetDto> getLatestByMovieId(Long movieId) {
-        return learningSetRepository.findTopByMovieIdOrderByDateDesc(movieId)
-                .map(learningSetMapper::toDto);
-    }
 
     public Optional<LearningSetDto> getLatestByUserAndMovie(Long userId, Long movieId) {
         return learningSetRepository.findTopByMovieIdAndCreatorIdOrderByDateDesc(movieId, userId)
                 .map(learningSetMapper::toDto);
     }
 
-    public Optional<LearningSetDto> getLatestByUserAndMovieWithLevel(Long userId, Long movieId,
-                                                                     EnglishLevel level) {
-        return learningSetRepository.findTopByMovieIdAndCreatorIdAndEnglishLevelOrderByDateDesc(movieId, userId, level)
-                .map(learningSetMapper::toDto);
-    }
-
-
-    public LearningSetDto getOrCreateByMovieId(Long movieId) {
-        LearningSetDto potentialSet = getLatestByMovieId(movieId).orElse(null);
-
-        if (potentialSet == null) {
-            return generateForMovie(movieId);
-        }
-
-        if (potentialSet.getLearningItems() == null || potentialSet.getLearningItems().isEmpty()) {
-            try {
-                learningSetRepository.deleteById(potentialSet.getId());
-            } catch (Exception e) {
-                log.error("Could not delete empty set {}: {}", potentialSet.getId(), e.getMessage());
-            }
-            return generateForMovie(movieId);
-        }
-
-        return potentialSet;
-    }
 
     public LearningSetDto getById(Long id, Long userId) {
         LearningSet set = findSetById(id);

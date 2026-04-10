@@ -49,15 +49,6 @@ public class OpenAiValidator {
                         throw new AiValidationException("AI validation failed: Answer cannot exceed 100 characters");
                     }
                 }
-            } else if (dto.getType() == LearningItemType.FLASH_CARD) {
-                if (dto.getText() != null) {
-                    int wordCount = dto.getText().split("\\s+").length;
-                    if (wordCount > 5) {
-                        log.warn("AI generated a full sentence instead of a phrase: '{}'", dto.getText());
-                        throw new AiValidationException(
-                                "AI returned a full sentence instead of a phrase: " + dto.getText());
-                    }
-                }
             }
         }
     }

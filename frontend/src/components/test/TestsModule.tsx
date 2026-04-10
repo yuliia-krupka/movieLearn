@@ -45,18 +45,15 @@ const TestsModule: React.FC = () => {
                 if (learningSetId) {
                     learningSetData = await learningSetService.getById(learningSetId);
                 } else {
-                    const interestsStr = Array.isArray(user?.interests) ? user.interests.join(',') : user?.interests;
                     const userLearningSet = await learningSetService.getLatestByUserAndMovie(
-                        Number(movieId),
-                        user?.englishLevel,
-                        interestsStr
+                        Number(movieId)
                     );
 
                     if (userLearningSet) {
                         learningSetData = userLearningSet;
                     } else {
                         console.log('Starting test generation...');
-                        learningSetData = await learningSetService.getOrCreateByMovie(Number(movieId));
+                        learningSetData = await learningSetService.startLearningForUser(Number(movieId));
                         console.log('Test generation completed');
                     }
                 }

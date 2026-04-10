@@ -48,7 +48,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
                 if (learningSetId) {
                     learningSetData = await learningSetService.getById(learningSetId);
                 } else {
-                    learningSetData = await learningSetService.getOrCreateByMovie(movieId);
+                    learningSetData = await learningSetService.startLearningForUser(movieId);
                 }
 
                 setLearningSet(learningSetData);

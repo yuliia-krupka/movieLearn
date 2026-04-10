@@ -25,6 +25,10 @@
     border: none;
 }
 
+.checkbox-agreement {
+    margin-top: 16px;
+}
+
 .create-form-header {
     display: flex;
     align-items: center;
