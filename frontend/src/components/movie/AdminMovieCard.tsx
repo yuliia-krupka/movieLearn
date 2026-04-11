@@ -3,8 +3,7 @@ import {Card, Modal} from 'antd';
 import {EditOutlined, DeleteOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
 import type {Movie} from '../../types/movie';
-import {getImageUrl} from '../../services/tmdbService';
-import './AdminMoviesList.css';
+import './AdminMovieCard.css';
 
 interface AdminMovieCardProps {
     movie: Movie;
@@ -34,7 +33,7 @@ const AdminMovieCard: React.FC<AdminMovieCardProps> = ({movie, onDelete}) => {
         });
     };
 
-    const imageSource = getImageUrl(movie.posterPath || null);
+    const imageSource = movie.image || null;
 
     return (
         <div className="admin-movie-card-container">
@@ -43,21 +42,14 @@ const AdminMovieCard: React.FC<AdminMovieCardProps> = ({movie, onDelete}) => {
                 variant="borderless"
                 onClick={() => navigate(`/movies/${movie.id}`)}
                 cover={
-                    <div style={{position: 'relative'}}>
+                    <div className="admin-card-cover-wrapper">
                         {imageSource ? (
                             <img
                                 alt={movie.title}
                                 src={imageSource}
                             />
                         ) : (
-                            <div style={{
-                                backgroundColor: '#f3f4f6',
-                                aspectRatio: '2/3',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: '#9ca3af'
-                            }}>
+                            <div className="admin-card-placeholder">
                                 No Image
                             </div>
                         )}

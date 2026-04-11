@@ -1,8 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Card, Tag, Progress} from 'antd';
 import {CheckCircleOutlined, TrophyOutlined, BookOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
-import {tmdbService, getImageUrl, type TMDBMovie} from '../../services/tmdbService';
 import type {MovieProgress} from '../../types/learningSet';
 
 interface StatMovieCardProps {
@@ -11,19 +10,10 @@ interface StatMovieCardProps {
 
 const StatMovieCard: React.FC<StatMovieCardProps> = ({item}) => {
     const navigate = useNavigate();
-    const [tmdbMovie, setTmdbMovie] = useState<TMDBMovie | null>(null);
 
-    useEffect(() => {
-        if (item.tmdbId) {
-            tmdbService.getMovieDetails(item.tmdbId)
-                .then(setTmdbMovie)
-                .catch(err => console.error('Error fetching TMDB for stat:', err));
-        }
-    }, [item.tmdbId]);
-
-    const imageSource = tmdbMovie
-        ? getImageUrl(tmdbMovie.backdrop_path || tmdbMovie.poster_path)
-        : '/placeholder-movie.png';
+    const imageSource = item.image || (item.tmdbId
+        ? `/abstract/abstract-${((item.tmdbId * 7) % 10) + 1}.svg`
+        : '/placeholder-movie.png');
 
     return (
         <Card

@@ -5,7 +5,7 @@ import {
     Button,
     Typography,
     Row,
-    Col, Card, Image, Checkbox,
+    Col, Card, Image as AntImage, Checkbox,
     Spin, Space
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
@@ -19,7 +19,7 @@ import GenreSelector from '../genre/GenreSelector.tsx';
 import FileUploader from './FileUploader.tsx';
 import AddGenreModal from '../genre/AddGenreModal.tsx';
 import TMDBSearch from './TMDBSearch.tsx';
-import {type TMDBMovie, getMovieImageUrl, tmdbGenreIdToName} from '../../services/tmdbService';
+import {type TMDBMovie, getAbstractImage, tmdbGenreIdToName} from '../../services/tmdbService';
 import MainLayout from '../layout/MainLayout.tsx';
 import useMessage from 'antd/es/message/useMessage';
 import {ErrorHandler} from '../err/ErrorHandler.tsx';
@@ -72,7 +72,7 @@ const CreateMovieForm: React.FC = () => {
         movieData: {
             title: string;
             tmdbId: number | undefined;
-            posterPath: string | null | undefined;
+            image: string;
             overview: string | undefined;
             genres: string[];
         };
@@ -80,11 +80,15 @@ const CreateMovieForm: React.FC = () => {
     }
 
     const createFormData = (values: MovieFormData): MoviePayload => {
+        // Generate abstract image path based on TMDB id
+        const imageValue = selectedTmdbMovie?.id
+            ? `/abstract/abstract-${((selectedTmdbMovie.id * 7) % 10) + 1}.svg`
+            : '/placeholder-movie.png';
         const movieData = {
             title: values.title,
             tmdbId: selectedTmdbMovie?.id,
-            posterPath: selectedTmdbMovie?.backdrop_path || selectedTmdbMovie?.poster_path,
-            overview: selectedTmdbMovie?.overview,
+            image: imageValue,
+            overview: values.overview || selectedTmdbMovie?.overview,
             genres: values.genres,
         };
         const payload: MoviePayload = {movieData};
@@ -147,6 +151,7 @@ const CreateMovieForm: React.FC = () => {
                         setSelectedTmdbMovie(movie);
                         form.setFieldsValue({
                             title: movie.title,
+                            overview: movie.overview,
                             genres: movie.genre_ids?.map(id => tmdbGenreIdToName[id]).filter(Boolean) ?? []
                         });
                     }}/>
@@ -169,6 +174,19 @@ const CreateMovieForm: React.FC = () => {
                     <Input placeholder="Enter movie title" showCount maxLength={100}/>
                 </Form.Item>
 
+                <Form.Item
+                    label="Description (Override if needed)"
+                    name="overview"
+                    rules={[{required: true, message: 'Please enter movie description'}]}
+                >
+                    <Input.TextArea
+                        placeholder="Enter movie description"
+                        rows={4}
+                        showCount
+                        maxLength={1000}
+                    />
+                </Form.Item>
+
                 <GenreSelector
                     genres={genres}
                     onAddGenre={() => setIsGenreModalVisible(true)}
@@ -180,11 +198,14 @@ const CreateMovieForm: React.FC = () => {
                 <Row gutter={[24, 16]}>
                     <Col xs={24} md={12}>
                         {selectedTmdbMovie ? (
-                            <Image
-                                src={getMovieImageUrl(selectedTmdbMovie)}
-                                alt="movie preview"
-                                className="movie-preview-image"
-                            />
+                            <div className="previews-container">
+                                <AntImage
+                                    src={getAbstractImage(selectedTmdbMovie.id)}
+                                    alt="abstract preview"
+                                    className="movie-preview-image"
+                                    fallback="/placeholder-movie.png"
+                                />
+                            </div>
                         ) : (
                             <div className="movie-preview-placeholder">
                                 No Preview Available

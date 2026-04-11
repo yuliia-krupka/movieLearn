@@ -34,8 +34,8 @@
 }
 
 .tmdb-search-avatar-img {
-    width: 80px;
-    height: 45px;
+    width: 45px;
+    height: 68px;
     object-fit: cover;
     border-radius: 4px;
 }

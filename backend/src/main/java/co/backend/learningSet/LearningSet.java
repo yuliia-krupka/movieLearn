@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Entity
 @Table(name = "learning_set")
 @Data
@@ -26,6 +29,7 @@ public class LearningSet {
 
     @ManyToOne
     @JoinColumn(name = "movie_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Movie movie;
 
     @OneToMany(mappedBy = "learningSet", cascade = CascadeType.ALL, orphanRemoval = true)

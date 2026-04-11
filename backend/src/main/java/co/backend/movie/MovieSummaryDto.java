@@ -13,7 +13,7 @@ public class MovieSummaryDto {
     private Long id;
     private String title;
     private Integer tmdbId;
-    private String posterPath;
+    private String image;
     private String overview;
     private List<String> genres;
     private Long creatorId;

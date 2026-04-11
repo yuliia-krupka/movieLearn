@@ -2,6 +2,7 @@ package co.backend.user;
 
 import co.backend.exceptions.*;
 import co.backend.learningSet.LearningSetRepository;
+import co.backend.movie.MovieRepository;
 import co.backend.userLearningItemStatus.UserLearningItemStatusRepository;
 import co.backend.userLearningSet.UserLearningSetRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class UserService {
     private final LearningSetRepository learningSetRepository;
     private final UserLearningSetRepository userLearningSetRepository;
     private final UserLearningItemStatusRepository userLearningItemStatusRepository;
+    private final MovieRepository movieRepository;
 
     public List<UserDto> getAllUsers(String email) {
         List<User> users;
@@ -67,8 +69,9 @@ public class UserService {
         userLearningItemStatusRepository.deleteByUserId(id);
         userLearningSetRepository.deleteByUserId(id);
         learningSetRepository.deleteByCreatorId(id);
+        movieRepository.deleteByCreatorId(id);
 
-        userRepository.deleteById(id);
+        userRepository.delete(userToDelete);
     }
 
     public UserDto createUserFromOAuth2(OAuth2User principal) {

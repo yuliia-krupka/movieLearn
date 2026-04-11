@@ -7,7 +7,7 @@ import MainLayout from "../layout/MainLayout.tsx";
 import {useAuth} from '../auth/useAuth';
 import {learningSetService} from '../../services/learningSetService';
 import {movieService} from '../../services/movieService';
-import {tmdbService, getImageUrl, type TMDBMovie} from '../../services/tmdbService';
+import {tmdbService, type TMDBMovie} from '../../services/tmdbService';
 import './MovieDetails.css';
 import learningCat from '../../assets/learning-cat.png';
 import './movies.css';
@@ -147,11 +147,9 @@ const MovieDetails: React.FC = () => {
 
         const hasMatchingSet = learningSet != null;
 
-        const imageSource = tmdbMovie
-            ? getImageUrl(tmdbMovie.backdrop_path || tmdbMovie.poster_path, 'original')
-            : '/placeholder-movie.png';
+        const imageSource = movie?.image || '/placeholder-movie.png';
 
-        const descriptionText = tmdbMovie?.overview || '';
+        const descriptionText = movie?.overview || tmdbMovie?.overview || '';
 
         return (
             <MainLayout>
@@ -179,8 +177,6 @@ const MovieDetails: React.FC = () => {
                         src={imageSource}
                         className="movie-poster-fullwidth"
                     />
-
-                    <div className="image-fade-bottom"/>
 
                     <div className="movie-title-overlay">
                         <div className="movie-title-main">
@@ -231,13 +227,14 @@ const MovieDetails: React.FC = () => {
                                                     Refine Flashcards
                                                 </Button>
                                             )}
-                                            <Button
-                                                className="primary-action-btn"
-                                                onClick={handleStartStudying}
-                                                disabled={learningSet?.status === 'REVIEW'}
-                                            >
-                                                {hasMatchingSet ? 'Continue Studying' : 'Start Studying'}
-                                            </Button>
+                                            {learningSet?.status !== 'REVIEW' && (
+                                                <Button
+                                                    className="primary-action-btn"
+                                                    onClick={handleStartStudying}
+                                                >
+                                                    {hasMatchingSet ? 'Continue Studying' : 'Start Studying'}
+                                                </Button>
+                                            )}
                                         </div>
                                     )}
 

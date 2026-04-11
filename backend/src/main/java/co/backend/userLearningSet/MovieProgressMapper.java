@@ -30,6 +30,15 @@ public class MovieProgressMapper {
         } else {
             dto.setTestsScore(0);
         }
+        var movie = uls.getLearningSet().getMovie();
+        if (movie != null) {
+            String imagePath = movie.getImage();
+            if (imagePath == null || imagePath.isEmpty()) {
+                int tmdbId = movie.getTmdbId() != null ? movie.getTmdbId() : 1;
+                imagePath = "/abstract/abstract-" + (((tmdbId * 7) % 10) + 1) + ".svg";
+            }
+            dto.setImage(imagePath);
+        }
         return dto;
     }
 }

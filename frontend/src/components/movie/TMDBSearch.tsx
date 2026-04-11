@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {Input, Spin, List, Typography} from 'antd';
 import {SearchOutlined} from '@ant-design/icons';
-import {tmdbService, type TMDBMovie, getMovieImageUrl} from '../../services/tmdbService';
+import {tmdbService, type TMDBMovie, getAbstractImage} from '../../services/tmdbService';
 import {useDebounce} from '../hooks/useDebounce';
 import './TMDBSearch.css';
 
@@ -105,7 +105,7 @@ const TMDBSearch: React.FC<TMDBSearchProps> = ({onSelectMovie, initialQuery = ''
                                     <List.Item.Meta
                                         avatar={
                                             <img
-                                                src={getMovieImageUrl(movie)}
+                                                src={getAbstractImage(movie.id)}
                                                 alt={movie.title}
                                                 className="tmdb-search-avatar-img"
                                             />

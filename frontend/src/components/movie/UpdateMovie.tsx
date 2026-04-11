@@ -8,8 +8,7 @@ import {
     Space,
     Spin,
     Row,
-    Col,
-    Image
+    Col, Image as AntImage
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 import useMessage from 'antd/es/message/useMessage';
@@ -25,7 +24,7 @@ import MainLayout from "../layout/MainLayout.tsx";
 import GenreSelector from "../genre/GenreSelector.tsx";
 import {ErrorHandler} from "../err/ErrorHandler.tsx";
 import TMDBSearch from "./TMDBSearch.tsx";
-import {getMovieImageUrl, tmdbGenreIdToName} from "../../services/tmdbService.ts";
+import {tmdbGenreIdToName, getAbstractImage} from "../../services/tmdbService.ts";
 
 const {Title} = Typography;
 
@@ -38,17 +37,14 @@ const UpdateMovieForm: React.FC = () => {
         currentImageUrl,
         setCurrentImageUrl,
         setTmdbId,
-        setTmdbPosterPath,
+        setImage,
         setTmdbOverview,
-
         genres,
         genresLoading,
         addGenre,
         fetchGenres,
-
         handleSubmit,
         handleCancel,
-
         id
     } = useUpdateMovie();
 
@@ -113,6 +109,7 @@ const UpdateMovieForm: React.FC = () => {
                         onFinish={handleSubmit}
                         initialValues={{
                             title: movie?.title || '',
+                            overview: movie?.overview || '',
                             genres: movie?.genres || []
                         }}
                     >
@@ -136,6 +133,19 @@ const UpdateMovieForm: React.FC = () => {
                                     <Input placeholder="Enter movie title" showCount maxLength={100}/>
                                 </Form.Item>
 
+                                <Form.Item
+                                    name="overview"
+                                    label="Description (Override if needed)"
+                                    rules={[{required: true, message: 'Please enter movie description'}]}
+                                >
+                                    <Input.TextArea
+                                        placeholder="Enter movie description"
+                                        rows={4}
+                                        showCount
+                                        maxLength={1000}
+                                    />
+                                </Form.Item>
+
                                 <GenreSelector
                                     genres={genres}
                                     onAddGenre={handleAddGenre}
@@ -150,11 +160,13 @@ const UpdateMovieForm: React.FC = () => {
                                         <Form.Item label="Relink TMDB Movie (Optional)">
                                             <TMDBSearch onSelectMovie={(m) => {
                                                 setTmdbId(m.id);
-                                                setTmdbPosterPath(m.backdrop_path || m.poster_path);
+                                                const abstractPath = getAbstractImage(m.id);
+                                                setImage(abstractPath);
                                                 setTmdbOverview(m.overview);
-                                                setCurrentImageUrl(getMovieImageUrl(m));
+                                                setCurrentImageUrl(abstractPath);
                                                 form.setFieldsValue({
                                                     title: m.title,
+                                                    overview: m.overview,
                                                     genres: m.genre_ids?.map(id => tmdbGenreIdToName[id]).filter(Boolean) ?? []
                                                 });
                                                 void messageApi.success('TMDB Movie Selected. Remember to Save Changes!');
@@ -162,11 +174,11 @@ const UpdateMovieForm: React.FC = () => {
                                         </Form.Item>
                                         {currentImageUrl && (
                                             <div className="current-image-wrapper">
-                                                <h5 className="current-image-label">Current Image:</h5>
-                                                <Image
+                                                <AntImage
                                                     src={currentImageUrl}
-                                                    alt="Current poster"
-                                                    className="current-image-preview"
+                                                    alt="movie abstract cover"
+                                                    className="movie-preview-image"
+                                                    fallback="/placeholder-movie.png"
                                                 />
                                             </div>
                                         )}

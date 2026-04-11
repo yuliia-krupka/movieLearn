@@ -4,6 +4,7 @@ import axios from 'axios';
 import {useNavigate, useParams} from "react-router-dom";
 import {useGenres} from './useGenres';
 import {movieService} from '../../services/movieService';
+import {getAbstractImage} from '../../services/tmdbService';
 
 import type {Movie, FormValues} from '../../types/movie';
 
@@ -13,7 +14,7 @@ const useUpdateMovie = () => {
     const [submitting, setSubmitting] = useState<boolean>(false);
     const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
     const [tmdbId, setTmdbId] = useState<number | null>(null);
-    const [tmdbPosterPath, setTmdbPosterPath] = useState<string | null>(null);
+    const [image, setImage] = useState<string | null>(null);
     const [tmdbOverview, setTmdbOverview] = useState<string | null>(null);
 
     const navigate = useNavigate();
@@ -39,23 +40,17 @@ const useUpdateMovie = () => {
                 form.setFieldsValue({
                     title: movieData.title,
                     tmdbId: movieData.tmdbId,
+                    overview: movieData.overview,
                     genres: movieData.genres,
                 });
 
                 if (movieData.tmdbId) {
                     setTmdbId(movieData.tmdbId);
-                    setTmdbPosterPath(movieData.posterPath || null);
+                    // Generate and save abstract image path
+                    const abstractImageUrl = getAbstractImage(movieData.tmdbId);
+                    setImage(abstractImageUrl);
                     setTmdbOverview(movieData.overview || null);
-                    try {
-                        const tmdbService = (await import('../../services/tmdbService')).tmdbService;
-                        const getMovieImageUrl = (await import('../../services/tmdbService')).getMovieImageUrl;
-                        const tmdbDetails = await tmdbService.getMovieDetails(movieData.tmdbId);
-                        if (tmdbDetails && isMounted) {
-                            setCurrentImageUrl(getMovieImageUrl(tmdbDetails));
-                        }
-                    } catch (error) {
-                        console.error('Failed to fetch TMDB details for image:', error);
-                    }
+                    setCurrentImageUrl(abstractImageUrl);
                 }
 
             } catch (error) {
@@ -85,8 +80,8 @@ const useUpdateMovie = () => {
             const moviePayload = {
                 title: values.title,
                 tmdbId: form.getFieldValue("tmdbId") || tmdbId,
-                posterPath: tmdbPosterPath,
-                overview: tmdbOverview,
+                image: image || getAbstractImage(form.getFieldValue("tmdbId") || tmdbId || 1),
+                overview: values.overview || tmdbOverview,
                 genres: values.genres
             };
 
@@ -137,8 +132,8 @@ const useUpdateMovie = () => {
         setCurrentImageUrl,
         tmdbId,
         setTmdbId,
-        tmdbPosterPath,
-        setTmdbPosterPath,
+        image,
+        setImage,
         tmdbOverview,
         setTmdbOverview,
 

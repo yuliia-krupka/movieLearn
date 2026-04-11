@@ -1,7 +1,6 @@
 import React from 'react';
 import {Card} from 'antd';
 import {useNavigate} from 'react-router-dom';
-import {getImageUrl} from '../../services/tmdbService';
 import './MovieCard.css';
 import './movies.css';
 
@@ -20,7 +19,7 @@ const MovieCard: React.FC<MovieCardProps> = React.memo(({movie}) => {
         navigate(`/movies/${movie.id}`);
     };
 
-    const imageSource = getImageUrl(movie.posterPath || null);
+    const imageSource = movie.image || '/placeholder-movie.png';
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {

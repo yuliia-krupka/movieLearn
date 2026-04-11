@@ -150,6 +150,16 @@
     cursor: pointer;
 }
 
+.image-placeholder-text {
+    padding: 16px;
+    background-color: var(--color-bg-secondary);
+    border: 1px dashed var(--color-placeholder);
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    text-align: center;
+}
+
 .script-info-filename {
     margin: 0 !important;
 }

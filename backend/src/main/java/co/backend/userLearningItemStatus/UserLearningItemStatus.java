@@ -24,6 +24,7 @@ public class UserLearningItemStatus {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnoreProperties({"role", "profilePictureUrl"})
     private User user;
 

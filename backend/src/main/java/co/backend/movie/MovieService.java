@@ -78,8 +78,8 @@ public class MovieService {
         movie.setTmdbId(movieDto.getTmdbId());
         movie.setCreatorId(creatorId);
 
-        if (movieDto.getPosterPath() != null) {
-            movie.setPosterPath(movieDto.getPosterPath());
+        if (movieDto.getImage() != null) {
+            movie.setImage(movieDto.getImage());
         }
         if (movieDto.getOverview() != null) {
             movie.setOverview(movieDto.getOverview());
@@ -143,8 +143,8 @@ public class MovieService {
                 }
                 movie.setTmdbId(movieDto.getTmdbId());
             }
-            if (movieDto.getPosterPath() != null) {
-                movie.setPosterPath(movieDto.getPosterPath());
+            if (movieDto.getImage() != null) {
+                movie.setImage(movieDto.getImage());
             }
             if (movieDto.getOverview() != null) {
                 movie.setOverview(movieDto.getOverview());

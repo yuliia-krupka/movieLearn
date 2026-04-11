@@ -335,6 +335,25 @@
     border-radius: var(--radius-sm);
 }
 
+.previews-container {
+    margin-bottom: 24px;
+}
+
+.preview-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.preview-label {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .movie-preview-image {
     width: 100%;
     max-width: 400px;

@@ -19,7 +19,7 @@ public class MovieDto {
     @Size(max = 100, message = "Title must not exceed 100 characters")
     private String title;
     private Integer tmdbId;
-    private String posterPath;
+    private String image;
     private String overview;
     @NotEmpty(message = "Genres must be provided")
     private List<String> genres;

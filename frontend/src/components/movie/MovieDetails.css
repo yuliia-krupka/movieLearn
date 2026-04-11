@@ -5,7 +5,7 @@
 
 .movie-poster-container {
     width: 100%;
-    height: 400px;
+    height: 320px;
     overflow: hidden;
     margin-bottom: 30px;
     position: relative;
@@ -17,12 +17,7 @@
     height: 100%;
     object-fit: cover;
     object-position: center 20%;
-    filter: brightness(0.7);
     transition: filter 0.5s ease;
-}
-
-.movie-poster-fullwidth:hover {
-    filter: brightness(0.85);
 }
 
 .movie-poster-placeholder {
@@ -41,16 +36,16 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 40px 20px 20px;
-    background: var(--gradient-dark-overlay);
+    padding: 30px 20px 20px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.25) 0%, transparent 100%);
     text-align: center;
 }
 
 .movie-title-main {
     color: white !important;
-    font-size: 45px;
+    font-size: 42px;
     font-family: var(--font-heading);
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.15em;
     animation: movieTitleEnter var(--transition-extra-slow) forwards;
@@ -73,7 +68,7 @@
     font-size: 1.2rem;
     color: var(--color-accent);
     font-weight: 600;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     text-transform: capitalize;
 }
 
@@ -81,7 +76,7 @@
     font-size: 1rem;
     color: var(--color-text-secondary);
     line-height: 1.6;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
@@ -134,12 +129,12 @@
 
 @media (max-width: 768px) {
     .movie-poster-container {
-        height: 320px;
-        margin-bottom: 30px;
+        height: 200px;
+        margin-bottom: 20px;
     }
 
     .movie-title-main {
-        font-size: 36px !important;
+        font-size: 24px !important;
     }
 
     .movie-title-overlay {

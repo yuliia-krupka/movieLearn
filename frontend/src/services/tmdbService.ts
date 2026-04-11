@@ -7,8 +7,6 @@ export interface TMDBMovie {
     id: number;
     title: string;
     overview: string;
-    poster_path: string | null;
-    backdrop_path: string | null;
     release_date: string;
     genre_ids?: number[];
 }
@@ -42,15 +40,8 @@ export interface TMDBSearchResult {
     total_results: number;
 }
 
-export const getImageUrl = (path: string | null, size: 'w500' | 'original' = 'w500') => {
-    if (!path) return '/placeholder-movie.png';
-    return `https://image.tmdb.org/t/p/${size}${path}`;
-};
-
-export const getMovieImageUrl = (movie: TMDBMovie | null, size: 'w500' | 'original' = 'w500') => {
-    if (!movie) return '/placeholder-movie.png';
-    const path = movie.backdrop_path || movie.poster_path;
-    return getImageUrl(path, size);
+export const getAbstractImage = (id: number): string => {
+    return `/abstract/abstract-${((id * 7) % 10) + 1}.svg`;
 };
 
 export const tmdbService = {
