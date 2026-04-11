@@ -40,7 +40,6 @@ function getStatusClass(status: string): string {
 const ResultsPage: React.FC<ResultsPageProps> = ({
                                                      flashcards,
                                                      results,
-                                                     learningSetName,
                                                      onTryAgain,
                                                      itemStatuses,
                                                      onGoToTest,
@@ -87,14 +86,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
                     </div>
                 </div>
 
-                <p className="results-movie-title">
-                    "{learningSetName}"
-                    {onGoToRefine && (
+                {onGoToRefine && (
+                    <div style={{textAlign: 'center', marginBottom: '20px'}}>
                         <button className="results-title-refine-btn" onClick={onGoToRefine}>
                             View Flashcards
                         </button>
-                    )}
-                </p>
+                    </div>
+                )}
 
                 <div className="results-list">
                     {flashcards.map((card, index) => {

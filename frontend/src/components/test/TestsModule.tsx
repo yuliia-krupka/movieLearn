@@ -238,11 +238,7 @@ const TestsModule: React.FC = () => {
     return (
         <MainLayout className="flashcard-content" fullHeight>
 
-            {learningSet && (
-                <div className="learning-set-info">
-                    <h2>{learningSet.name}</h2>
-                </div>
-            )}
+
 
             <div className="test-progress">
                 <div className="test-progress-fill" style={{width: `${progress}%`}}/>

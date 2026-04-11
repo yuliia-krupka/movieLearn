@@ -163,6 +163,7 @@
     .movie-details-action-group {
         flex-direction: column;
         width: 100%;
+        align-items: center;
     }
 
     .movie-details-action-group .primary-action-btn,
