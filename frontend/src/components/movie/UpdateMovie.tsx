@@ -6,9 +6,7 @@ import {
     Typography,
     Card,
     Space,
-    Spin,
-    Row,
-    Col, Image as AntImage
+    Spin
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
 import useMessage from 'antd/es/message/useMessage';
@@ -23,8 +21,6 @@ import AddGenreModal from '../genre/AddGenreModal.tsx';
 import MainLayout from "../layout/MainLayout.tsx";
 import GenreSelector from "../genre/GenreSelector.tsx";
 import {ErrorHandler} from "../err/ErrorHandler.tsx";
-import TMDBSearch from "./TMDBSearch.tsx";
-import {tmdbGenreIdToName, getAbstractImage} from "../../services/tmdbService.ts";
 
 const {Title} = Typography;
 
@@ -34,11 +30,6 @@ const UpdateMovieForm: React.FC = () => {
         submitting,
         movie,
         form,
-        currentImageUrl,
-        setCurrentImageUrl,
-        setTmdbId,
-        setImage,
-        setTmdbOverview,
         genres,
         genresLoading,
         addGenre,
@@ -154,36 +145,6 @@ const UpdateMovieForm: React.FC = () => {
                                     messageApi={messageApi}
                                     excludeMovieId={id ? parseInt(id) : undefined}
                                 />
-
-                                <Row gutter={[24, 16]}>
-                                    <Col xs={24} md={12}>
-                                        <Form.Item label="Relink TMDB Movie (Optional)">
-                                            <TMDBSearch onSelectMovie={(m) => {
-                                                setTmdbId(m.id);
-                                                const abstractPath = getAbstractImage(m.id);
-                                                setImage(abstractPath);
-                                                setTmdbOverview(m.overview);
-                                                setCurrentImageUrl(abstractPath);
-                                                form.setFieldsValue({
-                                                    title: m.title,
-                                                    overview: m.overview,
-                                                    genres: m.genre_ids?.map(id => tmdbGenreIdToName[id]).filter(Boolean) ?? []
-                                                });
-                                                void messageApi.success('TMDB Movie Selected. Remember to Save Changes!');
-                                            }}/>
-                                        </Form.Item>
-                                        {currentImageUrl && (
-                                            <div className="current-image-wrapper">
-                                                <AntImage
-                                                    src={currentImageUrl}
-                                                    alt="movie abstract cover"
-                                                    className="movie-preview-image"
-                                                    fallback="/placeholder-movie.png"
-                                                />
-                                            </div>
-                                        )}
-                                    </Col>
-                                </Row>
 
                                 <Form.Item className="form-actions-right">
                                     <Space size="middle">

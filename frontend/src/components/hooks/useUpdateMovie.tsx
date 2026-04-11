@@ -4,7 +4,10 @@ import axios from 'axios';
 import {useNavigate, useParams} from "react-router-dom";
 import {useGenres} from './useGenres';
 import {movieService} from '../../services/movieService';
-import {getAbstractImage} from '../../services/tmdbService';
+
+const getAbstractImageById = (id: number): string => {
+    return `/abstract/abstract-${((id * 7) % 10) + 1}.svg`;
+};
 
 import type {Movie, FormValues} from '../../types/movie';
 
@@ -13,9 +16,8 @@ const useUpdateMovie = () => {
     const [movie, setMovie] = useState<Movie | null>(null);
     const [submitting, setSubmitting] = useState<boolean>(false);
     const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
-    const [tmdbId, setTmdbId] = useState<number | null>(null);
     const [image, setImage] = useState<string | null>(null);
-    const [tmdbOverview, setTmdbOverview] = useState<string | null>(null);
+    const [overview, setOverview] = useState<string | null>(null);
 
     const navigate = useNavigate();
     const {id} = useParams<{ id: string }>();
@@ -39,19 +41,14 @@ const useUpdateMovie = () => {
 
                 form.setFieldsValue({
                     title: movieData.title,
-                    tmdbId: movieData.tmdbId,
                     overview: movieData.overview,
                     genres: movieData.genres,
                 });
 
-                if (movieData.tmdbId) {
-                    setTmdbId(movieData.tmdbId);
-                    // Generate and save abstract image path
-                    const abstractImageUrl = getAbstractImage(movieData.tmdbId);
-                    setImage(abstractImageUrl);
-                    setTmdbOverview(movieData.overview || null);
-                    setCurrentImageUrl(abstractImageUrl);
-                }
+                const abstractImageUrl = getAbstractImageById(movieData.id);
+                setImage(abstractImageUrl);
+                setOverview(movieData.overview || null);
+                setCurrentImageUrl(abstractImageUrl);
 
             } catch (error) {
                 if (isMounted) {
@@ -79,9 +76,8 @@ const useUpdateMovie = () => {
         try {
             const moviePayload = {
                 title: values.title,
-                tmdbId: form.getFieldValue("tmdbId") || tmdbId,
-                image: image || getAbstractImage(form.getFieldValue("tmdbId") || tmdbId || 1),
-                overview: values.overview || tmdbOverview,
+                image: image || getAbstractImageById(movie?.id || 1),
+                overview: values.overview || overview,
                 genres: values.genres
             };
 
@@ -130,12 +126,10 @@ const useUpdateMovie = () => {
         form,
         currentImageUrl,
         setCurrentImageUrl,
-        tmdbId,
-        setTmdbId,
         image,
         setImage,
-        tmdbOverview,
-        setTmdbOverview,
+        overview,
+        setOverview,
 
         genres,
         genresLoading,

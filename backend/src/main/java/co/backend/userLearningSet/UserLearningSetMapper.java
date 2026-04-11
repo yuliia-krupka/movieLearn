@@ -14,7 +14,7 @@ public interface UserLearningSetMapper {
     @Mapping(source = "uls.learningSet.id", target = "learningSetId")
     @Mapping(source = "uls.learningSet.movie.id", target = "movieId")
     @Mapping(source = "uls.learningSet.movie.title", target = "movieTitle")
-    @Mapping(source = "uls.learningSet.movie.tmdbId", target = "tmdbId")
+    @Mapping(source = "uls.learningSet.movie.image", target = "image")
     @Mapping(source = "uls.learningSet.englishLevel", target = "englishLevel")
     @Mapping(target = "testsScore", ignore = true)
     @Mapping(target = "totalWords", ignore = true)

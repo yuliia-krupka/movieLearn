@@ -18,7 +18,6 @@ public class MovieDto {
     @NotBlank(message = "Name must not be blank")
     @Size(max = 100, message = "Title must not exceed 100 characters")
     private String title;
-    private Integer tmdbId;
     private String image;
     private String overview;
     @NotEmpty(message = "Genres must be provided")

@@ -4,7 +4,6 @@ import type {Movie} from '../types/movie';
 export interface MovieSummary {
     id: number;
     title: string;
-    tmdbId: number;
 }
 
 export const movieService = {

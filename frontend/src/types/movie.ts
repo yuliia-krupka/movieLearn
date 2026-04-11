@@ -1,7 +1,6 @@
 export interface Movie {
     id: number;
     title: string;
-    tmdbId: number;
     image?: string;
     overview?: string;
     genres: string[];
@@ -11,7 +10,6 @@ export interface Movie {
 
 export interface MovieFormData {
     title: string;
-    tmdbId: number;
     image?: string;
     overview?: string;
     genres: string[];
@@ -19,7 +17,6 @@ export interface MovieFormData {
 
 export interface FormValues {
     title: string;
-    tmdbId: number;
     image?: string;
     overview?: string;
     genres: string[];
@@ -32,7 +29,6 @@ export interface NewGenreData {
 export interface MovieDetails {
     id: number;
     title: string;
-    tmdbId: number;
     image?: string;
     overview?: string;
     genres: string[];

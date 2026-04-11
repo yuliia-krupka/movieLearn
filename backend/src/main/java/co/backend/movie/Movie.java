@@ -31,8 +31,6 @@ public class Movie {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User creator;
 
-    private Integer tmdbId;
-
     @Column(name = "image")
     private String image;
 

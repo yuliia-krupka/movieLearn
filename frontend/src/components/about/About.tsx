@@ -1,12 +1,10 @@
 import React from 'react';
-import {LinkOutlined, MailOutlined} from '@ant-design/icons';
+import {MailOutlined} from '@ant-design/icons';
 import MainLayout from '../layout/MainLayout';
 import './About.css';
 import Logo from "../shared/Logo.tsx";
 import LogoDesign from "../shared/LogoDesign.tsx";
 
-const TMDB_LOGO_URL =
-    'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_long_2-9665a76b1ae401a510ec1e0ca40ddcb3b0cfe45f1d51b77a308fea0845885648.svg';
 
 const About: React.FC = () => {
     return (
@@ -24,7 +22,6 @@ const About: React.FC = () => {
                         English language skills by studying vocabulary from movie scripts. Users can generate
                         personalized flash cards and tests based on their own uploaded movie dialogues.
                     </p>
-                    <p>If you have any other information please contact us.</p>
                 </div>
 
                 <div className="about-section">
@@ -32,43 +29,15 @@ const About: React.FC = () => {
                     <p>
                         This platform operates on a user-centric model where individuals upload their own script files
                         for processing. By using this service and uploading content, users explicitly confirm they
-                        have the right to use the provided materials for educational purposes.
+                        have the right to use the provided data for educational purposes.
                     </p>
                     <p>
                         All generated learning sets and uploaded movie scripts are private and tied exclusively to the
-                        user who created them, ensuring personal data boundaries. We process this data solely to provide
+                        user who created them, ensuring personal data boundaries. Scripts are deleted right after approving learning set of flashcards. We process this data solely to provide
                         the learning functionality.
                     </p>
                 </div>
 
-                <div className="about-section tmdb-section">
-                    <h2>Data Attribution</h2>
-                    <img
-                        src={TMDB_LOGO_URL}
-                        alt="The Movie Database (TMDB)"
-                        className="tmdb-logo"
-                    />
-                    <div className="tmdb-text">
-                        <p>
-                            This application uses the{' '}
-                            <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer"
-                               className="tmdb-link">
-                                TMDB API <LinkOutlined/>
-                            </a>{' '}
-                            to retrieve movie metadata.
-                        </p>
-                        <p className="tmdb-disclaimer">
-                            This product uses the TMDB API but is not endorsed or certified by TMDB.
-                        </p>
-                        <p>
-                            The API is used solely for non-commercial, educational purposes in accordance with{' '}
-                            <a href="https://developer.themoviedb.org/docs/faq" target="_blank"
-                               rel="noopener noreferrer" className="tmdb-link">
-                                TMDB API Terms of Use <LinkOutlined/>
-                            </a>.
-                        </p>
-                    </div>
-                </div>
 
                 <div className="about-section">
                     <h2>University Project</h2>

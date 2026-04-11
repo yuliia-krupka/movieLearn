@@ -5,7 +5,7 @@ import {
     Button,
     Typography,
     Row,
-    Col, Card, Image as AntImage, Checkbox,
+    Col, Card, Checkbox,
     Spin, Space
 } from 'antd';
 import {SaveFilled, CloseOutlined} from '@ant-design/icons';
@@ -18,8 +18,6 @@ import {type MovieFormData, type NewGenreData} from '../../types/movie';
 import GenreSelector from '../genre/GenreSelector.tsx';
 import FileUploader from './FileUploader.tsx';
 import AddGenreModal from '../genre/AddGenreModal.tsx';
-import TMDBSearch from './TMDBSearch.tsx';
-import {type TMDBMovie, getAbstractImage, tmdbGenreIdToName} from '../../services/tmdbService';
 import MainLayout from '../layout/MainLayout.tsx';
 import useMessage from 'antd/es/message/useMessage';
 import {ErrorHandler} from '../err/ErrorHandler.tsx';
@@ -33,7 +31,6 @@ const CreateMovieForm: React.FC = () => {
     const [submitting, setSubmitting] = useState(false);
     const [isGenreModalVisible, setIsGenreModalVisible] = useState(false);
     const [addingGenre, setAddingGenre] = useState(false);
-    const [selectedTmdbMovie, setSelectedTmdbMovie] = useState<TMDBMovie | null>(null);
 
     const [customMessage, contextHolder] = useMessage();
     const navigate = useNavigate();
@@ -61,17 +58,12 @@ const CreateMovieForm: React.FC = () => {
 
 
     const validateUploadedFiles = (): boolean => {
-        if (!selectedTmdbMovie) {
-            void customMessage.error("Please search and select a movie from TMDB.");
-            return false;
-        }
         return scriptUpload.validateFile();
     };
 
     interface MoviePayload {
         movieData: {
             title: string;
-            tmdbId: number | undefined;
             image: string;
             overview: string | undefined;
             genres: string[];
@@ -80,15 +72,12 @@ const CreateMovieForm: React.FC = () => {
     }
 
     const createFormData = (values: MovieFormData): MoviePayload => {
-        // Generate abstract image path based on TMDB id
-        const imageValue = selectedTmdbMovie?.id
-            ? `/abstract/abstract-${((selectedTmdbMovie.id * 7) % 10) + 1}.svg`
-            : '/placeholder-movie.png';
+        // Generate abstract image path
+        const imageValue = `/abstract/abstract-${((Math.random() * 10) + 1).toFixed(0)}.svg`;
         const movieData = {
             title: values.title,
-            tmdbId: selectedTmdbMovie?.id,
             image: imageValue,
-            overview: values.overview || selectedTmdbMovie?.overview,
+            overview: values.overview,
             genres: values.genres,
         };
         const payload: MoviePayload = {movieData};
@@ -146,24 +135,9 @@ const CreateMovieForm: React.FC = () => {
                 layout="vertical"
                 onFinish={handleSubmit}
             >
-                <Form.Item label="Search Film on TMDB">
-                    <TMDBSearch onSelectMovie={(movie) => {
-                        setSelectedTmdbMovie(movie);
-                        form.setFieldsValue({
-                            title: movie.title,
-                            overview: movie.overview,
-                            genres: movie.genre_ids?.map(id => tmdbGenreIdToName[id]).filter(Boolean) ?? []
-                        });
-                    }}/>
-                    {selectedTmdbMovie && (
-                        <div className="tmdb-selected-info">
-                            <strong>Selected:</strong> {selectedTmdbMovie.title} ({selectedTmdbMovie.release_date?.substring(0, 4)})
-                        </div>
-                    )}
-                </Form.Item>
 
                 <Form.Item
-                    label="Title (Override if needed)"
+                    label="Title"
                     name="title"
                     rules={[
                         {required: true, message: 'Please enter movie title'},
@@ -175,7 +149,7 @@ const CreateMovieForm: React.FC = () => {
                 </Form.Item>
 
                 <Form.Item
-                    label="Description (Override if needed)"
+                    label="Description"
                     name="overview"
                     rules={[{required: true, message: 'Please enter movie description'}]}
                 >
@@ -196,23 +170,6 @@ const CreateMovieForm: React.FC = () => {
                 />
 
                 <Row gutter={[24, 16]}>
-                    <Col xs={24} md={12}>
-                        {selectedTmdbMovie ? (
-                            <div className="previews-container">
-                                <AntImage
-                                    src={getAbstractImage(selectedTmdbMovie.id)}
-                                    alt="abstract preview"
-                                    className="movie-preview-image"
-                                    fallback="/placeholder-movie.png"
-                                />
-                            </div>
-                        ) : (
-                            <div className="movie-preview-placeholder">
-                                No Preview Available
-                            </div>
-                        )}
-                    </Col>
-
                     <Col xs={24} md={12}>
                         <FileUploader
                             label="Script"
@@ -240,9 +197,8 @@ const CreateMovieForm: React.FC = () => {
                     className="checkbox-agreement"
                 >
                     <Checkbox>
-                        I confirm that I have the right to upload this script and I agree that the data will be
-                        processed
-                        to generate personalized learning sets.
+                        I confirm that I have the right to use these data and upload this script and I agree that the
+                        data will be processed to generate personalized learning sets using LLM.
                     </Checkbox>
                 </Form.Item>
 

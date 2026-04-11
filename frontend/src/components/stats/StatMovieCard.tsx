@@ -11,9 +11,7 @@ interface StatMovieCardProps {
 const StatMovieCard: React.FC<StatMovieCardProps> = ({item}) => {
     const navigate = useNavigate();
 
-    const imageSource = item.image || (item.tmdbId
-        ? `/abstract/abstract-${((item.tmdbId * 7) % 10) + 1}.svg`
-        : '/placeholder-movie.png');
+    const imageSource = item.image || '/placeholder-movie.png';
 
     return (
         <Card

@@ -69,13 +69,8 @@ public class MovieService {
             throw new BadRequestException("Movie title cannot be empty");
         }
 
-        if (movieDto.getTmdbId() != null && movieRepository.existsByTmdbIdAndCreatorId(movieDto.getTmdbId(), creatorId)) {
-            throw new DuplicateEntityException("You have already added this movie.");
-        }
-
         Movie movie = new Movie();
         movie.setTitle(movieDto.getTitle());
-        movie.setTmdbId(movieDto.getTmdbId());
         movie.setCreatorId(creatorId);
 
         if (movieDto.getImage() != null) {
@@ -136,13 +131,6 @@ public class MovieService {
                 movie.setTitle(movieDto.getTitle());
             }
 
-            if (movieDto.getTmdbId() != null) {
-                if (!movieDto.getTmdbId().equals(movie.getTmdbId()) &&
-                        movieRepository.existsByTmdbIdAndCreatorId(movieDto.getTmdbId(), requestingUserId)) {
-                    throw new DuplicateEntityException("You have already added this movie.");
-                }
-                movie.setTmdbId(movieDto.getTmdbId());
-            }
             if (movieDto.getImage() != null) {
                 movie.setImage(movieDto.getImage());
             }

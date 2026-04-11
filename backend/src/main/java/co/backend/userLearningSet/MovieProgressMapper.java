@@ -34,8 +34,7 @@ public class MovieProgressMapper {
         if (movie != null) {
             String imagePath = movie.getImage();
             if (imagePath == null || imagePath.isEmpty()) {
-                int tmdbId = movie.getTmdbId() != null ? movie.getTmdbId() : 1;
-                imagePath = "/abstract/abstract-" + (((tmdbId * 7) % 10) + 1) + ".svg";
+                imagePath = "/abstract/abstract-" + (((movie.getId() * 7) % 10) + 1) + ".svg";
             }
             dto.setImage(imagePath);
         }

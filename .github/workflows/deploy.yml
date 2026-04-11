@@ -63,8 +63,6 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         env:
-          VITE_TMDB_API_KEY: ${{ secrets.VITE_TMDB_API_KEY }}
-          TMDB_API_KEY: ${{ secrets.VITE_TMDB_API_KEY }}
         run: |
           npm ci
           npm run build

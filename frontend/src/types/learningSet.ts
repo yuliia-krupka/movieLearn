@@ -65,7 +65,6 @@ export interface MovieProgress {
     movieId: number;
     learningSetId: number;
     movieTitle: string;
-    tmdbId: number;
     image: string | null;
     flashcardsScore: number;
     testsScore: number;

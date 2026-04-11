@@ -152,6 +152,16 @@ const TestsModule: React.FC = () => {
         }
     };
 
+    const handleGoToRefine = () => {
+        if (learningSetId) {
+            navigate(`/learning-sets/${learningSetId}/update`);
+        } else if (learningSet) {
+            navigate(`/learning-sets/${learningSet.id}/update`);
+        } else {
+            navigate('/flash-cards', {state: {movieId: movieId}});
+        }
+    };
+
     if (loading) {
         return (
             <MainLayout className="flashcard-content" fullHeight>
@@ -226,6 +236,7 @@ const TestsModule: React.FC = () => {
                 itemStatuses={itemStatuses}
                 onBackToMovie={handleBackToMovie}
                 onBackToFlashcards={handleBackToFlashcards}
+                onGoToRefine={handleGoToRefine}
                 showStatus={false}
                 isTestResult={true}
             />

@@ -7,7 +7,6 @@ import MainLayout from "../layout/MainLayout.tsx";
 import {useAuth} from '../auth/useAuth';
 import {learningSetService} from '../../services/learningSetService';
 import {movieService} from '../../services/movieService';
-import {tmdbService, type TMDBMovie} from '../../services/tmdbService';
 import './MovieDetails.css';
 import learningCat from '../../assets/learning-cat.png';
 import './movies.css';
@@ -23,7 +22,6 @@ const MovieDetails: React.FC = () => {
         const [loading, setLoading] = useState(false);
         const [isGenerating, setIsGenerating] = useState(false);
         const [learningSet, setLearningSet] = useState<LearningSetDto | null>(null);
-        const [tmdbMovie, setTmdbMovie] = useState<TMDBMovie | null>(null);
         const [errorMsg, setErrorMsg] = useState<string | null>(null);
         const [successMsg, setSuccessMsg] = useState<string | null>(null);
         const [message, contextHolder] = antMessage.useMessage();
@@ -55,10 +53,6 @@ const MovieDetails: React.FC = () => {
                 try {
                     const data = await movieService.getById(Number(id));
                     setMovie(data);
-                    if (data.tmdbId) {
-                        const tmdbData = await tmdbService.getMovieDetails(data.tmdbId);
-                        setTmdbMovie(tmdbData);
-                    }
                 } catch (err: unknown) {
                     if (ErrorHandler.isForbiddenError(err)) {
                         navigate('/access-denied', {replace: true});
@@ -149,7 +143,7 @@ const MovieDetails: React.FC = () => {
 
         const imageSource = movie?.image || '/placeholder-movie.png';
 
-        const descriptionText = movie?.overview || tmdbMovie?.overview || '';
+        const descriptionText = movie?.overview || '';
 
         return (
             <MainLayout>

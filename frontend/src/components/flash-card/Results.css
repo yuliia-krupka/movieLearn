@@ -41,6 +41,21 @@
     flex-shrink: 0;
 }
 
+.results-learning-set-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0 16px 0;
+    padding: 0 8px;
+}
+
+.results-learning-set-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
 .results-score {
     font-size: 3rem;
     font-weight: 700;
