@@ -28,16 +28,35 @@ const About: React.FC = () => {
                     <h2>User Uploaded Content</h2>
                     <p>
                         This platform operates on a user-centric model where individuals upload their own script files
-                        for processing. By using this service and uploading content, users explicitly confirm they
-                        have the right to use the provided data for educational purposes.
+                        for processing. By using this service, users consent to the processing of their English level
+                        and interests to generate personalized learning materials, and confirm they have the right
+                        to use the provided data for educational purposes.
                     </p>
                     <p>
                         All generated learning sets and uploaded movie scripts are private and tied exclusively to the
-                        user who created them, ensuring personal data boundaries. Scripts are deleted right after approving learning set of flashcards. We process this data solely to provide
+                        user who created them, ensuring personal data boundaries. Scripts are deleted immediately after
+                        the learning set of flashcards is approved. We process this data solely to provide
                         the learning functionality.
                     </p>
                 </div>
 
+                <div className="about-section">
+                    <h2>Personalized Learning</h2>
+                    <p>
+                        MovieLearn creates personalized learning experiences by analyzing your English proficiency level
+                        and personal interests.
+                        The system adapts vocabulary difficulty and content complexity to match your specific language
+                        skills, ensuring that
+                        learning materials are appropriately challenging for your level.
+                    </p>
+                    <p>
+                        Your interests help generate relevant and engaging vocabulary examples from movie scripts,
+                        making the learning process
+                        more enjoyable and effective. This personalized approach ensures that each user receives a
+                        unique learning experience
+                        tailored to their specific needs and preferences.
+                    </p>
+                </div>
 
                 <div className="about-section">
                     <h2>University Project</h2>
