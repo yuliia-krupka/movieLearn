@@ -30,7 +30,7 @@ const About: React.FC = () => {
                 <div className="about-section">
                     <h2>User Uploaded Content</h2>
                     <p>
-                        This platform operates on a user-centric model where individuals upload their own scripts
+                        This platform operates on a user-centric model where individuals upload their own script files
                         for processing. By using this service and uploading content, users explicitly confirm they
                         have the right to use the provided materials for educational purposes.
                     </p>
@@ -55,7 +55,7 @@ const About: React.FC = () => {
                                className="tmdb-link">
                                 TMDB API <LinkOutlined/>
                             </a>{' '}
-                            to retrieve movie metadata and poster images.
+                            to retrieve movie metadata.
                         </p>
                         <p className="tmdb-disclaimer">
                             This product uses the TMDB API but is not endorsed or certified by TMDB.
