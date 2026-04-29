@@ -16,6 +16,13 @@
     margin-bottom: 20px;
 }
 
+.update-form-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
 .current-file-container {
     margin-bottom: 16px;
 }
@@ -189,24 +196,157 @@
 .step-content.hidden {
     display: none;
 }
+.form-actions-center {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0;
+}
+
+.form-actions-center .ant-form-item-control-input-content {
+    display: flex;
+    justify-content: center;
+}
+
 
 @media (max-width: 576px) {
     .update-movie-container {
         padding: 12px;
     }
 
-    .form-actions-right {
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .form-actions-right .ant-space {
+    .form-actions-center .ant-space {
         flex-direction: column;
         width: 100%;
     }
 
-    .form-actions-right button {
+    .form-actions-center button {
         width: 100%;
         margin: 0 !important;
     }
+}
+
+/* ── Center label item ── */
+.centered-label-item .ant-form-item-label {
+    text-align: center;
+}
+.centered-label-item .ant-form-item-label > label {
+    justify-content: center;
+    width: 100%;
+}
+
+/* ── Poster card ── */
+.poster-card {
+    display: flex;
+    margin: 0 auto;
+    flex-direction: column;
+    border: 1px solid var(--color-border-light, #e8e8e8);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--color-bg-secondary, #f9f9f9);
+    width: 320px;
+}
+
+.poster-img-wrapper {
+    width: 320px;
+    height: 200px;
+    overflow: hidden;
+    background: #1a1a2e;
+    flex-shrink: 0;
+}
+
+.poster-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.2s ease;
+}
+
+.poster-card-footer {
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.poster-status-label {
+    font-size: 12px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.poster-status-custom  { color: var(--color-success, #52c41a); }
+.poster-status-abstract { color: var(--color-text-secondary, #888); }
+.poster-status-new      { color: #1677ff; }
+
+.poster-action-bar {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* Native button reset + shared poster action style */
+.poster-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+    line-height: 1.4;
+    background: none;
+}
+
+.poster-action-change {
+    color: #1677ff;
+    border-color: #1677ff;
+    background: rgba(22, 119, 255, 0.05);
+}
+.poster-action-change:hover {
+    background: rgba(22, 119, 255, 0.12);
+}
+
+.poster-action-remove {
+    color: #ff4d4f;
+    border-color: #ff4d4f;
+    background: rgba(255, 77, 79, 0.05);
+}
+.poster-action-remove:hover {
+    background: rgba(255, 77, 79, 0.12);
+}
+
+.poster-action-discard {
+    color: #888;
+    border-color: #d9d9d9;
+    background: rgba(0, 0, 0, 0.02);
+}
+.poster-action-discard:hover {
+    color: #555;
+    border-color: #aaa;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.poster-action-restore {
+    color: var(--color-success, #52c41a);
+    border-color: var(--color-success, #52c41a);
+    background: rgba(82, 196, 26, 0.05);
+}
+.poster-action-restore:hover {
+    background: rgba(82, 196, 26, 0.12);
+}
+
+@media (max-width: 480px) {
+    .poster-card { width: 100%; }
+    .poster-img-wrapper { width: 100%; height: 140px; }
+    .poster-card-footer { flex-direction: column; align-items: flex-start; }
+    .poster-status-label { max-width: 100%; }
 }

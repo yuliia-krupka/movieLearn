@@ -8,8 +8,8 @@ const MoviesList: React.FC = () => {
         <MainLayout className="content-movies">
             <MoviesGrid
                 apiEndpoint="/api/movies"
-                title="Choose your movie to start a lesson!"
-                emptyMessage="No movies available. Please check back later!"
+                title="Choose your movie card to start a lesson!"
+                emptyMessage="No movie cards available. Please check back later!"
                 showGenreFilter={true}
             />
         </MainLayout>

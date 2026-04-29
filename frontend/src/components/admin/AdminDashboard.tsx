@@ -71,9 +71,9 @@ const AdminDashboard: React.FC = () => {
                             <div className="stat-icon-wrapper icon-movies">
                                 <VideoCameraAddOutlined/>
                             </div>
-                            <div className="stat-title">Total Movies</div>
+                            <div className="stat-title">Total Movies Cards</div>
                             <div className="stat-value">{stats.movies}</div>
-                            <div className="stat-description">Manage movies</div>
+                            <div className="stat-description">Manage movies cards</div>
                         </Card>
                     </Col>
                 </Row>

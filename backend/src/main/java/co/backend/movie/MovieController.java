@@ -51,21 +51,29 @@ public class MovieController {
     @PostMapping(consumes = {"multipart/form-data"})
     @ResponseStatus(HttpStatus.CREATED)
     public MovieDto createMovie(@Valid @RequestPart("movieData") MovieDto movieDto,
-                                @RequestPart(value = "script", required = false) MultipartFile script,
+                                @RequestPart(value = "script") MultipartFile script,
+                                @RequestPart(value = "image", required = false) MultipartFile image,
                                 @AuthenticationPrincipal OAuth2User principal) {
         User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
-        return movieService.createMovie(movieDto, script, user.getId());
+        return movieService.createMovie(movieDto, script, image, user.getId());
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
     public MovieDto updateMovie(@PathVariable Long id,
-                                @Valid @RequestBody MovieDto movieDto,
+                                @Valid @RequestPart("movieData") MovieDto movieDto,
+                                @RequestPart(value = "image", required = false) MultipartFile image,
                                 @AuthenticationPrincipal OAuth2User principal) {
         User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
         boolean isAdmin = user.getRole() != null && user.getRole().name().equals("ADMIN");
-        return movieService.updateMovie(id, movieDto, user.getId(), isAdmin);
+        return movieService.updateMovie(id, movieDto, image, user.getId(), isAdmin);
     }
 
+    @DeleteMapping("/{id}/image")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMovieImage(@PathVariable Long id,
+                                 @AuthenticationPrincipal OAuth2User principal) {
+        movieService.deleteMovieImage(id, principal.getAttribute("email"));
+    }
 
     @GetMapping("/count")
     public int getMoviesCountByUserId(@AuthenticationPrincipal OAuth2User principal) {
@@ -78,5 +86,4 @@ public class MovieController {
         User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
         return movieService.getMoviesByUser(user.getId());
     }
-
 }

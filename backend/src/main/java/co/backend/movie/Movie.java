@@ -31,8 +31,10 @@ public class Movie {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User creator;
 
-    @Column(name = "image")
-    private String image;
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "image", columnDefinition = "LONGBLOB")
+    private byte[] imageData;
 
     @Column(columnDefinition = "TEXT")
     private String overview;

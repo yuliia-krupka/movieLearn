@@ -28,7 +28,8 @@ const About: React.FC = () => {
                     <h2>User Uploaded Content</h2>
                     <p>
                         This platform operates on a user-centric model where individuals upload their own script files
-                        for processing. By using this service, users consent to the processing of their English level
+                        for processing and images for movie card display. By using this service, users consent to the
+                        processing of their English level
                         and interests to generate personalized learning materials, and confirm they have the right
                         to use the provided data for educational purposes.
                     </p>

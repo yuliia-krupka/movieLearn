@@ -37,6 +37,7 @@ const CreateMovieForm: React.FC = () => {
     const {isAdmin} = useAuth();
     const {genres, loading, addGenre, fetchGenres} = useGenres();
     const scriptUpload = useFileUpload('Please upload a script file');
+    const imageUpload = useFileUpload('');
 
     const [form] = Form.useForm();
 
@@ -64,19 +65,16 @@ const CreateMovieForm: React.FC = () => {
     interface MoviePayload {
         movieData: {
             title: string;
-            image: string;
             overview: string | undefined;
             genres: string[];
         };
         script?: File | Blob;
+        image?: File | Blob;
     }
 
     const createFormData = (values: MovieFormData): MoviePayload => {
-        // Generate abstract image path
-        const imageValue = `/abstract/abstract-${((Math.random() * 10) + 1).toFixed(0)}.svg`;
         const movieData = {
             title: values.title,
-            image: imageValue,
             overview: values.overview,
             genres: values.genres,
         };
@@ -84,12 +82,15 @@ const CreateMovieForm: React.FC = () => {
         if (scriptUpload.file) {
             payload.script = scriptUpload.file;
         }
+        if (imageUpload.file) {
+            payload.image = imageUpload.file;
+        }
         return payload;
     };
 
     const submitMovieData = async (payload: MoviePayload) => {
         const createdMovie = await movieService.create(payload);
-        void customMessage.success('Movie created successfully!');
+        void customMessage.success('Movie Card created successfully!');
         return createdMovie;
     };
 
@@ -128,7 +129,7 @@ const CreateMovieForm: React.FC = () => {
     const renderFormContent = () => (
         <Card className="create-movie-card-wide">
             <div className="create-form-header">
-                <Title level={2} className="create-form-title">Add New Movie</Title>
+                <Title level={2} className="create-form-title">Create New Movie Card</Title>
             </div>
             <Form
                 form={form}
@@ -145,16 +146,16 @@ const CreateMovieForm: React.FC = () => {
                         {max: 100, message: 'Title must be at most 100 characters'},
                     ]}
                 >
-                    <Input placeholder="Enter movie title" showCount maxLength={100}/>
+                    <Input placeholder="Enter movie card title" showCount maxLength={100}/>
                 </Form.Item>
 
                 <Form.Item
                     label="Description"
                     name="overview"
-                    rules={[{required: true, message: 'Please enter movie description'}]}
+                    rules={[{required: true, message: 'Please enter movie card description'}]}
                 >
                     <Input.TextArea
-                        placeholder="Enter movie description"
+                        placeholder="Enter movie card description"
                         rows={4}
                         showCount
                         maxLength={1000}
@@ -181,6 +182,20 @@ const CreateMovieForm: React.FC = () => {
                             uploadButtonText="Upload Script File"
                             description="PDF, TXT, DOCX • max 20 MB"
                             iconType="document"
+                            required={true}
+                        />
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <FileUploader
+                            label="Movie Card Poster (optional)"
+                            file={imageUpload.file}
+                            previewUrl={imageUpload.previewUrl}
+                            accept="image/jpeg,image/png,image/webp"
+                            onFileChange={(file) => imageUpload.handleFileChange(file, true)}
+                            onFileRemove={imageUpload.handleFileRemove}
+                            uploadButtonText="Upload Poster Image"
+                            description="JPG, PNG, WEBP • max 5 MB"
+                            iconType="image"
                         />
                     </Col>
                 </Row>

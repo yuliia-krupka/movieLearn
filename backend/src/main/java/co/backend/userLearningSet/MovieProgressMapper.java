@@ -32,11 +32,12 @@ public class MovieProgressMapper {
         }
         var movie = uls.getLearningSet().getMovie();
         if (movie != null) {
-            String imagePath = movie.getImage();
-            if (imagePath == null || imagePath.isEmpty()) {
-                imagePath = "/abstract/abstract-" + (((movie.getId() * 7) % 10) + 1) + ".svg";
+            if (movie.getImageData() != null && movie.getImageData().length > 0) {
+                dto.setImage("data:image/jpeg;base64," +
+                        java.util.Base64.getEncoder().encodeToString(movie.getImageData()));
+            } else {
+                dto.setImage("/abstract/abstract-" + (((movie.getId() * 7) % 10) + 1) + ".svg");
             }
-            dto.setImage(imagePath);
         }
         return dto;
     }

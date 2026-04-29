@@ -15,6 +15,7 @@ interface FileUploaderProps {
     showPreview?: boolean;
     description?: string;
     iconType?: 'image' | 'document';
+    required?: boolean;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({
@@ -29,9 +30,11 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                                                        uploadButtonText,
                                                        description,
                                                        iconType = 'document',
+                                                       required = false,
                                                    }) => {
     return (
-        <Form.Item label={label} required>
+        <Form.Item label={label} required={required}>
+
             <div className="upload-section">
                 {!file ? (
                     <Upload

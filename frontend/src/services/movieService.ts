@@ -34,20 +34,36 @@ export const movieService = {
         return data;
     },
 
-    async create(movieData: { movieData: Record<string, unknown>, script?: File | Blob }): Promise<Movie> {
+    async create(movieData: {
+        movieData: Record<string, unknown>,
+        script?: File | Blob,
+        image?: File | Blob
+    }): Promise<Movie> {
         const formData = new FormData();
         formData.append('movieData', new Blob([JSON.stringify(movieData.movieData)], {type: 'application/json'}));
         if (movieData.script) {
             formData.append('script', movieData.script);
+        }
+        if (movieData.image) {
+            formData.append('image', movieData.image);
         }
 
         const {data} = await apiClient.post<Movie>('/movies', formData);
         return data;
     },
 
-    async update(id: number, movieData: Record<string, unknown>): Promise<Movie> {
-        const {data} = await apiClient.put<Movie>(`/movies/${id}`, movieData);
+    async update(id: number, movieData: Record<string, unknown>, imageFile?: File | Blob): Promise<Movie> {
+        const formData = new FormData();
+        formData.append('movieData', new Blob([JSON.stringify(movieData)], {type: 'application/json'}));
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+        const {data} = await apiClient.put<Movie>(`/movies/${id}`, formData);
         return data;
+    },
+
+    async deleteImage(id: number): Promise<void> {
+        await apiClient.delete(`/movies/${id}/image`);
     },
 
     async delete(id: number): Promise<void> {
@@ -57,14 +73,5 @@ export const movieService = {
     async getMoviesCount(): Promise<number> {
         const {data} = await apiClient.get<number>('/movies/count');
         return data;
-    },
-
-    async checkUserStarted(movieId: number): Promise<boolean> {
-        try {
-            await apiClient.get(`/user-learning-sets/movie/${movieId}`);
-            return true;
-        } catch {
-            return false;
-        }
     },
 };

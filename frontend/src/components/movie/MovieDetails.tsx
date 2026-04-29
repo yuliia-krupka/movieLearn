@@ -85,7 +85,7 @@ const MovieDetails: React.FC = () => {
                 onOk: async () => {
                     try {
                         await movieService.delete(Number(id));
-                        antMessage.success('Movie deleted successfully');
+                        antMessage.success('Movie Card deleted successfully');
                         navigate(isAdmin ? '/admin/movies' : '/home');
                     } catch (error) {
                         console.error('Error deleting movie:', error);
@@ -234,16 +234,21 @@ const MovieDetails: React.FC = () => {
 
                                     <div className="movie-details-action-group">
                                         {isAdmin && (
-                                            <Button className="yellow-btn"
+                                            <Button type="primary" shape="circle" size="large"
                                                     icon={<EditOutlined/>}
-                                                    onClick={() => navigate(`/admin/movies/${id}/update`)}>
-                                                Edit
-                                            </Button>
+                                                    title="Edit Movie Card"
+                                                    onClick={() => navigate(`/admin/movies/${id}/update`)}/>
+                                        )}
+                                        {!isAdmin && movie.creatorId === currentUserId && (
+                                            <Button type="primary" shape="circle" size="large"
+                                                    icon={<EditOutlined/>}
+                                                    title="Edit Movie Card"
+                                                    onClick={() => navigate(`/movies/${id}/update`)}/>
                                         )}
                                         {(isAdmin || movie.creatorId === currentUserId) && (
                                             <Button danger type="primary" shape="circle" size="large"
                                                     icon={<DeleteOutlined/>}
-                                                    title="Delete Movie"
+                                                    title="Delete Movie Card"
                                                     onClick={handleDeleteConfirm}/>
                                         )}
                                     </div>

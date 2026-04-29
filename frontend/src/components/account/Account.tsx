@@ -71,7 +71,7 @@ const Account = () => {
                         {!isAdmin && (
                             <>
                                 <ProfileDetail label="English level:" value={user?.englishLevel || "Not set"}/>
-                                <ProfileDetail label="Movies started:" value={moviesStarted}/>
+                                <ProfileDetail label="Movie cards started:" value={moviesStarted}/>
 
                                 <div className="profile-detail">
                                     <Text className="profile-label">Interests:</Text>

@@ -125,6 +125,14 @@ function App() {
                                 }
                             />
                             <Route
+                                path="/movies/:id/update"
+                                element={
+                                    <ProtectedRoute requireAuth={true} requireUser={true} requireOnboarding={true}>
+                                        <UpdateMovie/>
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
                                 path="/admin/users"
                                 element={
                                     <ProtectedRoute requireAdmin requireAuth={true}>

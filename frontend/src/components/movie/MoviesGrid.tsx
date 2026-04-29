@@ -24,7 +24,7 @@ interface MoviesGridProps {
 const MoviesGrid: React.FC<MoviesGridProps> = ({
                                                    apiEndpoint,
                                                    title,
-                                                   emptyMessage = "No movies available. Please check back later!",
+                                                   emptyMessage = "No movie cards available. Please check back later!",
                                                    showGenreFilter = true,
                                                }) => {
     const {genres, loading: genresLoading} = useGenres();
@@ -150,9 +150,9 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                 <div className="movies-grid-empty">
                     <Empty description={
                         searchQuery
-                            ? `No movies found for "${searchQuery}"`
+                            ? `No movie cards found for "${searchQuery}"`
                             : selectedGenres.length > 0
-                                ? "No movies match the selected genres"
+                                ? "No movie cards match the selected genres"
                                 : emptyMessage
                     }/>
                 </div>

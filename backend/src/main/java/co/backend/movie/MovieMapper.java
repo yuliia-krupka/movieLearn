@@ -8,8 +8,10 @@ import org.mapstruct.Mapping;
 public interface MovieMapper {
 
     @Mapping(target = "genres", source = "genres")
+    @Mapping(target = "image", ignore = true)
     MovieDto toDto(Movie movie);
 
     @Mapping(target = "genres", source = "genres")
+    @Mapping(target = "image", ignore = true)
     MovieSummaryDto toSummaryDto(Movie movie);
 }

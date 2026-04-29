@@ -49,7 +49,7 @@ const ProgressDashboard: React.FC = () => {
                     <div className="overall-summary">
                         <Card className="summary-card">
                             <Statistic
-                                title="Movies Started"
+                                title="Movie Cards Started"
                                 value={progress.length}
                                 prefix={<CheckCircleOutlined />}
                             />
@@ -74,7 +74,7 @@ const ProgressDashboard: React.FC = () => {
                 </div>
 
                 {progress.length === 0 ? (
-                    <Empty description="No movies started yet. Start watching movies to see your progress!" />
+                    <Empty description="No movie cards started yet. Start learning with movie cards to see your progress!" />
                 ) : (
                     <Row gutter={[24, 24]} className="movie-stats-grid">
                         {progress.map((item: MovieProgress) => (

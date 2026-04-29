@@ -34,7 +34,7 @@ export const getMenuItems = (
         (!isAdmin ? {
             key: "/movies/new",
             icon: <PlusCircleOutlined/>,
-            label: "Add Movie",
+            label: "Add Movie Card",
             onClick: () => handleClick("/movies/new"),
         } : null),
         (isAdmin ? {

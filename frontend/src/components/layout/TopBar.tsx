@@ -36,12 +36,12 @@ const TopBar: React.FC = () => {
             {contextHolder}
             <div className="topbar-right">
                 <Search
-                    placeholder="Search movies..."
+                    placeholder="Search movie cards..."
                     onSearch={onSearch}
                     enterButton
                     className="topbar-search"
                     allowClear
-                    aria-label="Search movies"
+                    aria-label="Search movie cards"
                 />
 
                 <div className="topbar-user">

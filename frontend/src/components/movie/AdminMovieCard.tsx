@@ -7,12 +7,13 @@ import './AdminMovieCard.css';
 
 interface AdminMovieCardProps {
     movie: Movie;
+    creatorEmail?: string;
     onDelete: (id: number) => void;
 }
 
 const {confirm} = Modal;
 
-const AdminMovieCard: React.FC<AdminMovieCardProps> = ({movie, onDelete}) => {
+const AdminMovieCard: React.FC<AdminMovieCardProps> = ({movie, creatorEmail, onDelete}) => {
     const navigate = useNavigate();
 
     const handleEdit = () => {
@@ -66,9 +67,10 @@ const AdminMovieCard: React.FC<AdminMovieCardProps> = ({movie, onDelete}) => {
                     <div className="admin-movie-genre">
                         {movie.genres && movie.genres.length > 0 ? movie.genres.join(', ') : 'No genre'}
                     </div>
-                    {movie.creatorId && (
+                    {creatorEmail && (
                         <div className="admin-movie-creator">
-                            Creator ID: {movie.creatorId}
+                            <span style={{color: 'var(--color-text-subtle, #8c8c8c)'}}>Added by: </span>
+                            {creatorEmail}
                         </div>
                     )}
                 </div>
