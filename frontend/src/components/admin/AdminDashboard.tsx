@@ -18,9 +18,9 @@ const AdminDashboard: React.FC = () => {
         const fetchStats = async () => {
             try {
                 const users = await userService.getAll();
-                const movies = await movieService.getAll();
+                const moviesCount = await movieService.getTotalMoviesCount();
 
-                setStats({users: users.length, movies: movies.length});
+                setStats({users: users.length, movies: moviesCount});
             } catch (error) {
                 console.error('Failed to fetch dashboard stats', error);
             } finally {

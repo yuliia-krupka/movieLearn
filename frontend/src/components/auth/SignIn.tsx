@@ -91,7 +91,7 @@ function SignIn() {
                         <Card className="step-card">
                             <PlayCircleOutlined className="step-icon"/>
                             <h3>1. Add movie</h3>
-                            <p>Choose a movie and upload its script to the system.</p>
+                            <p>Add a movie card and upload its script to the system.</p>
                         </Card>
                     </Col>
                     <Col xs={24} md={8}>

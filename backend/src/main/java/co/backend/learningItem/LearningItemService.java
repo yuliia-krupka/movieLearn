@@ -106,8 +106,12 @@ public class LearningItemService {
         List<LearningItemDto> dtos = oldItems.stream().map(learningItemMapper::toDto).toList();
         Movie movie = set.getMovie();
 
-        return openAiService.regenerateBatch(dtos, feedback, movie != null ? movie.getTitle() : "Unknown",
-                movie != null ? scriptParser.parse(movie.getScript()) : "",
+        if (movie == null || movie.getScript() == null || movie.getScript().length == 0) {
+            throw new BadRequestException("The script for this movie is missing. Please edit the movie card and re-upload the script before regenerating flashcards.");
+        }
+
+        return openAiService.regenerateBatch(dtos, feedback, movie.getTitle(),
+                scriptParser.parse(movie.getScript()),
                 set.getEnglishLevel() != null ? set.getEnglishLevel().name() : "B1",
                 set.getInterests() != null ? set.getInterests() : "");
     }

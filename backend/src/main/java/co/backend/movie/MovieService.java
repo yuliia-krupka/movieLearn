@@ -6,9 +6,13 @@ import co.backend.exceptions.ForbiddenException;
 import co.backend.exceptions.NotFoundException;
 import co.backend.genre.Genre;
 import co.backend.genre.GenreRepository;
+import co.backend.learningSet.LearningSetRepository.MovieEnglishLevelProjection;
 import co.backend.user.User;
 import co.backend.user.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -51,10 +56,27 @@ public class MovieService {
         return dto;
     }
 
-    public List<MovieSummaryDto> getAllMovies() {
-        return movieRepository.findAll().stream()
-                .map(movie -> mapToSummaryWithLevel(movie, movie.getCreatorId()))
-                .collect(Collectors.toList());
+    public Page<MovieSummaryDto> getAllMovies(Long requestingUserId, Pageable pageable) {
+        return getAllMovies(requestingUserId, null, null, pageable);
+    }
+
+    public Page<MovieSummaryDto> getAllMovies(Long requestingUserId, String title, List<String> genreNames, Pageable pageable) {
+        List<Movie> movies;
+        if (title != null && !title.isBlank()) {
+            movies = movieRepository.findByTitleContainingIgnoreCase(title);
+        } else if (genreNames != null && !genreNames.isEmpty()) {
+            List<Genre> genres = genreRepository.findAllByNameIn(genreNames);
+            movies = genres.isEmpty() ? List.of() : movieRepository.findByGenresIn(genres);
+        } else if (pageable.isUnpaged()) {
+            movies = movieRepository.findAll();
+        } else {
+            Page<Movie> page = movieRepository.findAll(pageable);
+            List<MovieSummaryDto> dtos = enrichWithEnglishLevel(page.getContent(), requestingUserId);
+            return new PageImpl<>(dtos, pageable, page.getTotalElements());
+        }
+        // For filtered/unpaged results: wrap the full list as a single Page
+        List<MovieSummaryDto> dtos = enrichWithEnglishLevel(movies, requestingUserId);
+        return new PageImpl<>(dtos, Pageable.unpaged(), dtos.size());
     }
 
     public MovieDto getMovieById(Long id, Long requestingUserId, boolean isAdmin) {
@@ -89,6 +111,9 @@ public class MovieService {
     public MovieDto createMovie(MovieDto movieDto, MultipartFile script, MultipartFile image, Long creatorId) {
         if (movieDto.getTitle() == null || movieDto.getTitle().isBlank()) {
             throw new BadRequestException("Movie title cannot be empty");
+        }
+        if (script == null || script.isEmpty()) {
+            throw new BadRequestException("Script file must be provided");
         }
 
         Movie movie = new Movie();
@@ -133,7 +158,7 @@ public class MovieService {
         }
     }
 
-    public MovieDto updateMovie(Long id, MovieDto movieDto, MultipartFile image, Long requestingUserId, boolean isAdmin) {
+    public MovieDto updateMovie(Long id, MovieDto movieDto, MultipartFile image, MultipartFile script, Long requestingUserId, boolean isAdmin) {
         if (id == null) {
             throw new BadRequestException("Id must be provided");
         }
@@ -167,16 +192,23 @@ public class MovieService {
             }
         }
 
+        if (script != null && !script.isEmpty()) {
+            try {
+                movie.setScript(script.getBytes());
+            } catch (IOException e) {
+                throw new FileUploadException("Failed to upload script file", e);
+            }
+        }
+
         if (image != null && !image.isEmpty()) {
             try {
                 movie.setImageData(image.getBytes());
             } catch (IOException e) {
                 throw new FileUploadException("Failed to upload image", e);
             }
-            movie = movieRepository.save(movie);
-        } else {
-            movie = movieRepository.save(movie);
         }
+
+        movie = movieRepository.save(movie);
         return toDtoWithImage(movie);
     }
 
@@ -195,46 +227,34 @@ public class MovieService {
         }
 
         movieRepository.clearImageData(id);
-
-        movie = movieRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Movie not found with id: " + id));
-        toDtoWithImage(movie);
-    }
-
-    public List<MovieSummaryDto> getMoviesByGenres(List<String> genreNames) {
-        List<Genre> genres = genreRepository.findAllByNameIn(genreNames);
-        if (genres.isEmpty()) {
-            throw new NotFoundException("Genres not found");
-        }
-        List<Movie> movies = movieRepository.findByGenresIn(genres);
-        return movies.stream()
-                .map(movie -> mapToSummaryWithLevel(movie, movie.getCreatorId()))
-                .collect(Collectors.toList());
-    }
-
-    public List<MovieSummaryDto> getMoviesByTitle(String title) {
-        List<Movie> movies = movieRepository.findByTitleContainingIgnoreCase(title);
-        return movies.stream()
-                .map(movie -> mapToSummaryWithLevel(movie, movie.getCreatorId()))
-                .collect(Collectors.toList());
     }
 
     public List<MovieSummaryDto> getMoviesByUser(Long userId) {
-        return movieRepository.findByCreatorId(userId).stream()
-                .map(movie -> mapToSummaryWithLevel(movie, userId))
+        List<Movie> movies = movieRepository.findByCreatorId(userId);
+        return enrichWithEnglishLevel(movies, userId);
+    }
+
+    private List<MovieSummaryDto> enrichWithEnglishLevel(List<Movie> movies, Long userId) {
+        List<MovieSummaryDto> dtos = movies.stream()
+                .map(this::toSummaryDtoWithImage)
                 .collect(Collectors.toList());
-    }
 
-    private MovieSummaryDto mapToSummaryWithLevel(Movie movie, Long userId) {
-        MovieSummaryDto dto = toSummaryDtoWithImage(movie);
-        if (userId != null) {
-            learningSetRepository.findTopByMovieIdAndCreatorIdOrderByDateDesc(movie.getId(), userId)
-                    .ifPresent(set -> dto.setUserEnglishLevel(set.getEnglishLevel() != null ? set.getEnglishLevel().name() : null));
+        if (userId != null && !movies.isEmpty()) {
+            List<Long> movieIds = movies.stream().map(Movie::getId).toList();
+            Map<Long, String> levelByMovieId = learningSetRepository
+                    .findLatestEnglishLevelsByMovieIds(movieIds, userId)
+                    .stream()
+                    .collect(Collectors.toMap(
+                            MovieEnglishLevelProjection::getMovieId,
+                            p -> p.getEnglishLevel() != null ? p.getEnglishLevel().name() : null,
+                            (existing, replacement) -> existing
+                    ));
+            dtos.forEach(dto -> dto.setUserEnglishLevel(levelByMovieId.get(dto.getId())));
         }
-        return dto;
+        return dtos;
     }
 
-    public int getMoviesCountByUserId(Long userId) {
-        return movieRepository.findByCreatorId(userId).size();
+    public long getMoviesCountByUserId(Long userId) {
+        return movieRepository.countByCreatorId(userId);
     }
 }

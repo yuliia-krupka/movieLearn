@@ -11,7 +11,6 @@ import co.backend.learningItem.LearningItemRepository;
 import co.backend.learningItem.LearningItemType;
 import co.backend.movie.Movie;
 import co.backend.movie.MovieRepository;
-import co.backend.user.EnglishLevel;
 import co.backend.user.User;
 import co.backend.user.UserRepository;
 
@@ -118,15 +117,6 @@ public class LearningSetService {
         validateOwnership(set, userId);
         set.setStatus(status);
         learningSetRepository.save(set);
-
-        if (status == LearningSetStatus.READY && set.getMovie() != null) {
-            Movie movie = set.getMovie();
-            if (movie.getScript() != null) {
-                log.info("[BACKEND] Approving set {} — deleting script for movie {}", id, movie.getId());
-                movie.setScript(null);
-                movieRepository.save(movie);
-            }
-        }
     }
 
     public List<LearningItemDto> getFlashCardsByLearningSetId(Long learningSetId, Long userId) {

@@ -37,7 +37,7 @@ const AdminMoviesList: React.FC = () => {
     const emptyGenres = React.useMemo(() => [], []);
 
     const {movies, loading, fetchMovies} = useMovies({
-        apiEndpoint: '/api/movies',
+        apiEndpoint: '/api/movies?size=10000',
         searchQuery: '',
         selectedGenres: emptyGenres
     });
@@ -142,7 +142,7 @@ const AdminMoviesList: React.FC = () => {
                         <Spin size="large"/>
                     </div>
                 ) : filteredMovies.length === 0 ? (
-                    <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                    <div style={{padding: '40px 0', textAlign: 'center'}}>
                         <Empty description={
                             searchQuery
                                 ? `No movie cards found for "${searchQuery}"`
@@ -161,8 +161,8 @@ const AdminMoviesList: React.FC = () => {
                                     return (
                                         <Col key={movie.id} xs={24} sm={12} md={8} lg={6}
                                              className="admin-movie-col">
-                                            <AdminMovieCard 
-                                                movie={movie} 
+                                            <AdminMovieCard
+                                                movie={movie}
                                                 creatorEmail={creatorEmail}
                                                 onDelete={handleDelete}/>
                                         </Col>

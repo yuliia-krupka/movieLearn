@@ -41,7 +41,7 @@ public class Movie {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(columnDefinition = "LONGBLOB")
+    @Column(columnDefinition = "LONGBLOB", nullable = false)
     private byte[] script;
 
     @ManyToMany

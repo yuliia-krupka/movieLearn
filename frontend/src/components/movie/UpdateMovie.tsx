@@ -28,6 +28,7 @@ import AddGenreModal from '../genre/AddGenreModal.tsx';
 import MainLayout from "../layout/MainLayout.tsx";
 import GenreSelector from "../genre/GenreSelector.tsx";
 import {ErrorHandler} from "../err/ErrorHandler.tsx";
+import FileUploader from "./FileUploader.tsx";
 
 const {Title} = Typography;
 
@@ -48,6 +49,8 @@ const UpdateMovieForm: React.FC = () => {
         imagePreviewUrl,
         removeCurrentImage,
         hasCustomPoster,
+        scriptFile,
+        setScriptFile,
         handleImageChange,
         handleImageRemove,
         handleRemovePoster,
@@ -220,9 +223,9 @@ const UpdateMovieForm: React.FC = () => {
             );
         }
 
-        return <Form.Item 
+        return <Form.Item
             className="centered-label-item"
-            label={<span style={{ width: '100%', textAlign: 'center', display: 'block' }}>Movie Card Poster</span>}
+            label={<span style={{width: '100%', textAlign: 'center', display: 'block'}}>Movie Card Poster</span>}
         >
             <div className="poster-card">
                 <div className="poster-img-wrapper">
@@ -299,6 +302,21 @@ const UpdateMovieForm: React.FC = () => {
                                     onGenreUpdated={() => void fetchGenres()}
                                     messageApi={messageApi}
                                     excludeMovieId={id ? parseInt(id) : undefined}
+                                />
+
+                                <FileUploader
+                                    label="Replace Script (optional)"
+                                    file={scriptFile}
+                                    accept=".pdf,.txt,.doc,.docx"
+                                    onFileChange={(file) => {
+                                        setScriptFile(file);
+                                        return false;
+                                    }}
+                                    onFileRemove={() => setScriptFile(null)}
+                                    uploadButtonText="Upload New Script"
+                                    description="PDF, TXT, DOCX • max 20 MB. Upload to replace the current script."
+                                    iconType="document"
+                                    required={false}
                                 />
 
                                 {renderPosterSection()}

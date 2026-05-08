@@ -17,6 +17,7 @@ const useUpdateMovie = () => {
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
     const [removeCurrentImage, setRemoveCurrentImage] = useState<boolean>(false);
+    const [scriptFile, setScriptFile] = useState<File | null>(null);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -53,7 +54,6 @@ const useUpdateMovie = () => {
                     genres: movieData.genres,
                 });
 
-                // Store existing image URL (data: URL means custom poster, otherwise abstract)
                 if (movieData.image) {
                     setExistingImageUrl(movieData.image);
                 }
@@ -89,9 +89,9 @@ const useUpdateMovie = () => {
 
             if (removeCurrentImage && !imageFile) {
                 await movieService.deleteImage(Number(id));
-                await movieService.update(Number(id), moviePayload);
+                await movieService.update(Number(id), moviePayload, undefined, scriptFile ?? undefined);
             } else {
-                await movieService.update(Number(id), moviePayload, imageFile ?? undefined);
+                await movieService.update(Number(id), moviePayload, imageFile ?? undefined, scriptFile ?? undefined);
             }
 
             void message.success('Movie Card updated successfully!');
@@ -169,6 +169,8 @@ const useUpdateMovie = () => {
         imagePreviewUrl,
         removeCurrentImage,
         hasCustomPoster,
+        scriptFile,
+        setScriptFile,
         handleImageChange,
         handleImageRemove,
         handleRemovePoster,

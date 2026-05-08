@@ -3,6 +3,9 @@ package co.backend.movie;
 import co.backend.user.User;
 import co.backend.user.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -21,15 +24,12 @@ public class MovieController {
     private final UserService userService;
 
     @GetMapping()
-    public List<MovieSummaryDto> getMovies(@RequestParam(required = false) List<String> genre,
-                                           @RequestParam(required = false) String title) {
-        if (title != null && !title.isBlank()) {
-            return movieService.getMoviesByTitle(title);
-        } else if (genre != null && !genre.isEmpty()) {
-            return movieService.getMoviesByGenres(genre);
-        } else {
-            return movieService.getAllMovies();
-        }
+    public Page<MovieSummaryDto> getMovies(@RequestParam(required = false) List<String> genre,
+                                           @RequestParam(required = false) String title,
+                                           @PageableDefault(size = 20, sort = "id") Pageable pageable,
+                                           @AuthenticationPrincipal OAuth2User principal) {
+        User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
+        return movieService.getAllMovies(user.getId(), title, genre, pageable);
     }
 
     @GetMapping("/{id}")
@@ -62,10 +62,11 @@ public class MovieController {
     public MovieDto updateMovie(@PathVariable Long id,
                                 @Valid @RequestPart("movieData") MovieDto movieDto,
                                 @RequestPart(value = "image", required = false) MultipartFile image,
+                                @RequestPart(value = "script", required = false) MultipartFile script,
                                 @AuthenticationPrincipal OAuth2User principal) {
         User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
         boolean isAdmin = user.getRole() != null && user.getRole().name().equals("ADMIN");
-        return movieService.updateMovie(id, movieDto, image, user.getId(), isAdmin);
+        return movieService.updateMovie(id, movieDto, image, script, user.getId(), isAdmin);
     }
 
     @DeleteMapping("/{id}/image")
@@ -76,7 +77,7 @@ public class MovieController {
     }
 
     @GetMapping("/count")
-    public int getMoviesCountByUserId(@AuthenticationPrincipal OAuth2User principal) {
+    public long getMoviesCountByUserId(@AuthenticationPrincipal OAuth2User principal) {
         User user = userService.getCurrentUserByEmail(principal.getAttribute("email"));
         return movieService.getMoviesCountByUserId(user.getId());
     }

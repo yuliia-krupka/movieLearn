@@ -6,9 +6,17 @@ export interface MovieSummary {
     title: string;
 }
 
+export interface MoviePage {
+    content: Movie[];
+    totalElements: number;
+    totalPages: number;
+    number: number;
+    size: number;
+}
+
 export const movieService = {
-    async getAll(): Promise<MovieSummary[]> {
-        const {data} = await apiClient.get<MovieSummary[]>('/movies');
+    async getAll(page = 0, size = 20): Promise<MoviePage> {
+        const {data} = await apiClient.get<MoviePage>('/movies', {params: {page, size}});
         return data;
     },
 
@@ -19,19 +27,23 @@ export const movieService = {
 
     async fetchByEndpoint(endpoint: string, params?: Record<string, string>): Promise<Movie[]> {
         const url = endpoint.startsWith('/api') ? endpoint.replace('/api', '') : endpoint;
-        const {data} = await apiClient.get<Movie[]>(url, {params});
-        return data;
+        const {data} = await apiClient.get<MoviePage | Movie[]>(url, {params});
+        // Handle both plain arrays (legacy) and Page responses
+        if (data && typeof data === 'object' && 'content' in data) {
+            return (data as MoviePage).content;
+        }
+        return data as Movie[];
     },
 
     async search(searchQuery: string | null, selectedGenres: string[]): Promise<Movie[]> {
-        const params: Record<string, string> = {};
+        const params: Record<string, string | string[]> = {};
         if (searchQuery && searchQuery.trim()) {
             params.title = searchQuery.trim();
         } else if (selectedGenres.length > 0) {
-            params.genre = selectedGenres.join(',');
+            params.genre = selectedGenres;
         }
-        const {data} = await apiClient.get<Movie[]>('/movies', {params});
-        return data;
+        const {data} = await apiClient.get<MoviePage>('/movies', {params});
+        return data.content;
     },
 
     async create(movieData: {
@@ -52,11 +64,14 @@ export const movieService = {
         return data;
     },
 
-    async update(id: number, movieData: Record<string, unknown>, imageFile?: File | Blob): Promise<Movie> {
+    async update(id: number, movieData: Record<string, unknown>, imageFile?: File | Blob, scriptFile?: File | Blob): Promise<Movie> {
         const formData = new FormData();
         formData.append('movieData', new Blob([JSON.stringify(movieData)], {type: 'application/json'}));
         if (imageFile) {
             formData.append('image', imageFile);
+        }
+        if (scriptFile) {
+            formData.append('script', scriptFile);
         }
         const {data} = await apiClient.put<Movie>(`/movies/${id}`, formData);
         return data;
@@ -73,5 +88,10 @@ export const movieService = {
     async getMoviesCount(): Promise<number> {
         const {data} = await apiClient.get<number>('/movies/count');
         return data;
+    },
+
+    async getTotalMoviesCount(page = 0, size = 1): Promise<number> {
+        const {data} = await apiClient.get<MoviePage>('/movies', {params: {page, size}});
+        return data.totalElements;
     },
 };

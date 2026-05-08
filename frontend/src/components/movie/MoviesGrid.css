@@ -61,3 +61,24 @@
     text-align: center;
     margin: 0;
 }
+
+.load-more-btn {
+    padding: 8px 28px;
+    border: none;
+    border-radius: 8px;
+    background: var(--color-primary, #5A73DB);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.load-more-btn:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.load-more-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

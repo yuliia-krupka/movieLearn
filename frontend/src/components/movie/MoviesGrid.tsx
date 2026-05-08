@@ -51,7 +51,7 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
         }
     }, [location.state, messageApi]);
 
-    const {movies, loading} = useMovies({
+    const {movies, loading, hasMore, loadMore} = useMovies({
         apiEndpoint,
         searchQuery,
         selectedGenres
@@ -184,6 +184,17 @@ const MoviesGrid: React.FC<MoviesGridProps> = ({
                             hideOnSinglePage={true}
                             className="movies-grid-pagination"
                         />
+                        {hasMore && (
+                            <div style={{textAlign: 'center', marginTop: '16px'}}>
+                                <button
+                                    className="load-more-btn"
+                                    onClick={() => void loadMore()}
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Loading...' : 'Load More'}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </>
             )}
