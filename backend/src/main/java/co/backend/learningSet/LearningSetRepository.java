@@ -10,25 +10,17 @@ import java.util.Optional;
 
 @Repository
 public interface LearningSetRepository extends JpaRepository<LearningSet, Long> {
-    Optional<LearningSet> findTopByMovieIdAndCreatorIdOrderByDateDesc(Long movieId, Long creatorId);
+    Optional<LearningSet> findByMovieIdAndCreatorId(Long movieId, Long creatorId);
 
     @Query("""
             SELECT ls.movie.id AS movieId, ls.englishLevel AS englishLevel
             FROM LearningSet ls
             WHERE ls.movie.id IN :movieIds
-              AND ls.creatorId = :userId
-              AND ls.date = (
-                  SELECT MAX(ls2.date) FROM LearningSet ls2
-                  WHERE ls2.movie.id = ls.movie.id AND ls2.creatorId = :userId
-              )
             """)
     List<MovieEnglishLevelProjection> findLatestEnglishLevelsByMovieIds(
-            @Param("movieIds") List<Long> movieIds,
-            @Param("userId") Long userId);
+            @Param("movieIds") List<Long> movieIds);
 
     void deleteByCreatorId(Long creatorId);
-
-    void deleteByMovieIdAndCreatorId(Long movieId, Long creatorId);
 
     void deleteByMovieId(Long movieId);
 

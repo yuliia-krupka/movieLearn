@@ -27,10 +27,13 @@ public class LearningSet {
 
     private LocalDateTime date;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "movie_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Movie movie;
+
+    @Column(name = "script_hash")
+    private Integer scriptHash;
 
     @OneToMany(mappedBy = "learningSet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LearningItem> learningItems = new ArrayList<>();

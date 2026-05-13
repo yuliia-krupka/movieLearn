@@ -56,10 +56,6 @@ public class MovieService {
         return dto;
     }
 
-    public Page<MovieSummaryDto> getAllMovies(Long requestingUserId, Pageable pageable) {
-        return getAllMovies(requestingUserId, null, null, pageable);
-    }
-
     public Page<MovieSummaryDto> getAllMovies(Long requestingUserId, String title, List<String> genreNames, Pageable pageable) {
         List<Movie> movies;
         if (title != null && !title.isBlank()) {
@@ -74,7 +70,6 @@ public class MovieService {
             List<MovieSummaryDto> dtos = enrichWithEnglishLevel(page.getContent(), requestingUserId);
             return new PageImpl<>(dtos, pageable, page.getTotalElements());
         }
-        // For filtered/unpaged results: wrap the full list as a single Page
         List<MovieSummaryDto> dtos = enrichWithEnglishLevel(movies, requestingUserId);
         return new PageImpl<>(dtos, Pageable.unpaged(), dtos.size());
     }
@@ -242,7 +237,7 @@ public class MovieService {
         if (userId != null && !movies.isEmpty()) {
             List<Long> movieIds = movies.stream().map(Movie::getId).toList();
             Map<Long, String> levelByMovieId = learningSetRepository
-                    .findLatestEnglishLevelsByMovieIds(movieIds, userId)
+                    .findLatestEnglishLevelsByMovieIds(movieIds)
                     .stream()
                     .collect(Collectors.toMap(
                             MovieEnglishLevelProjection::getMovieId,

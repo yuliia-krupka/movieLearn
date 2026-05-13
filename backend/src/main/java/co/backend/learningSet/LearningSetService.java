@@ -51,21 +51,44 @@ public class LearningSetService {
         log.debug("User level: {}, interests: {}", user.getEnglishLevel(), user.getInterests());
 
         Optional<LearningSet> existingSet = learningSetRepository
-                .findTopByMovieIdAndCreatorIdOrderByDateDesc(movieId, userId);
+                .findByMovieIdAndCreatorId(movieId, userId);
 
         if (existingSet.isPresent()) {
             LearningSet existing = existingSet.get();
-            log.info("[BACKEND] Found existing user set, reusing: {}", existing.getId());
-            return learningSetMapper.toDto(existing);
+            if (!isChanged(existing, user, movie)) {
+                log.info("[BACKEND] Found existing user set, reusing: {}", existing.getId());
+                return learningSetMapper.toDto(existing);
+            }
+            log.info("[BACKEND] User profile or script changed, regenerating set for movie: {}", movieId);
         }
 
         return generateNewSet(movie, user);
     }
 
+    private boolean isChanged(LearningSet existing, User user, Movie movie) {
+        if (user.getEnglishLevel() != existing.getEnglishLevel()) {
+            log.info("[BACKEND] English level changed");
+            return true;
+        }
+        if (!Objects.equals(user.getInterests(), existing.getInterests())) {
+            log.info("[BACKEND] Interests changed");
+            return true;
+        }
+        if (movie != null && movie.getScript() != null) {
+            Integer currentScriptHash = Arrays.hashCode(movie.getScript());
+            if (existing.getScriptHash() == null || !existing.getScriptHash().equals(currentScriptHash)) {
+                log.info("[BACKEND] Script changed");
+                return true;
+            }
+        }
+        return false;
+    }
+
     private LearningSetDto generateNewSet(Movie movie, User user) {
         log.info("[BACKEND] Generating new learning set...");
 
-        learningSetRepository.deleteByMovieIdAndCreatorId(movie.getId(), user.getId());
+        learningSetRepository.deleteByMovieId(movie.getId());
+        learningSetRepository.flush();
 
         if (movie.getScript() == null || movie.getScript().length == 0) {
             throw new BadRequestException("Movie script was deleted after approval. Please re-add the movie to change language level or interests.");
@@ -78,6 +101,7 @@ public class LearningSetService {
                 user.getEnglishLevel() != null ? user.getEnglishLevel().name() : "B1");
 
         LearningSet set = createNewLearningSetEntity(movie, user);
+        set.setScriptHash(Arrays.hashCode(movie.getScript()));
         LearningSet savedSet = learningSetRepository.save(set);
         addItemsToSet(savedSet, generatedItems);
 
@@ -101,8 +125,19 @@ public class LearningSetService {
 
 
     public Optional<LearningSetDto> getLatestByUserAndMovie(Long userId, Long movieId) {
-        return learningSetRepository.findTopByMovieIdAndCreatorIdOrderByDateDesc(movieId, userId)
-                .map(learningSetMapper::toDto);
+        Optional<LearningSet> existingSet = learningSetRepository.findByMovieIdAndCreatorId(movieId, userId);
+        if (existingSet.isEmpty()) {
+            return Optional.empty();
+        }
+        LearningSet set = existingSet.get();
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user != null && isChanged(set, user, set.getMovie())) {
+            log.info("[BACKEND] Set is dirty due to profile or script changes. Returning empty to force regeneration.");
+            return Optional.empty();
+        }
+
+        return Optional.of(learningSetMapper.toDto(set));
     }
 
 
