@@ -231,7 +231,7 @@ const TestsModule: React.FC = () => {
             <ResultsPage
                 flashcards={flashcardData}
                 results={resultsMap}
-                learningSetName={learningSet?.name || 'Test'}
+                learningSetName={learningSet?.movieTitle ? `AI Set for ${learningSet.movieTitle}` : (learningSet?.name || 'Test')}
                 onTryAgain={handleTryAgain}
                 itemStatuses={itemStatuses}
                 onBackToMovie={handleBackToMovie}
@@ -248,7 +248,6 @@ const TestsModule: React.FC = () => {
 
     return (
         <MainLayout className="flashcard-content" fullHeight>
-
 
 
             <div className="test-progress">

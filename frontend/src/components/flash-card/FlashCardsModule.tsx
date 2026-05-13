@@ -205,7 +205,7 @@ const FlashCardsModule: React.FC<FlashCardsModuleProps> = (props) => {
             <ResultsPage
                 flashcards={flashcards}
                 results={results}
-                learningSetName={learningSet?.name || 'Learning Set'}
+                learningSetName={learningSet?.movieTitle ? `AI Set for ${learningSet.movieTitle}` : (learningSet?.name || 'Learning Set')}
                 onTryAgain={handleTryAgain}
                 itemStatuses={itemStatuses}
                 onGoToTest={handleGoToTest}

@@ -185,7 +185,8 @@ const UpdateFlashCards: React.FC = () => {
             <div className="suggested-words-header">
                 <div>
                     <div className="suggested-words-title">
-                        "{learningSet?.name || 'Movie Title'}" - <span>Review Words</span>
+                        "{learningSet?.movieTitle ? `AI Set for ${learningSet.movieTitle}` : (learningSet?.name || 'Movie Title')}"
+                        - <span>Review Words</span>
                     </div>
                     <div style={{color: '#8c8c8c', fontSize: '0.85rem', marginTop: '4px'}}>
                         You can have a maximum of 20 flashcards per set.

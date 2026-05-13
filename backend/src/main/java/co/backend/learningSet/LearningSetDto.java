@@ -13,6 +13,7 @@ public class LearningSetDto {
     private String name;
     private LocalDateTime date;
     private Long movieId;
+    private String movieTitle;
     private LearningSetStatus status;
     private EnglishLevel englishLevel;
     private String interests;

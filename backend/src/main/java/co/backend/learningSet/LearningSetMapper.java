@@ -8,5 +8,6 @@ import org.mapstruct.Mapping;
 public interface LearningSetMapper {
 
     @Mapping(source = "movie.id", target = "movieId")
+    @Mapping(source = "movie.title", target = "movieTitle")
     LearningSetDto toDto(LearningSet learningSet);
 }

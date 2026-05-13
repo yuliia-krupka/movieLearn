@@ -18,6 +18,7 @@ export interface LearningSetDto {
     status: 'GENERATING' | 'REVIEW' | 'READY';
     englishLevel: string;
     interests?: string;
+    movieTitle?: string;
 }
 
 export interface FlashCardData {
