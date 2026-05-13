@@ -62,7 +62,7 @@ public class OpenAiService {
                         - text: The English word or phrase (MAX 255 chars).
                         - translation: Accurate Ukrainian translation (MAX 255 chars).
                         - transcription: IPA transcription enclosed in slashes (MAX 150 chars).
-                        - exampleSentence: Create an original example sentence inspired by the movie's context and scenario, but do NOT quote the script verbatim. Paraphrase or create a new sentence that naturally demonstrates how the word/phrase is used (MAX 255 chars).
+                        - exampleSentence: exampleSentence: A sentence or a brief definition (from the script) that clearly illustrates the meaning of the word/phrase being tested (MAX 255 chars).
                         Do not use one word or phrase more than once in a set of flashcards!
                         """,
                 movieTitle, scriptContent, interests, level);
@@ -92,7 +92,7 @@ public class OpenAiService {
                         - text: The English question or sentence with a blank (MAX 255 chars).
                         - translation: The Ukrainian translation of the word being tested (MAX 255 chars).
                         - transcription: IPA transcription of the word enclosed in slashes, e.g. /wɜːrd/ (MAX 150 chars).
-                        - exampleSentence: An original example sentence or a brief definition that clearly illustrates the meaning of the word/phrase being tested. DO NOT use direct quotes from any script (MAX 255 chars).
+                        - exampleSentence: A sentence or a brief definition (from the script) that clearly illustrates the meaning of the word/phrase being tested (MAX 255 chars).
                         - answers: An array of exactly 4 strings (options) (Each option MAX 150 chars).
                         - correctAnswerIndex: The integer index (0-3) of the correct answer in the answers array.
                         """,
