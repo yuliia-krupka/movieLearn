@@ -27,7 +27,7 @@ public class LearningSet {
 
     private LocalDateTime date;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "movie_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Movie movie;
