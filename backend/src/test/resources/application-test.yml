@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # URL is overridden at runtime by @DynamicPropertySource in AbstractIntegrationTest
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    enabled: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            # Placeholder credentials — OAuth2 is not exercised in integration tests
+            client-id: test-client-id
+            client-secret: test-client-secret
+            scope: profile,email
+
+  ai:
+    openai:
+      # Placeholder key — OpenAI calls are mocked / not invoked in integration tests
+      api-key: test-key
+      chat:
+        options:
+          model: gpt-4o-mini
+
+frontend:
+  url: http://localhost:5173
+
+cors:
+  allowed-origins: http://localhost:5173
+
+logging:
+  level:
+    co.backend: DEBUG
+    org.testcontainers: INFO

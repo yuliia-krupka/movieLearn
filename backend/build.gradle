@@ -35,6 +35,12 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Testcontainers
+    testImplementation platform('org.testcontainers:testcontainers-bom:1.21.0')
+    testImplementation 'org.testcontainers:testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:mysql'
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
@@ -48,4 +54,13 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    jvmArgs '-Ddocker.host=unix:///var/run/docker.sock'
+    environment 'DOCKER_HOST', 'unix:///var/run/docker.sock'
+    // Docker Desktop requires API >= 1.44; override the default 1.41 used by docker-java
+    environment 'DOCKER_API_VERSION', '1.44'
+    systemProperty 'DOCKER_API_VERSION', '1.44'
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
 }
