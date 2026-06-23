@@ -12,7 +12,7 @@ interface GenreSelectorProps {
     genres: Genre[];
     onAddGenre: () => void;
     onGenreDeleted?: () => void;
-    onGenreUpdated?: () => void;
+    onGenreUpdated?: (oldName: string, newName: string) => void;
     messageApi: ReturnType<typeof useMessage>[0];
     excludeMovieId?: number;
 }
@@ -69,13 +69,14 @@ const GenreSelector: React.FC<GenreSelectorProps> = ({
                 return;
             }
 
+            const oldName = editingGenre!.name;
             await genreService.update(editingGenre!.id, {name: updatedName});
 
             messageApi.success(`Genre updated successfully`);
             setEditModalVisible(false);
             setEditingGenre(null);
             editForm.resetFields();
-            onGenreUpdated?.();
+            onGenreUpdated?.(oldName, updatedName);
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 const data = error.response?.data;

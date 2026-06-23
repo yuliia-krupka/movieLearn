@@ -299,7 +299,12 @@ const UpdateMovieForm: React.FC = () => {
                                     genres={genres}
                                     onAddGenre={handleAddGenre}
                                     onGenreDeleted={handleGenreDeleted}
-                                    onGenreUpdated={() => void fetchGenres()}
+                                    onGenreUpdated={(oldName, newName) => {
+                                        void fetchGenres();
+                                        const current: string[] = form.getFieldValue('genres') || [];
+                                        const updated = current.map(name => name === oldName ? newName : name);
+                                        form.setFieldsValue({genres: updated});
+                                    }}
                                     messageApi={messageApi}
                                     excludeMovieId={id ? parseInt(id) : undefined}
                                 />

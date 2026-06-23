@@ -23,9 +23,8 @@ export const useGenres = () => {
 
     const addGenre = async (genreData: NewGenreData): Promise<boolean> => {
         try {
-            const newGenre = await genreService.create(genreData);
-
-            setGenres(prev => [...prev, {id: newGenre.id, name: genreData.name}]);
+            await genreService.create(genreData);
+            await fetchGenres();
             void message.success('Genre added successfully!');
             return true;
         } catch (err: unknown) {
